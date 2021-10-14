@@ -291,6 +291,37 @@ def mk_session_block_wf_store(
     return s
 
 
+def mk_mongo_single_data(
+    mgc='mongodol/test', key_fields=('session', 'block'), data_field: str = 'data'
+):
+    """s[session, block] waveform store with a mongoDB backend"""
+    from operator import itemgetter
+    from functools import partial
+
+    from mongodol.stores import MongoTupleKeyStore
+    from mongodol import get_mongo_collection_pymongo_obj
+    from dol import wrap_kvs
+
+    def itemsetter(item, key, container_factory=dict):
+        """A (single item) dual of itemgetter. To call repeatedly on the same container, use lambda: mutable_container_reference"""
+        container = container_factory()
+        container[key] = item
+        return container
+
+    # Note: Could also add input type validation in data_of_obj
+    wrapper = wrap_kvs(
+        data_of_obj=partial(itemsetter, key=data_field),
+        obj_of_data=itemgetter(data_field),
+    )
+    db_name, col_name = mgc.split('/')
+
+    return wrapper(
+        MongoTupleKeyStore(
+            db_name, col_name, key_fields=key_fields, data_fields=(data_field,)
+        )
+    )
+
+
 def mk_session_block_bytes_store(rootdir=None) -> SessionBlockBytesStoreType:
 
     rootdir = get_root_dir(rootdir)
