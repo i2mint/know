@@ -49,7 +49,7 @@ def default_keyboard_event_callback(
         print(f'[Keyboard] {keyboard_timestamp}: {char=} ({ord(char)=})', end='\n\r')
 
         if char in stop_signal_chars:
-            return f"ascii code: {ord(char)} (See https://theasciicode.com.ar/)"
+            return f'ascii code: {ord(char)} (See https://theasciicode.com.ar/)'
         else:
             return False
 
@@ -109,30 +109,93 @@ def keyboard_and_audio(
         source_reader=KeyboardInputSourceReader(), maxlen=maxlen
     )
 
+    # def buffer_to_reader_to_iterator():
+
     src = ContextFanout(audio_stream_buffer, keyboard_stream_buffer)
     with src as (audio_stream_buffer, keyboard_stream_buffer):
         audio_buffer_reader = audio_stream_buffer.mk_reader()
         keyboard_buffer_reader = keyboard_stream_buffer.mk_reader()
 
         print('getch! Press any key! Esc to quit!\n')
-        while True:
+
+        # slabs = zip(keyboard_buffer_reader, audio_buffer_reader)
+
+        def stop_criteria(items):
+            return keyboard_data_callback(items[1])
+
+        slabs = iterate((audio_buffer_reader, keyboard_buffer_reader),
+                        stop_criteria)
+
+        for keyboard_data, audio_data in slabs:
             try:
-                keyboard_data = next(keyboard_buffer_reader)
-                audio_data = next(audio_buffer_reader)
-
-                should_quit = keyboard_data_callback(keyboard_data)
-                if should_quit:
-                    print(f'\n\nI got a signal ({should_quit}) to quit.')
-                    break
-
+                #
+                # should_quit = keyboard_data_callback(keyboard_data)
+                # if should_quit:
+                #     print(f'\n\nI got a signal ({should_quit}) to quit.')
+                #     break
+                # print(audio_data)
                 audio_data_callback(audio_data)
 
             except KeyboardInterrupt as e:
                 print(f'\n\nGot a {e}')
                 break
 
+        # This works:
+        # while True:
+        #     try:
+        #         keyboard_data = next(keyboard_buffer_reader)
+        #         audio_data = next(audio_buffer_reader)
+        #
+        #         should_quit = keyboard_data_callback(keyboard_data)
+        #         if should_quit:
+        #             print(f'\n\nI got a signal ({should_quit}) to quit.')
+        #             break
+        #
+        #         audio_data_callback(audio_data)
+        #
+        #     except KeyboardInterrupt as e:
+        #         print(f'\n\nGot a {e}')
+        #         break
+
     print(f'\nQuitting the app...\n')
 
+def never_stop(items):
+    return False
+
+from i2 import Pipe
+
+apply = Pipe(map, tuple)
+
+
+def iterate(iterators, stop_condition=lambda x: False):
+    iterators = apply(iter, iterators)
+    while True:
+        items = apply(next, iterators)
+        yield items
+        if stop_condition(items):
+            break
+
+
+# NOTE: Just zip?
+class MultiIter:
+    def __init__(self, *iterables):
+        self.iterables = iterables
+
+    def __iter__(self):
+
+        yield from self.iterables
+
+
+# class LiveProcess:
+#     slabs: Iterable[Slab]
+#     slab_callback: SlabCallback
+#
+#     def __call__(self):
+#         with ContextFanout(self.slabs, self.slab_callback):
+#             for slab in self.slabs:
+#                 callback_output = self.slab_callback(slab)
+#
+#         return callback_output
 
 if __name__ == '__main__':
     keyboard_and_audio()
