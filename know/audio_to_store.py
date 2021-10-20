@@ -29,12 +29,11 @@ print(f"{len(wfs)=}")
 ```
 """
 
-from dataclasses import dataclass
 from time import time
-from typing import Protocol, Tuple, NewType, Iterable, Any, Callable, Union
+from typing import Protocol, Tuple, NewType, Any, Callable, Union
 from operator import itemgetter
 
-from atypes import WaveformBytes, Waveform, IntervalSlice, Segment, Slab
+from atypes import WaveformBytes, Waveform, IntervalSlice, Segment
 from recode import mk_encoder_and_decoder
 
 from dol import StrTupleDict, wrap_kvs
@@ -299,7 +298,6 @@ def mk_mongo_single_data(
     from functools import partial
 
     from mongodol.stores import MongoTupleKeyStore
-    from mongodol import get_mongo_collection_pymongo_obj
     from dol import wrap_kvs
 
     def itemsetter(item, key, container_factory=dict):
@@ -384,45 +382,6 @@ def demo_live_data_acquisition(
             # store.add(live_source[bt:tt])
 
     return store
-
-
-SlabCallback = Callable[[Slab], Any]
-
-
-@dataclass
-class LiveProcess:
-    slabs: Iterable[Slab]
-    slab_callback: SlabCallback
-
-    def __call__(self):
-        with self.slabs:
-            with self.slab_callback:
-                for slab in self.slabs:
-                    callback_output = self.slab_callback(slab)
-
-        return callback_output
-
-
-from creek import Creek
-
-
-# TODO: Weird subclassing. Not the Creek init. Consider factory or delegation
-class Hunker(Creek):
-    def __init__(self, src, chk_size, chk_step=None, start_idx=0, end_idx=None):
-        intervals = chunk_indices(
-            chk_size=chk_size, chk_step=chk_step, start_idx=start_idx, end_idx=end_idx
-        )
-        super().__init__(stream=intervals)
-        self.src = src
-
-    def data_to_obj(self, data):
-        return self.src[slice(*data)]
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        pass
 
 
 def iterate_chunks(src, chk_size, chk_step=None, start_idx=0, end_idx=None):
