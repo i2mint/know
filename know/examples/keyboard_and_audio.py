@@ -45,6 +45,7 @@ def default_keyboard_event_callback(
     :return:
     """
     if keyboard_data is not None:
+        # print(f"{type(keyboard_data)=}, {len(keyboard_data)=}")
         index, keyboard_timestamp, char = keyboard_data
         print(f'[Keyboard] {keyboard_timestamp}: {char=} ({ord(char)=})', end='\n\r')
 
@@ -52,6 +53,15 @@ def default_keyboard_event_callback(
             return f'ascii code: {ord(char)} (See https://theasciicode.com.ar/)'
         else:
             return False
+
+
+def default_keyboard_event_callback_2(keyboard_data):
+    if keyboard_data is not None:
+        index, keyboard_timestamp, char = keyboard_data
+        print(
+            f'[Keyboard] ({index})-{keyboard_timestamp}: {char=} ({ord(char)=})',
+            end='\n\r',
+        )
 
 
 def keyboard_and_audio(
@@ -111,70 +121,104 @@ def keyboard_and_audio(
 
     # def buffer_to_reader_to_iterator():
 
-    src = ContextFanout(audio_stream_buffer, keyboard_stream_buffer)
-    with src as (audio_stream_buffer, keyboard_stream_buffer):
-        audio_buffer_reader = audio_stream_buffer.mk_reader()
-        keyboard_buffer_reader = keyboard_stream_buffer.mk_reader()
+    src = ContextFanout(audio=audio_stream_buffer, keyboard=keyboard_stream_buffer)
+    with src:
+        audio_buffer_reader = src.audio.mk_reader()
+        keyboard_buffer_reader = src.keyboard.mk_reader()
 
         print('getch! Press any key! Esc to quit!\n')
 
         # Trying to make this work:
-        # slabs = zip(keyboard_buffer_reader, audio_buffer_reader)
+        # slabs = zip(audio_buffer_reader, keyboard_buffer_reader)
 
-        # def stop_criteria(items):
-        #     return keyboard_data_callback(items[1])
-        #
-        # slabs = iterate((audio_buffer_reader, keyboard_buffer_reader),
-        #                 stop_criteria)
-        #
-        # for keyboard_data, audio_data in slabs:
-        #     try:
-        #         #
-        #         # should_quit = keyboard_data_callback(keyboard_data)
-        #         # if should_quit:
-        #         #     print(f'\n\nI got a signal ({should_quit}) to quit.')
-        #         #     break
-        #         # print(audio_data)
-        #         audio_data_callback(audio_data)
-        #
-        #     except KeyboardInterrupt as e:
-        #         print(f'\n\nGot a {e}')
-        #         break
+        def stop_criteria(items):
+            return keyboard_data_callback(items[1])
 
-        # Working alternative
-        while True:
+        slabs = iterate((audio_buffer_reader, keyboard_buffer_reader), stop_criteria)
+
+        for audio_data, keyboard_data in slabs:
             try:
-                keyboard_data = next(keyboard_buffer_reader)
-                audio_data = next(audio_buffer_reader)
-
                 should_quit = keyboard_data_callback(keyboard_data)
                 if should_quit:
                     print(f'\n\nI got a signal ({should_quit}) to quit.')
                     break
-
+                # print(audio_data)
                 audio_data_callback(audio_data)
 
             except KeyboardInterrupt as e:
                 print(f'\n\nGot a {e}')
                 break
 
+        # Working alternative
+        # while True:
+        #     try:
+        #         keyboard_data = next(keyboard_buffer_reader)
+        #         audio_data = next(audio_buffer_reader)
+        #
+        #         should_quit = keyboard_data_callback(keyboard_data)
+        #         if should_quit:
+        #             print(f'\n\nI got a signal ({should_quit}) to quit.')
+        #             break
+        #
+        #         audio_data_callback(audio_data)
+        #
+        #     except KeyboardInterrupt as e:
+        #         print(f'\n\nGot a {e}')
+        #         break
+
     print(f'\nQuitting the app...\n')
+
 
 def never_stop(items):
     return False
 
+
 from i2 import Pipe
+from typing import Iterable
 
-apply = Pipe(map, tuple)
+
+from typing import Iterator
 
 
-def iterate(iterators, stop_condition=lambda x: False):
-    iterators = apply(iter, iterators)
+def iterate(
+    iterators: Iterable[Iterator],
+    stop_condition: Callable[[Iterable], bool] = lambda x: False,
+):
+    # TODO: Meant to ensure iterator, but not working. Repair:
+    # iterators = apply(iter, iterators)
     while True:
         items = apply(next, iterators)
         yield items
         if stop_condition(items):
             break
+
+
+from i2.multi_object import MultiObj
+
+
+class MultiIterator(MultiObj):
+    def _gen_next(self):
+        for name, iterator in self.objects.items():
+            yield name, next(iterator)
+
+    def __next__(self):
+        return dict(self._gen_next())
+
+
+def iterate(
+    iterators: Iterable[Iterator],
+    stop_condition: Callable[[Iterable], bool] = lambda x: False,
+):
+    # TODO: Meant to ensure iterator, but not working. Repair:
+    # iterators = apply(iter, iterators)
+    while True:
+        items = apply(next, iterators)
+        yield items
+        if stop_condition(items):
+            break
+
+
+apply = Pipe(map, tuple)
 
 
 # NOTE: Just zip?
