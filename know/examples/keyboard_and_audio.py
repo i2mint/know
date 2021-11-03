@@ -129,26 +129,44 @@ def keyboard_and_audio(
 
         print('getch! Press any key! Esc to quit!\n')
 
+        from know.scrap.architectures import WithSlabs
+
+        def stop_criteria(data):
+            audio_data, keyboard_data = data
+            if keyboard_data_callback(keyboard_data):
+                src.__exit__(None, None, None)
+
+        def audio_and_keyboard_data_callback(data):
+            audio_data, keyboard_data = data
+            return audio_data_callback(audio_data), keyboard_data_callback(keyboard_data)
+
+        slabs = iterate((audio_buffer_reader, keyboard_buffer_reader))
+        ws = WithSlabs(slabs, {'print': audio_and_keyboard_data_callback,
+                               'stop': stop_criteria})
+        ws_it = iter(ws)
+        while src.audio.is_running:
+            next(ws_it)
+
         # Trying to make this work:
         # slabs = zip(audio_buffer_reader, keyboard_buffer_reader)
 
-        def stop_criteria(items):
-            return keyboard_data_callback(items[1])
-
-        slabs = iterate((audio_buffer_reader, keyboard_buffer_reader), stop_criteria)
-
-        for audio_data, keyboard_data in slabs:
-            try:
-                should_quit = keyboard_data_callback(keyboard_data)
-                if should_quit:
-                    print(f'\n\nI got a signal ({should_quit}) to quit.')
-                    break
-                # print(audio_data)
-                audio_data_callback(audio_data)
-
-            except KeyboardInterrupt as e:
-                print(f'\n\nGot a {e}')
-                break
+        # def stop_criteria(items):
+        #     return keyboard_data_callback(items[1])
+        #
+        # slabs = iterate((audio_buffer_reader, keyboard_buffer_reader), stop_criteria)
+        #
+        # for audio_data, keyboard_data in slabs:
+        #     try:
+        #         should_quit = keyboard_data_callback(keyboard_data)
+        #         if should_quit:
+        #             print(f'\n\nI got a signal ({should_quit}) to quit.')
+        #             break
+        #         # print(audio_data)
+        #         audio_data_callback(audio_data)
+        #
+        #     except KeyboardInterrupt as e:
+        #         print(f'\n\nGot a {e}')
+        #         break
 
         # Working alternative
         # while True:

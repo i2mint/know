@@ -8,8 +8,8 @@ from i2.multi_object import FuncFanout, ContextFanout, MultiObj
 Service = MyType(
     'Consumer', Callable[[Slab], Any], doc='A function that will call slabs iteratively'
 )
-Name = str.isidentifier()
-BoolFunc = Callable[[...], bool]
+Name = str
+# BoolFunc = Callable[[...], bool]
 FiltFunc = Callable[[Any], bool]
 
 def let_through(x):
