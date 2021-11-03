@@ -122,6 +122,7 @@ def keyboard_and_audio(
     # def buffer_to_reader_to_iterator():
 
     src = ContextFanout(audio=audio_stream_buffer, keyboard=keyboard_stream_buffer)
+
     with src:
         audio_buffer_reader = src.audio.mk_reader()
         keyboard_buffer_reader = src.keyboard.mk_reader()

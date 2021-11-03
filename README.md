@@ -1,4 +1,3 @@
-
 # know
 
 Build live stream tools
@@ -17,7 +16,7 @@ proc = LiveProc(
        plc=PlcSource(...),
        video=VideoSource(...),
    ),
-   consumers=Consumers(  # make a multi-data consumer (and/or writer/transformer) object
+   services=Services(  # make a multi-data service (and/or writer/transformer) object
        storage=Store(...),
        notifications=Notif(...),
        live_viz=LiveViz(...),
@@ -123,3 +122,10 @@ wfs = demo_live_data_acquisition(
 )
 print(f"{len(wfs)=}")
 ```
+
+
+
+
+
+
+
