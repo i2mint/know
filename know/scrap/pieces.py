@@ -6,12 +6,13 @@ from i2 import MultiObj
 from typing import Callable, Iterable, Iterator
 from i2 import Pipe
 
+
 class MultiIterator(MultiObj):
     def _gen_next(self):
         for name, iterator in self.objects.items():
             yield name, next(iterator, None)
 
-    def __next__(self):
+    def __next__(self) -> dict:
         return dict(self._gen_next())
 
 
@@ -70,10 +71,11 @@ def test_multi_iterator():
         """
         return any(map(is_not_none, d.values()))
 
-    get_multi_iterable = lambda: MultiIterable(
-        audio=iter([1, 2, 3]),
-        keyboard=iter([4, 5, 6])
-    )
+    # Note: Does not work (never stops)
+    # get_multi_iterable = lambda: MultiIterable(
+    #     audio=iter([1, 2, 3]),
+    #     keyboard=iter([4, 5, 6])
+    # )
 
     get_multi_iterable = lambda: DictZip(
         audio=iter([1, 2, 3]),
@@ -245,3 +247,4 @@ def test_multi_iterator():
 # apply = Pipe(map, tuple)
 #
 #
+

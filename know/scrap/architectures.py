@@ -1,27 +1,28 @@
 """To explore different architectures"""
 
 from dataclasses import dataclass
-from typing import Callable, Iterable, Any
+from typing import Callable, Iterable, Any, Mapping
 from atypes import Slab, MyType
 from i2.multi_object import FuncFanout
 
-Consumer = MyType(
+Service = MyType(
     'Consumer', Callable[[Slab], Any], doc="A function that will call slabs iteratively"
 )
+Name = str.isidentifier()
 
 # TODO: Default consumer(s) (e.g. data-safe prints?)
 # TODO: Default slabs? (iterate through
 @dataclass
 class WithSlabs:
     slabs: Iterable[Slab]
-    services: Iterable[Consumer]
+    services: Mapping[Name, Service]
 
     def __post_init__(self):
         if isinstance(self.services, FuncFanout):
             self.multi_service = self.services
         else:
             # TODO: Add capability (in FuncFanout) to get a mix of (un)named consumers
-            self.multi_service = FuncFanout(*self.services)
+            self.multi_service = FuncFanout(**self.services)
 
     def __iter__(self):
         for slab in self.slabs:
