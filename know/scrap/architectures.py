@@ -1,8 +1,9 @@
 """To explore different architectures"""
 
 from dataclasses import dataclass
-from typing import Callable, Iterable, Any, Mapping
+from typing import Callable, Iterable, Any, Mapping, Iterator
 from atypes import Slab, MyType
+from i2 import Pipe
 from i2.multi_object import FuncFanout, ContextFanout, MultiObj
 
 Service = MyType(
@@ -14,6 +15,14 @@ FiltFunc = Callable[[Any], bool]
 
 def let_through(x):
     return x
+
+def iterate(iterators: Iterable[Iterator]):
+    while True:
+        items = apply(next, iterators)
+        yield items
+
+
+apply = Pipe(map, tuple)
 
 class MultiIterator(MultiObj):
     def _gen_next(self):
@@ -42,7 +51,12 @@ class WithSlabs:
 
     def __iter__(self):
         with self.slabs_and_services_context:
-            for slab in self.slabs:
+            if isinstance(self.slabs, ContextFanout):
+                its = tuple(getattr(self.slabs, s) for s in self.slabs)
+                slabs = iterate(its)
+            else:
+                slabs = self.slabs
+            for slab in slabs:
                 yield self.multi_service(slab)
 
     def __call__(self, callback: Callable = None, sentinel_func: FiltFunc = None):
