@@ -1,11 +1,13 @@
 """Util objects"""
 from dataclasses import dataclass
 from typing import Callable, Any, Iterable, Dict, NewType
+import itertools
 
 from i2 import ContextFanout, FuncFanout, MultiObj
 
 from atypes import Slab, Hunk, FiltFunc
 from creek import Creek
+from creek.util import to_iterator
 from taped import chunk_indices
 
 SlabCallback = Callable[[Slab], Any]
@@ -26,30 +28,49 @@ def always_true(x):
     return True
 
 
-class MultiIterator(MultiObj):
+class _MultiIterator(MultiObj):
+    """Helper class for DictZip"""
+    def __init__(self, *unnamed, **named):
+        super().__init__(*unnamed, **named)
+        self.objects = {k: to_iterator(v) for k, v in self.objects.items()}
+
     def _gen_next(self):
         for name, iterator in self.objects.items():
             yield name, next(iterator, None)
 
-    def __next__(self):
+    def __next__(self) -> dict:
         return dict(self._gen_next())
 
 
-no_more_data = type('no_more_data', (), {})
-
-
 class DictZip:
-    def __init__(self, *unnamed, takewhile=always_true, **named):
-        self.multi_iterator = MultiIterator(*unnamed, **named)
+    def __init__(self, *unnamed, takewhile=None, **named):
+        self.multi_iterator = _MultiIterator(*unnamed, **named)
         self.objects = self.multi_iterator.objects
         self.takewhile = takewhile
 
     def __iter__(self):
         while True:
             x = next(self.multi_iterator)
-            if not self.takewhile(x):
+            if self.takewhile and not self.takewhile(x):
                 break
             yield x
+
+
+class MultiIterable:
+    def __init__(self, *unnamed, **named):
+        self.multi_iterator = _MultiIterator(*unnamed, **named)
+        self.objects = self.multi_iterator.objects
+
+    def __iter__(self):
+        while True:
+            yield next(self.multi_iterator)
+
+    def takewhile(self, predicate=None):
+        """itertools.takewhile applied to self, with a bit of syntactic sugar
+        There's nothing to stop the iteration"""
+        if predicate is None:
+            predicate = lambda x: True  # always true
+        return itertools.takewhile(predicate, self)
 
 
 @dataclass
