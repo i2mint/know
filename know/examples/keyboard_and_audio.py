@@ -1,5 +1,5 @@
 """Keyboard and audio acquisition"""
-
+import time
 
 """Example of processing audio and keyboard streams"""
 from typing import Callable, NewType, Any
@@ -119,33 +119,50 @@ def keyboard_and_audio(
         source_reader=KeyboardInputSourceReader(), maxlen=maxlen
     )
 
-    # def buffer_to_reader_to_iterator():
+    from know.scrap.architectures import WithSlabs
 
-    src = ContextFanout(audio=audio_stream_buffer, keyboard=keyboard_stream_buffer)
+    slabs = ContextFanout(audio=audio_stream_buffer, keyboard=keyboard_stream_buffer)
 
-    with src:
-        audio_buffer_reader = src.audio.mk_reader()
-        keyboard_buffer_reader = src.keyboard.mk_reader()
+    def stop_criteria(data):
+        audio_data, keyboard_data = data
+        if keyboard_data_callback(keyboard_data):
+            slabs.__exit__(None, None, None)
+        return 'stop'
 
-        print('getch! Press any key! Esc to quit!\n')
+    def audio_and_keyboard_data_callback(data):
+        audio_data, keyboard_data = data
+        return audio_data_callback(audio_data), keyboard_data_callback(keyboard_data)
 
-        from know.scrap.architectures import WithSlabs
+    ws = WithSlabs(slabs, {'print': audio_and_keyboard_data_callback, 'stop': stop_criteria})
+    for x in iter(ws):
+        if not audio_stream_buffer.is_running:
+            break
 
-        def stop_criteria(data):
-            audio_data, keyboard_data = data
-            if keyboard_data_callback(keyboard_data):
-                src.__exit__(None, None, None)
-
-        def audio_and_keyboard_data_callback(data):
-            audio_data, keyboard_data = data
-            return audio_data_callback(audio_data), keyboard_data_callback(keyboard_data)
-
-        slabs = iterate((audio_buffer_reader, keyboard_buffer_reader))
-        ws = WithSlabs(slabs, {'print': audio_and_keyboard_data_callback,
-                               'stop': stop_criteria})
-        ws_it = iter(ws)
-        while src.audio.is_running:
-            next(ws_it)
+    # src = ContextFanout(audio=audio_stream_buffer, keyboard=keyboard_stream_buffer)
+    #
+    # with src:
+    #     audio_buffer_reader = src.audio.mk_reader()
+    #     keyboard_buffer_reader = src.keyboard.mk_reader()
+    #
+    #     print('getch! Press any key! Esc to quit!\n')
+    #
+    #     from know.scrap.architectures import WithSlabs
+    #
+    #     def stop_criteria(data):
+    #         audio_data, keyboard_data = data
+    #         if keyboard_data_callback(keyboard_data):
+    #             src.__exit__(None, None, None)
+    #
+    #     def audio_and_keyboard_data_callback(data):
+    #         audio_data, keyboard_data = data
+    #         return audio_data_callback(audio_data), keyboard_data_callback(keyboard_data)
+    #
+    #     slabs = iterate((audio_buffer_reader, keyboard_buffer_reader))
+    #     ws = WithSlabs(slabs, {'print': audio_and_keyboard_data_callback,
+    #                            'stop': stop_criteria})
+    #     ws_it = iter(ws)
+    #     while src.audio.is_running:
+    #         next(ws_it)
 
         # Trying to make this work:
         # slabs = zip(audio_buffer_reader, keyboard_buffer_reader)
@@ -226,15 +243,10 @@ class MultiIterator(MultiObj):
 
 def iterate(
     iterators: Iterable[Iterator],
-    stop_condition: Callable[[Iterable], bool] = lambda x: False,
 ):
-    # TODO: Meant to ensure iterator, but not working. Repair:
-    # iterators = apply(iter, iterators)
     while True:
         items = apply(next, iterators)
         yield items
-        if stop_condition(items):
-            break
 
 
 apply = Pipe(map, tuple)
