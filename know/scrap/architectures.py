@@ -13,8 +13,10 @@ Name = str
 # BoolFunc = Callable[[...], bool]
 FiltFunc = Callable[[Any], bool]
 
+
 def let_through(x):
     return x
+
 
 def iterate(iterators: Iterable[Iterator]):
     while True:
@@ -24,6 +26,7 @@ def iterate(iterators: Iterable[Iterator]):
 
 apply = Pipe(map, tuple)
 
+
 class MultiIterator(MultiObj):
     def _gen_next(self):
         for name, iterator in self.objects.items():
@@ -31,6 +34,7 @@ class MultiIterator(MultiObj):
 
     def __next__(self) -> dict:
         return dict(self._gen_next())
+
 
 # TODO: Default consumer(s) (e.g. data-safe prints?)
 # TODO: Default slabs? (iterate through
@@ -59,10 +63,9 @@ class WithSlabs:
             for slab in slabs:
                 yield self.multi_service(slab)
 
-    def __call__(self,
-                 callback: Callable = None,
-                 sentinel_func: FiltFunc = None,
-        ):
+    def __call__(
+        self, callback: Callable = None, sentinel_func: FiltFunc = None,
+    ):
         for multi_service_output in self:
             if callback:
                 callback_output = callback(multi_service_output)

@@ -78,9 +78,7 @@ def test_multi_iterator():
     # )
 
     get_multi_iterable = lambda: DictZip(
-        audio=iter([1, 2, 3]),
-        keyboard=iter([4, 5, 6]),
-        takewhile=any_non_none_value,
+        audio=iter([1, 2, 3]), keyboard=iter([4, 5, 6]), takewhile=any_non_none_value,
     )
 
     m = get_multi_iterable()
@@ -95,9 +93,7 @@ def test_multi_iterator():
             return else_func(x)
 
     call_if_not_none = partial(
-        if_then_else,
-        if_func=lambda x: x is not None,
-        else_func=lambda x: None
+        if_then_else, if_func=lambda x: x is not None, else_func=lambda x: None
     )
     #
     predicate = partial(call_if_not_none, then_func=lambda x: sum(x.values()) < 7)
@@ -113,9 +109,8 @@ def test_multi_iterator():
     assert list(m) == [
         {'audio': 1, 'keyboard': 4},
         {'audio': 2, 'keyboard': 5},
-        {'audio': 3, 'keyboard': 6}
+        {'audio': 3, 'keyboard': 6},
     ]
-
 
     #
     # get_multi_iterable = lambda: DictZip(
@@ -247,4 +242,3 @@ def test_multi_iterator():
 # apply = Pipe(map, tuple)
 #
 #
-
