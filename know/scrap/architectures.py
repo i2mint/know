@@ -1,22 +1,8 @@
 """To explore different architectures"""
 
 from dataclasses import dataclass
-from typing import (
-    Callable,
-    Mapping,
-    Iterable,
-    Any
-)
-
 from typing import Callable, Iterable, Any, Mapping, Iterator
 from atypes import Slab, MyType
-from i2.multi_object import FuncFanout, ContextFanout
-
-from know.util import DictZip
-
-# from creek.util import DictZip
-
-FiltFunc = Callable[[Any], bool]
 from i2 import Pipe
 from i2.multi_object import FuncFanout, ContextFanout, MultiObj
 
@@ -24,7 +10,8 @@ Service = MyType(
     'Consumer', Callable[[Slab], Any], doc='A function that will call slabs iteratively'
 )
 Name = str
-
+# BoolFunc = Callable[[...], bool]
+FiltFunc = Callable[[Any], bool]
 
 def let_through(x):
     return x
@@ -42,9 +29,11 @@ class MultiIterator(MultiObj):
         for name, iterator in self.objects.items():
             yield name, next(iterator, None)
 
+    def __next__(self) -> dict:
+        return dict(self._gen_next())
 
-# TODO: Default service(s) (e.g. data-safe prints?)
-# TODO: Default slabs? (iterate through)
+# TODO: Default consumer(s) (e.g. data-safe prints?)
+# TODO: Default slabs? (iterate through
 @dataclass
 class WithSlabs:
     slabs: Iterable[Slab]
@@ -68,13 +57,12 @@ class WithSlabs:
             else:
                 slabs = self.slabs
             for slab in slabs:
-            # while True:
-            #     slab = next(self.slabs)
-            #     yield self.multi_service(slab)
-            for slab in self.slabs:
                 yield self.multi_service(slab)
 
-    def __call__(self, callback: Callable = None, sentinel_func: FiltFunc = None):
+    def __call__(self,
+                 callback: Callable = None,
+                 sentinel_func: FiltFunc = None,
+        ):
         for multi_service_output in self:
             if callback:
                 callback_output = callback(multi_service_output)
@@ -110,7 +98,7 @@ def test_multi_iterator():
     #     keyboard=iter([4, 5, 6])
     # )
 
-    slabs = DictZip(audio=iter([1, 2, 3]), keyboard=iter([4, 5, 6]))
+    slabs = MultiIterator(audio=iter([1, 2, 3]), keyboard=iter([4, 5, 6]))
     services = {'let_through': let_through, 'log': print}
     app = WithSlabs(slabs=slabs, services=services)
 

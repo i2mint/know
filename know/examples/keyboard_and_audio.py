@@ -3,6 +3,7 @@ import time
 
 """Example of processing audio and keyboard streams"""
 from typing import Callable, NewType, Any
+import json
 from stream2py.stream_buffer import StreamBuffer
 from stream2py.sources.keyboard_input import KeyboardInputSourceReader
 from stream2py.sources.audio import (
@@ -27,11 +28,21 @@ def default_audio_callback(audio_data):
         )
 
 
-def default_keyboard_event_callback(
+def default_keyboard_event_callback(keyboard_data):
+    """Prints some data extracted from keyboard_data
+    :param keyboard_data: Input character
+    """
+    if keyboard_data is not None:
+        # print(f"{type(keyboard_data)=}, {len(keyboard_data)=}")
+        index, keyboard_timestamp, char = keyboard_data
+        print(f'[Keyboard] {keyboard_timestamp}: {char=} ({ord(char)=})', end='\n\r')
+
+
+def keyboard_data_signals_an_interrupt(
     keyboard_data, stop_signal_chars=frozenset(['\x03', '\x04', '\x1b'])
 ):
-    """The function will print the input character and ascii code, and return a positive
-    stop signal (1) if the character is in the `stop_signal_chars` set.
+    """The function returns a positive stop signal (1) if the character is in the
+    `stop_signal_chars` set.
     By default, the `stop_signal_chars` contains:
     * \x03: (ascii 3 - End of Text)
     * \x04: (ascii 4 - End of Trans)
@@ -47,7 +58,7 @@ def default_keyboard_event_callback(
     if keyboard_data is not None:
         # print(f"{type(keyboard_data)=}, {len(keyboard_data)=}")
         index, keyboard_timestamp, char = keyboard_data
-        print(f'[Keyboard] {keyboard_timestamp}: {char=} ({ord(char)=})', end='\n\r')
+        # print(f'[Keyboard] {keyboard_timestamp}: {char=} ({ord(char)=})', end='\n\r')
 
         if char in stop_signal_chars:
             return f'ascii code: {ord(char)} (See https://theasciicode.com.ar/)'
@@ -55,13 +66,15 @@ def default_keyboard_event_callback(
             return False
 
 
-def default_keyboard_event_callback_2(keyboard_data):
-    if keyboard_data is not None:
-        index, keyboard_timestamp, char = keyboard_data
-        print(
-            f'[Keyboard] ({index})-{keyboard_timestamp}: {char=} ({ord(char)=})',
-            end='\n\r',
-        )
+def handle_input_device_index(input_device_index, verbose=1):
+    if input_device_index is None:
+        input_device_index = find_a_default_input_device_index()
+
+    audio_src_info = PyAudioSourceReader.info_of_input_device_index(input_device_index)
+    if verbose:
+        print(f'Starting audio device: {json.dumps(audio_src_info, indent=2)}\n')
+
+    return input_device_index
 
 
 def keyboard_and_audio(
@@ -89,15 +102,7 @@ def keyboard_and_audio(
     :return: None
     """
 
-    if input_device_index is None:
-        input_device_index = find_a_default_input_device_index()
-
-    selected_device_info = next(
-        dev
-        for dev in PyAudioSourceReader.list_device_info()
-        if dev['index'] == input_device_index
-    )
-    print(f"Starting audio device: {selected_device_info['name']}\n")
+    input_device_index = handle_input_device_index(input_device_index)
 
     # converts seconds_to_keep_in_stream_buffer to max number of buffers of size frames_per_buffer
     maxlen = PyAudioSourceReader.audio_buffer_size_seconds_to_maxlen(
@@ -120,158 +125,35 @@ def keyboard_and_audio(
     )
 
     from know.scrap.architectures import WithSlabs
+    from i2 import HandleExceptions
 
     slabs = ContextFanout(audio=audio_stream_buffer, keyboard=keyboard_stream_buffer)
 
-    def stop_criteria(data):
-        audio_data, keyboard_data = data
-        if keyboard_data_callback(keyboard_data):
-            slabs.__exit__(None, None, None)
-        return 'stop'
-
+    # TODO: Use a multi obj for this
     def audio_and_keyboard_data_callback(data):
         audio_data, keyboard_data = data
+        if keyboard_data_signals_an_interrupt(keyboard_data):
+            raise KeyboardInterrupt('You want to stop?')
         return audio_data_callback(audio_data), keyboard_data_callback(keyboard_data)
 
-    ws = WithSlabs(slabs, {'print': audio_and_keyboard_data_callback, 'stop': stop_criteria})
-    for x in iter(ws):
-        if not audio_stream_buffer.is_running:
-            break
+    ws = WithSlabs(
+        slabs,
+        services={
+            'print': audio_and_keyboard_data_callback,
+            # 'stop': stop_criteria
+        },
+    )
 
-    # src = ContextFanout(audio=audio_stream_buffer, keyboard=keyboard_stream_buffer)
-    #
-    # with src:
-    #     audio_buffer_reader = src.audio.mk_reader()
-    #     keyboard_buffer_reader = src.keyboard.mk_reader()
-    #
-    #     print('getch! Press any key! Esc to quit!\n')
-    #
-    #     from know.scrap.architectures import WithSlabs
-    #
-    #     def stop_criteria(data):
-    #         audio_data, keyboard_data = data
-    #         if keyboard_data_callback(keyboard_data):
-    #             src.__exit__(None, None, None)
-    #
-    #     def audio_and_keyboard_data_callback(data):
-    #         audio_data, keyboard_data = data
-    #         return audio_data_callback(audio_data), keyboard_data_callback(keyboard_data)
-    #
-    #     slabs = iterate((audio_buffer_reader, keyboard_buffer_reader))
-    #     ws = WithSlabs(slabs, {'print': audio_and_keyboard_data_callback,
-    #                            'stop': stop_criteria})
-    #     ws_it = iter(ws)
-    #     while src.audio.is_running:
-    #         next(ws_it)
-
-        # Trying to make this work:
-        # slabs = zip(audio_buffer_reader, keyboard_buffer_reader)
-
-        # def stop_criteria(items):
-        #     return keyboard_data_callback(items[1])
-        #
-        # slabs = iterate((audio_buffer_reader, keyboard_buffer_reader), stop_criteria)
-        #
-        # for audio_data, keyboard_data in slabs:
-        #     try:
-        #         should_quit = keyboard_data_callback(keyboard_data)
-        #         if should_quit:
-        #             print(f'\n\nI got a signal ({should_quit}) to quit.')
-        #             break
-        #         # print(audio_data)
-        #         audio_data_callback(audio_data)
-        #
-        #     except KeyboardInterrupt as e:
-        #         print(f'\n\nGot a {e}')
-        #         break
-
-        # Working alternative
-        # while True:
-        #     try:
-        #         keyboard_data = next(keyboard_buffer_reader)
-        #         audio_data = next(audio_buffer_reader)
-        #
-        #         should_quit = keyboard_data_callback(keyboard_data)
-        #         if should_quit:
-        #             print(f'\n\nI got a signal ({should_quit}) to quit.')
-        #             break
-        #
-        #         audio_data_callback(audio_data)
-        #
-        #     except KeyboardInterrupt as e:
-        #         print(f'\n\nGot a {e}')
-        #         break
+    with HandleExceptions({KeyboardInterrupt: 'You made an interrupt key combo!'}):
+        for _ in iter(ws):
+            if not ws.slabs['audio'].is_running:
+                break
 
     print(f'\nQuitting the app...\n')
 
 
-def never_stop(items):
-    return False
-
-
-from i2 import Pipe
-from typing import Iterable
-
-
-from typing import Iterator
-
-
-def iterate(
-    iterators: Iterable[Iterator],
-    stop_condition: Callable[[Iterable], bool] = lambda x: False,
-):
-    # TODO: Meant to ensure iterator, but not working. Repair:
-    # iterators = apply(iter, iterators)
-    while True:
-        items = apply(next, iterators)
-        yield items
-        if stop_condition(items):
-            break
-
-
-from i2.multi_object import MultiObj
-
-
-class MultiIterator(MultiObj):
-    def _gen_next(self):
-        for name, iterator in self.objects.items():
-            yield name, next(iterator)
-
-    def __next__(self):
-        return dict(self._gen_next())
-
-
-def iterate(
-    iterators: Iterable[Iterator],
-):
-    while True:
-        items = apply(next, iterators)
-        yield items
-
-
-apply = Pipe(map, tuple)
-
-
-# NOTE: Just zip?
-class MultiIter:
-    def __init__(self, *iterables):
-        self.iterables = iterables
-
-    def __iter__(self):
-
-        yield from self.iterables
-
-
-# class LiveProcess:
-#     slabs: Iterable[Slab]
-#     slab_callback: SlabCallback
-#
-#     def __call__(self):
-#         with ContextFanout(self.slabs, self.slab_callback):
-#             for slab in self.slabs:
-#                 callback_output = self.slab_callback(slab)
-#
-#         return callback_output
-
 if __name__ == '__main__':
+    # TODO: When wrappers.py ready for it, use argh, preprocessing the function so that:
+    #   specific (int expected) transformed to int (argname, annotation, or default)
+    #   functional args removed, or {str: func} map provided, or inject otherwise?
     keyboard_and_audio()
