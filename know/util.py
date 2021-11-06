@@ -1,6 +1,6 @@
 """Util objects"""
 from dataclasses import dataclass
-from typing import Callable, Any, Iterable, Dict, NewType
+from typing import Callable, Any, Iterable, Dict, NewType, Mapping
 import itertools
 
 from i2 import ContextFanout, FuncFanout, MultiObj
@@ -20,20 +20,6 @@ always: FiltFunc
 Hunker: HunkerType
 
 
-def asis(x: Any):
-    return x
-
-
-def always_true(x: Any) -> True:
-    """Returns True, regardless of input. Meant for filter functions."""
-    return True
-
-
-def always_false(x: Any) -> False:
-    """Returns False, regardless of input. Meant for stopping (filter) functions"""
-    return False
-
-
 class _MultiIterator(MultiObj):
     """Helper class for DictZip"""
 
@@ -49,8 +35,49 @@ class _MultiIterator(MultiObj):
         return dict(self._gen_next())
 
 
+def asis(x: Any):
+    return x
+
+
+def always_true(x: Any) -> True:
+    """Returns True, regardless of input. Meant for filter functions."""
+    return True
+
+
+def always_false(x: Any) -> False:
+    """Returns False, regardless of input. Meant for stopping (filter) functions"""
+    return False
+
+
+def any_value_is_none(d: Mapping):
+    """Returns True if any value of the mapping is None"""
+    return any(d[k] is None for k in d)
+
+
+StopCondition = Callable[[Any], bool]
+
+
+# TODO: Make smart default for stop_condition. If finite iterable, use any_value_is_none?
 class MultiIterable:
-    def __init__(self, *unnamed, stop_condition: always_false, **named):
+    """Join several iterables together.
+
+    >>> from know.util import any_value_is_none
+    >>> from functools import partial
+    >>>
+    >>> any_value_is_none = lambda d: any(d[k] is None for k in d)
+    >>> mk_multi_iterable = partial(MultiIterable, stop_condition=any_value_is_none)
+    >>> mi = mk_multi_iterable(lets='abc', nums=[1, 2, 3, 4])
+    >>> list(mi)
+    [{'lets': 'a', 'nums': 1}, {'lets': 'b', 'nums': 2}, {'lets': 'c', 'nums': 3}]
+
+    >>> mi = MultiIterable(
+    ...     x=[5, 4, 3, 2, 1], y=[1, 2, 3, 4, 5],
+    ...     stop_condition=lambda d: d['x'] == d['y']
+    ... )
+    >>> list(mi)
+    [{'x': 5, 'y': 1}, {'x': 4, 'y': 2}]
+    """
+    def __init__(self, *unnamed, stop_condition: StopCondition = always_false, **named):
         self.multi_iterator = _MultiIterator(*unnamed, **named)
         self.iterators = self.multi_iterator.objects
         self.stop_condition = stop_condition
