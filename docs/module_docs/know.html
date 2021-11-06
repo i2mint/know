@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>know &#8212; know 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/toggleprompt.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="know.audio_to_store" href="know/audio_to_store.html" />
+    <link rel="prev" title="Welcome to know’s documentation!" href="../index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-know">
+<span id="know"></span><h1>know<a class="headerlink" href="#module-know" title="Permalink to this headline">¶</a></h1>
+<p>Build live stream tools</p>
+<p>Essentially being able to do this:</p>
+<p>The tools are made to be able to create live streams of data
+(e.g. from sensors) and funnel them into proceses with a consistent interfaces.
+One important process being the process that will store all or part of
+the data, through a simple storage-system-agnositic facade.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">proc</span> <span class="o">=</span> <span class="n">LiveProc</span><span class="p">(</span>
+   <span class="n">source</span><span class="o">=</span><span class="n">Sources</span><span class="p">(</span>  <span class="c1"># make a multi-source object (which will manage buffering and timing)</span>
+       <span class="n">audio</span><span class="o">=</span><span class="n">AudioSource</span><span class="p">(</span><span class="o">...</span><span class="p">),</span>
+       <span class="n">plc</span><span class="o">=</span><span class="n">PlcSource</span><span class="p">(</span><span class="o">...</span><span class="p">),</span>
+       <span class="n">video</span><span class="o">=</span><span class="n">VideoSource</span><span class="p">(</span><span class="o">...</span><span class="p">),</span>
+   <span class="p">),</span>
+   <span class="n">consumers</span><span class="o">=</span><span class="n">Consumers</span><span class="p">(</span>  <span class="c1"># make a multi-data consumer (and/or writer/transformer) object</span>
+       <span class="n">storage</span><span class="o">=</span><span class="n">Store</span><span class="p">(</span><span class="o">...</span><span class="p">),</span>
+       <span class="n">notifications</span><span class="o">=</span><span class="n">Notif</span><span class="p">(</span><span class="o">...</span><span class="p">),</span>
+       <span class="n">live_viz</span><span class="o">=</span><span class="n">LiveViz</span><span class="p">(</span><span class="o">...</span><span class="p">),</span>
+   <span class="p">),</span>
+   <span class="o">...</span>  <span class="c1"># other settings for the process (logging, etc.)</span>
+<span class="p">)</span>
+
+<span class="n">proc</span><span class="p">()</span>  <span class="c1"># run the process</span>
+</pre></div>
+</div>
+<p>With a variety of sources, target storage systems, etc.</p>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">know</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">know</a></li>
+<li class="toctree-l1"><a class="reference internal" href="know/audio_to_store.html">know.audio_to_store</a></li>
+<li class="toctree-l1"><a class="reference internal" href="know/examples/keyboard_and_audio.html">know.examples.keyboard_and_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="know/scrap/architectures.html">know.scrap.architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="know/scrap/pieces.html">know.scrap.pieces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="know/util.html">know.util</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">Welcome to know’s documentation!</a></li>
+      <li>Next: <a href="know/audio_to_store.html" title="next chapter">know.audio_to_store</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;NO COPYRIGHT.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/module_docs/know.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

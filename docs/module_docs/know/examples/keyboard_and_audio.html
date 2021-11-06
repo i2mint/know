@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>know.examples.keyboard_and_audio &#8212; know 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/toggleprompt.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="know.scrap.architectures" href="../scrap/architectures.html" />
+    <link rel="prev" title="know.audio_to_store" href="../audio_to_store.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-know.examples.keyboard_and_audio">
+<span id="know-examples-keyboard-and-audio"></span><h1>know.examples.keyboard_and_audio<a class="headerlink" href="#module-know.examples.keyboard_and_audio" title="Permalink to this headline">¶</a></h1>
+<p>Keyboard and audio acquisition</p>
+<dl class="py function">
+<dt id="know.examples.keyboard_and_audio.default_keyboard_event_callback">
+<code class="sig-prename descclassname">know.examples.keyboard_and_audio.</code><code class="sig-name descname">default_keyboard_event_callback</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">keyboard_data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/know/examples/keyboard_and_audio.html#default_keyboard_event_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.examples.keyboard_and_audio.default_keyboard_event_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints some data extracted from keyboard_data
+:param keyboard_data: Input character</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="know.examples.keyboard_and_audio.keyboard_and_audio">
+<code class="sig-prename descclassname">know.examples.keyboard_and_audio.</code><code class="sig-name descname">keyboard_and_audio</code><span class="sig-paren">(</span><em class="sig-param">input_device_index=None, rate=44100, width=2, channels=1, frames_per_buffer=44100, seconds_to_keep_in_stream_buffer=60, audio_data_callback: Callable[[NewType.&lt;locals&gt;.new_type], Any] = &lt;function default_audio_callback&gt;, keyboard_data_callback: Callable[[NewType.&lt;locals&gt;.new_type], Any] = &lt;function default_keyboard_event_callback&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/know/examples/keyboard_and_audio.html#keyboard_and_audio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.examples.keyboard_and_audio.keyboard_and_audio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts two independent streams: one for audio and another for keyboard inputs.
+Prints stream type, timestamp, and additional info about data:
+Shows input key pressed for keyboard and byte count for audio</p>
+<p>Press Esc key to quit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_device_index</strong> – find index with PyAudioSourceReader.list_device_info()</p></li>
+<li><p><strong>rate</strong> – audio sample rate</p></li>
+<li><p><strong>width</strong> – audio byte width</p></li>
+<li><p><strong>channels</strong> – number of audio input channels</p></li>
+<li><p><strong>frames_per_buffer</strong> – audio samples per buffer</p></li>
+<li><p><strong>seconds_to_keep_in_stream_buffer</strong> – max size of audio buffer before data falls off</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="know.examples.keyboard_and_audio.keyboard_data_signals_an_interrupt">
+<code class="sig-prename descclassname">know.examples.keyboard_and_audio.</code><code class="sig-name descname">keyboard_data_signals_an_interrupt</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">keyboard_data</span></em>, <em class="sig-param"><span class="n">stop_signal_chars</span><span class="o">=</span><span class="default_value">frozenset({'\x03', '\x04', '\x1b'})</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/know/examples/keyboard_and_audio.html#keyboard_data_signals_an_interrupt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.examples.keyboard_and_audio.keyboard_data_signals_an_interrupt" title="Permalink to this definition">¶</a></dt>
+<dd><p>The function returns a positive stop signal (1) if the character is in the
+<code class="docutils literal notranslate"><span class="pre">stop_signal_chars</span></code> set.
+By default, the <code class="docutils literal notranslate"><span class="pre">stop_signal_chars</span></code> contains:</p>
+<ul class="simple">
+<li><p>: (ascii 3 - End of Text)</p></li>
+<li><p>: (ascii 4 - End of Trans)</p></li>
+<li><p>: (ascii 27 - Escape)</p></li>
+</ul>
+<p>(See <a class="reference external" href="https://theasciicode.com.ar/">https://theasciicode.com.ar/</a> for ascii codes.)</p>
+<ol class="arabic simple">
+<li><p>in the form of a string specifying what the ascii code of the input character was</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keyboard_data</strong> – Input character</p></li>
+<li><p><strong>stop_signal_chars</strong> – Set of stop characters</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">know</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../know.html">know</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../audio_to_store.html">know.audio_to_store</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">know.examples.keyboard_and_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scrap/architectures.html">know.scrap.architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scrap/pieces.html">know.scrap.pieces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../util.html">know.util</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../audio_to_store.html" title="previous chapter">know.audio_to_store</a></li>
+      <li>Next: <a href="../scrap/architectures.html" title="next chapter">know.scrap.architectures</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;NO COPYRIGHT.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../../_sources/module_docs/know/examples/keyboard_and_audio.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

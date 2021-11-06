@@ -77,6 +77,7 @@ class MultiIterable:
     >>> list(mi)
     [{'x': 5, 'y': 1}, {'x': 4, 'y': 2}]
     """
+
     def __init__(self, *unnamed, stop_condition: StopCondition = always_false, **named):
         self.multi_iterator = _MultiIterator(*unnamed, **named)
         self.iterators = self.multi_iterator.objects
