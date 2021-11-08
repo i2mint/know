@@ -4,9 +4,10 @@ import sys
 
 from flask import Flask
 from know.http_sensor_sim import simulate_http_sensor
-from stream2py.sources.flask_request import FlaskRequestReader
+from flaskstream2py.flask_request_reader import FlaskRequestReader
 
 app = Flask(__name__)
+
 
 @app.route('/', methods=['POST'])
 def handle_stream():
