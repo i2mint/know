@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>know.util &#8212; know 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../_static/toggleprompt.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="prev" title="know.scrap.pieces" href="scrap/pieces.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-know.util">
+<span id="know-util"></span><h1>know.util<a class="headerlink" href="#module-know.util" title="Permalink to this headline">¶</a></h1>
+<p>Util objects</p>
+<dl class="py class">
+<dt id="know.util.FixedStepHunker">
+<em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">FixedStepHunker</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src</span></em>, <em class="sig-param"><span class="n">chk_size</span></em>, <em class="sig-param"><span class="n">chk_step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">start_idx</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">end_idx</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#FixedStepHunker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.FixedStepHunker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="know.util.LiveProcess">
+<em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">LiveProcess</code><span class="sig-paren">(</span><em class="sig-param">streams: Dict[str, Iterable], slab_callback: Callable[[Slab], Any] = &lt;built-in function print&gt;, walk: Callable = &lt;class 'know.util.DictZip'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#LiveProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.LiveProcess" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="know.util.LiveProcess.slab_callback">
+<code class="sig-name descname">slab_callback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#know.util.LiveProcess.slab_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>print(value, …, sep=’ ‘, end=’n’, file=sys.stdout, flush=False)</p>
+<p>Prints the values to a stream, or to sys.stdout by default.
+Optional keyword arguments:
+file:  a file-like object (stream); defaults to the current sys.stdout.
+sep:   string inserted between values, default a space.
+end:   string appended after the last value, default a newline.
+flush: whether to forcibly flush the stream.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="know.util.MultiIterable">
+<em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">MultiIterable</code><span class="sig-paren">(</span><em class="sig-param">*unnamed, stop_condition: Callable[[Any], bool] = &lt;function always_false&gt;, **named</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#MultiIterable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.MultiIterable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Join several iterables together.</p>
+<blockquote>
+<div><p>from know.util import any_value_is_none
+from functools import partial</p>
+<p>any_value_is_none = lambda d: any(d[k] is None for k in d)
+mk_multi_iterable = partial(MultiIterable, stop_condition=any_value_is_none)
+mi = mk_multi_iterable(lets=’abc’, nums=[1, 2, 3, 4])
+list(mi)
+[{‘lets’: ‘a’, ‘nums’: 1}, {‘lets’: ‘b’, ‘nums’: 2}, {‘lets’: ‘c’, ‘nums’: 3}]</p>
+<p>mi = MultiIterable(
+…     x=[5, 4, 3, 2, 1], y=[1, 2, 3, 4, 5],
+…     stop_condition=lambda d: d[‘x’] == d[‘y’]
+… )
+list(mi)
+[{‘x’: 5, ‘y’: 1}, {‘x’: 4, ‘y’: 2}]</p>
+</div></blockquote>
+<dl class="py method">
+<dt id="know.util.MultiIterable.takewhile">
+<code class="sig-name descname">takewhile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">predicate</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#MultiIterable.takewhile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.MultiIterable.takewhile" title="Permalink to this definition">¶</a></dt>
+<dd><p>itertools.takewhile applied to self, with a bit of syntactic sugar
+There’s nothing to stop the iteration</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="know.util.Slabbing">
+<em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">Slabbing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">slabs</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span>Slab<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">slab_callback</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span>Slab<span class="p">]</span><span class="p">, </span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#Slabbing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.Slabbing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="know.util.always_false">
+<code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">always_false</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> &#x2192; False<a class="reference internal" href="../../_modules/know/util.html#always_false"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.always_false" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns False, regardless of input. Meant for stopping (filter) functions</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="know.util.always_true">
+<code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">always_true</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> &#x2192; True<a class="reference internal" href="../../_modules/know/util.html#always_true"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.always_true" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True, regardless of input. Meant for filter functions.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="know.util.any_value_is_none">
+<code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">any_value_is_none</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span><span class="p">:</span> <span class="n">Mapping</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#any_value_is_none"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.any_value_is_none" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if any value of the mapping is None</p>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">know</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../know.html">know</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_to_store.html">know.audio_to_store</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/keyboard_and_audio.html">know.examples.keyboard_and_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scrap/architectures.html">know.scrap.architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scrap/pieces.html">know.scrap.pieces</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">know.util</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="scrap/pieces.html" title="previous chapter">know.scrap.pieces</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;NO COPYRIGHT.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/module_docs/know/util.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

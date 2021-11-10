@@ -1,0 +1,356 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>know.scrap.pieces &#8212; know 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/toggleprompt.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for know.scrap.pieces</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;pieces of thing for inspiration</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">takewhile</span> <span class="k">as</span> <span class="n">itertools_takewhile</span>
+<span class="kn">from</span> <span class="nn">i2</span> <span class="kn">import</span> <span class="n">MultiObj</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span>
+<span class="kn">from</span> <span class="nn">i2</span> <span class="kn">import</span> <span class="n">Pipe</span>
+
+
+<div class="viewcode-block" id="MultiIterator"><a class="viewcode-back" href="../../../module_docs/know/scrap/pieces.html#know.scrap.pieces.MultiIterator">[docs]</a><span class="k">class</span> <span class="nc">MultiIterator</span><span class="p">(</span><span class="n">MultiObj</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_gen_next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">iterator</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="n">name</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">iterator</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gen_next</span><span class="p">())</span></div>
+
+
+<span class="n">no_more_data</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;no_more_data&#39;</span><span class="p">,</span> <span class="p">(),</span> <span class="p">{})</span>
+
+
+<span class="k">class</span> <span class="nc">DictZip</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">unnamed</span><span class="p">,</span> <span class="n">takewhile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">named</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multi_iterator</span> <span class="o">=</span> <span class="n">MultiIterator</span><span class="p">(</span><span class="o">*</span><span class="n">unnamed</span><span class="p">,</span> <span class="o">**</span><span class="n">named</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">objects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multi_iterator</span><span class="o">.</span><span class="n">objects</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">takewhile</span> <span class="o">=</span> <span class="n">takewhile</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">multi_iterator</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">takewhile</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+                <span class="k">break</span>
+            <span class="k">yield</span> <span class="n">x</span>
+
+
+<span class="k">class</span> <span class="nc">MultiIterable</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">unnamed</span><span class="p">,</span> <span class="o">**</span><span class="n">named</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multi_iterator</span> <span class="o">=</span> <span class="n">MultiIterator</span><span class="p">(</span><span class="o">*</span><span class="n">unnamed</span><span class="p">,</span> <span class="o">**</span><span class="n">named</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">objects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multi_iterator</span><span class="o">.</span><span class="n">objects</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">multi_iterator</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">takewhile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predicate</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;itertools.takewhile applied to self, with a bit of syntactic sugar</span>
+<span class="sd">        There&#39;s nothing to stop the iteration&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">predicate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">predicate</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="kc">True</span>  <span class="c1"># always true</span>
+        <span class="k">return</span> <span class="n">itertools_takewhile</span><span class="p">(</span><span class="n">predicate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">test_multi_iterator</span><span class="p">():</span>
+    <span class="c1"># get_multi_iterable = lambda: MultiIterable(</span>
+    <span class="c1">#     audio=iter([1, 2, 3]), keyboard=iter([4, 5, 6])</span>
+    <span class="c1"># )</span>
+
+    <span class="k">def</span> <span class="nf">is_none</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">is_not_none</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+    <span class="c1"># Note: Equivalent to any_non_none_value = Pipe(methodcaller(&#39;values&#39;), iterize(</span>
+    <span class="c1"># is_not_none), any)</span>
+    <span class="k">def</span> <span class="nf">any_non_none_value</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;True if and only if d has any non-None values</span>
+
+<span class="sd">        &gt;&gt;&gt; assert not any_non_none_value({&#39;a&#39;: None, &#39;b&#39;: None})</span>
+<span class="sd">        &gt;&gt;&gt; assert any_non_none_value({&#39;a&#39;: None, &#39;b&#39;: 3})</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">is_not_none</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+
+    <span class="c1"># Note: Does not work (never stops)</span>
+    <span class="c1"># get_multi_iterable = lambda: MultiIterable(</span>
+    <span class="c1">#     audio=iter([1, 2, 3]),</span>
+    <span class="c1">#     keyboard=iter([4, 5, 6])</span>
+    <span class="c1"># )</span>
+
+    <span class="n">get_multi_iterable</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">DictZip</span><span class="p">(</span>
+        <span class="n">audio</span><span class="o">=</span><span class="nb">iter</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span> <span class="n">keyboard</span><span class="o">=</span><span class="nb">iter</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]),</span> <span class="n">takewhile</span><span class="o">=</span><span class="n">any_non_none_value</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">m</span> <span class="o">=</span> <span class="n">get_multi_iterable</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">objects</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;audio&#39;</span><span class="p">,</span> <span class="s1">&#39;keyboard&#39;</span><span class="p">]</span>
+
+    <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+    <span class="k">def</span> <span class="nf">if_then_else</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">then_func</span><span class="p">,</span> <span class="n">else_func</span><span class="p">,</span> <span class="n">if_func</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">if_func</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">then_func</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">else_func</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="n">call_if_not_none</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+        <span class="n">if_then_else</span><span class="p">,</span> <span class="n">if_func</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">else_func</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="kc">None</span>
+    <span class="p">)</span>
+    <span class="c1">#</span>
+    <span class="n">predicate</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">call_if_not_none</span><span class="p">,</span> <span class="n">then_func</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">7</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">predicate</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="n">m</span> <span class="o">=</span> <span class="n">get_multi_iterable</span><span class="p">()</span>
+
+    <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s1">&#39;audio&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;keyboard&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;audio&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;keyboard&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;audio&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;keyboard&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">},</span>
+    <span class="p">]</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># get_multi_iterable = lambda: DictZip(</span>
+    <span class="c1">#     audio=iter([1, 2, 3]),</span>
+    <span class="c1">#     keyboard=iter([4, 5, 6]),</span>
+    <span class="c1">#     takewhile=lambda x: x is not None</span>
+    <span class="c1"># )</span>
+    <span class="c1">#</span>
+    <span class="c1"># m = get_multi_iterable()</span>
+    <span class="c1"># assert list(m.objects) == [&#39;audio&#39;, &#39;keyboard&#39;]</span>
+    <span class="c1">#</span>
+    <span class="c1"># from functools import partial</span>
+    <span class="c1">#</span>
+    <span class="c1"># def if_then_else(x, then_func, else_func, if_func):</span>
+    <span class="c1">#     if if_func(x):</span>
+    <span class="c1">#         return then_func(x)</span>
+    <span class="c1">#     else:</span>
+    <span class="c1">#         return else_func(x)</span>
+    <span class="c1">#</span>
+    <span class="c1"># call_if_not_none = partial(</span>
+    <span class="c1">#     if_then_else, if_func=lambda x: x is not None, else_func=lambda x: None</span>
+    <span class="c1"># )</span>
+    <span class="c1">#</span>
+    <span class="c1"># predicate = partial(call_if_not_none, then_func=lambda x: sum(x.values()) &lt; 7)</span>
+    <span class="c1">#</span>
+    <span class="c1"># def predicate(x):</span>
+    <span class="c1">#     if x is not None:</span>
+    <span class="c1">#         return any(v is not None for v in x.values())</span>
+    <span class="c1">#     else:</span>
+    <span class="c1">#         return False</span>
+    <span class="c1">#</span>
+    <span class="c1"># m = get_multi_iterable()</span>
+    <span class="c1"># assert list(m) == [</span>
+    <span class="c1">#     {&#39;audio&#39;: 1, &#39;keyboard&#39;: 4},</span>
+    <span class="c1">#     {&#39;audio&#39;: 2, &#39;keyboard&#39;: 5},</span>
+    <span class="c1">#     {&#39;audio&#39;: 3, &#39;keyboard&#39;: 6},</span>
+    <span class="c1"># ]</span>
+    <span class="c1">#</span>
+    <span class="c1"># # iter(callable, sentinel) use pattern</span>
+    <span class="c1"># # It would have been desirable to provide the tools to be able to use</span>
+    <span class="c1"># # more known iter(callable, sentinel) pattern, but I had difficulty squeezing</span>
+    <span class="c1"># # my use case into it. The best I could do was below.</span>
+    <span class="c1"># # Required:</span>
+    <span class="c1"># # - a multi_iter_zip (zip, for lists of dicts)</span>
+    <span class="c1"># # - a wrapper to produce a given sentinel when a given condition is met</span>
+    <span class="c1"># # - an object that makes a callable (yielding next item) from an iterable</span>
+    <span class="c1">#</span>
+    <span class="c1"># get_multi_iterator = lambda: MultiIterator(</span>
+    <span class="c1">#     audio=iter([1, 2, 3]), keyboard=iter([4, 5, 6])</span>
+    <span class="c1"># )</span>
+    <span class="c1">#</span>
+    <span class="c1"># m = get_multi_iterator()</span>
+    <span class="c1"># assert list(zip(*m)) == [(1, 4), (2, 5), (3, 6)]</span>
+    <span class="c1">#</span>
+    <span class="c1"># from i2 import Pipe</span>
+    <span class="c1">#</span>
+    <span class="c1"># m = get_multi_iterator()</span>
+    <span class="c1"># dict_zip = Pipe(partial(zip, m.objects), dict)</span>
+    <span class="c1"># multi_iter_zip = lambda m: map(dict_zip, zip(*m))</span>
+    <span class="c1"># assert list(multi_iter_zip(m)) == [</span>
+    <span class="c1">#     {&#39;audio&#39;: 1, &#39;keyboard&#39;: 4},</span>
+    <span class="c1">#     {&#39;audio&#39;: 2, &#39;keyboard&#39;: 5},</span>
+    <span class="c1">#     {&#39;audio&#39;: 3, &#39;keyboard&#39;: 6},</span>
+    <span class="c1"># ]</span>
+    <span class="c1">#</span>
+    <span class="c1"># def sentinel_on_condition(x, bool_func, sentinel=None):</span>
+    <span class="c1">#     if bool_func(x):</span>
+    <span class="c1">#         return sentinel</span>
+    <span class="c1">#     return x</span>
+    <span class="c1">#</span>
+    <span class="c1"># class Iter:</span>
+    <span class="c1">#     def __init__(self, iterator):</span>
+    <span class="c1">#         self.iterator = iterator</span>
+    <span class="c1">#</span>
+    <span class="c1">#     def __call__(self):</span>
+    <span class="c1">#         return next(self.iterator)</span>
+    <span class="c1">#</span>
+    <span class="c1"># none_on_cond = partial(sentinel_on_condition, bool_func=cond)</span>
+    <span class="c1">#</span>
+    <span class="c1"># m = get_multi_iterator()</span>
+    <span class="c1"># assert list(iter(Iter(map(none_on_cond, multi_iter_zip(m))), None)) == [</span>
+    <span class="c1">#     {&#39;audio&#39;: 1, &#39;keyboard&#39;: 4},</span>
+    <span class="c1">#     {&#39;audio&#39;: 2, &#39;keyboard&#39;: 5},</span>
+    <span class="c1">#     # {&#39;audio&#39;: 3, &#39;keyboard&#39;: 6}</span>
+    <span class="c1"># ]</span>
+
+
+<span class="c1"># test_multi_iterator()</span>
+
+<span class="c1"># def _ensure_predicate_is_callable(stop_cond):</span>
+<span class="c1">#     if not isinstance(stop_cond, Callable):</span>
+<span class="c1">#         stop_val = stop_cond</span>
+<span class="c1">#         stop_cond = lambda item: item == stop_val</span>
+<span class="c1">#     assert isinstance(stop_cond, Callable), f&#39;stop_cond not callable: {stop_cond}&#39;</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># def iter_until_condition(iterator, stop_cond=None, include_last=False):</span>
+<span class="c1">#     stop_cond = _ensure_predicate_is_callable(stop_cond)  # Pattern: Postel</span>
+<span class="c1">#     while True:</span>
+<span class="c1">#         item = next(iterator)</span>
+<span class="c1">#         if stop_cond(item):</span>
+<span class="c1">#             if include_last:</span>
+<span class="c1">#                 yield item</span>
+<span class="c1">#             break</span>
+<span class="c1">#         yield item</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># def iter_while_condition(iterator, stop_cond):</span>
+<span class="c1">#     stop_cond = _ensure_predicate_is_callable(stop_cond)  # Pattern: Postel</span>
+<span class="c1">#     while True:</span>
+<span class="c1">#         item = next(iterator)</span>
+<span class="c1">#         if stop_cond(item):</span>
+<span class="c1">#             yield item</span>
+<span class="c1">#         else:</span>
+<span class="c1">#             break</span>
+
+<span class="c1"># def iterate(</span>
+<span class="c1">#         iterators: Iterable[Iterator],</span>
+<span class="c1">#         stop_condition: Callable[[Iterable], bool] = lambda x: False,</span>
+<span class="c1"># ):</span>
+<span class="c1">#     # TODO: Meant to ensure iterator, but not working. Repair:</span>
+<span class="c1">#     # iterators = apply(iter, iterators)</span>
+<span class="c1">#     while True:</span>
+<span class="c1">#         items = apply(next, iterators)</span>
+<span class="c1">#         yield items</span>
+<span class="c1">#         if stop_condition(items):</span>
+<span class="c1">#             break</span>
+<span class="c1">#</span>
+<span class="c1"># apply = Pipe(map, tuple)</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">know</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know.html">know</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/audio_to_store.html">know.audio_to_store</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/examples/keyboard_and_audio.html">know.examples.keyboard_and_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/scrap/architectures.html">know.scrap.architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/scrap/pieces.html">know.scrap.pieces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/util.html">know.util</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;NO COPYRIGHT.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

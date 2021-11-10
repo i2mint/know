@@ -1,0 +1,532 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>know.audio_to_store &#8212; know 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../_static/toggleprompt.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for know.audio_to_store</h1><div class="highlight"><pre>
+<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Audio to store experimentation</span>
+
+<span class="sd">Example use:</span>
+
+<span class="sd">```</span>
+<span class="sd">from omisc.audio_to_store import *</span>
+
+<span class="sd">wfs = demo_live_data_acquisition(</span>
+<span class="sd">    live_source=LiveWf(</span>
+<span class="sd">        input_device_index = None,  # if None, will try to guess the device index</span>
+<span class="sd">        sr = 44100,</span>
+<span class="sd">        sample_width = 2,</span>
+<span class="sd">        chk_size = 4096,</span>
+<span class="sd">        stream_buffer_size_s = 60,</span>
+<span class="sd">    ),</span>
+<span class="sd">    store=mk_session_block_wf_store(</span>
+<span class="sd">        rootdir=None,  # will choose one for you</span>
+<span class="sd">        # template examples: &#39;{session}_{block}.wav&#39; &#39;{session}/d/{block}.pcm&#39;,</span>
+<span class="sd">        #    &#39;{session}/{block}&#39;, &#39;demo/s_{session}/blocks/{block}.wav&#39;</span>
+<span class="sd">        template=&#39;{session}_{block}.wav&#39;,  #</span>
+<span class="sd">        pattern=r&#39;\d+&#39;,</span>
+<span class="sd">        value_trans=int</span>
+<span class="sd">    ),</span>
+<span class="sd">    chk_size=100_000,</span>
+<span class="sd">    end_idx=300_000,</span>
+<span class="sd">    logger=print</span>
+<span class="sd">)</span>
+<span class="sd">print(f&quot;{len(wfs)=}&quot;)</span>
+<span class="sd">```</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">NewType</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+
+<span class="kn">from</span> <span class="nn">atypes</span> <span class="kn">import</span> <span class="n">WaveformBytes</span><span class="p">,</span> <span class="n">Waveform</span><span class="p">,</span> <span class="n">IntervalSlice</span><span class="p">,</span> <span class="n">Segment</span>
+<span class="kn">from</span> <span class="nn">recode</span> <span class="kn">import</span> <span class="n">mk_encoder_and_decoder</span>
+
+<span class="kn">from</span> <span class="nn">dol</span> <span class="kn">import</span> <span class="n">StrTupleDict</span><span class="p">,</span> <span class="n">wrap_kvs</span>
+<span class="kn">from</span> <span class="nn">dol.filesys</span> <span class="kn">import</span> <span class="n">RelPathFileBytesPersister</span>
+<span class="kn">from</span> <span class="nn">dol.paths</span> <span class="kn">import</span> <span class="n">mk_dirs_if_missing</span>
+<span class="kn">from</span> <span class="nn">lined</span> <span class="kn">import</span> <span class="n">Pipe</span>
+
+<span class="kn">from</span> <span class="nn">taped</span> <span class="kn">import</span> <span class="n">LiveWf</span><span class="p">,</span> <span class="n">chunk_indices</span>
+<span class="kn">from</span> <span class="nn">i2</span> <span class="kn">import</span> <span class="n">Sig</span>
+
+
+<span class="k">def</span> <span class="nf">print_signature</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">Sig</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="si">}{</span><span class="s1">&#39;=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">default</span><span class="p">)</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Sig</span><span class="o">.</span><span class="n">empty</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">,&quot;</span><span class="p">)</span>
+
+
+<span class="n">SessionId</span> <span class="o">=</span> <span class="n">NewType</span><span class="p">(</span><span class="s1">&#39;SessionId&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+<span class="n">BlockId</span> <span class="o">=</span> <span class="n">NewType</span><span class="p">(</span><span class="s1">&#39;BlockId&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+<span class="n">SessionBlockTuple</span> <span class="o">=</span> <span class="n">NewType</span><span class="p">(</span><span class="s1">&#39;SessionBlockTuple&#39;</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">SessionId</span><span class="p">,</span> <span class="n">BlockId</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="LiveDataSingleSourceType"><a class="viewcode-back" href="../../module_docs/know/audio_to_store.html#know.audio_to_store.LiveDataSingleSourceType">[docs]</a><span class="k">class</span> <span class="nc">LiveDataSingleSourceType</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">IntervalSlice</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Segment</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get a segment of data from a [bt, tt] interface&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="SessionBlockStoreType"><a class="viewcode-back" href="../../module_docs/know/audio_to_store.html#know.audio_to_store.SessionBlockStoreType">[docs]</a><span class="k">class</span> <span class="nc">SessionBlockStoreType</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The protocol for SessionBlockStores&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">SessionBlockTuple</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Segment</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Takes a (session: int, block: int) pair and segment, and stores them&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="SessionBlockBytesStoreType"><a class="viewcode-back" href="../../module_docs/know/audio_to_store.html#know.audio_to_store.SessionBlockBytesStoreType">[docs]</a><span class="k">class</span> <span class="nc">SessionBlockBytesStoreType</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The protocol for SessionBlockStores&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">SessionBlockTuple</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">WaveformBytes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Takes a (session: int, block: int) pair and waveform bytes, and stores them&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="SessionBlockWaveformStoreType"><a class="viewcode-back" href="../../module_docs/know/audio_to_store.html#know.audio_to_store.SessionBlockWaveformStoreType">[docs]</a><span class="k">class</span> <span class="nc">SessionBlockWaveformStoreType</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The protocol for SessionBlockStores&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">SessionBlockTuple</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Waveform</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Takes a (session: int, block: int) pair and waveform, and stores them&quot;&quot;&quot;</span></div>
+
+
+<span class="k">def</span> <span class="nf">get_resource</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">dflt_callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">resource</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">resource</span> <span class="o">=</span> <span class="n">dflt_callback</span>
+    <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">resource</span><span class="p">):</span>
+        <span class="n">resource</span> <span class="o">=</span> <span class="n">resource</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">resource</span>
+
+
+<span class="k">def</span> <span class="nf">demo_audio_to_file</span><span class="p">(</span><span class="n">rootdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chk_size</span><span class="o">=</span><span class="mi">100_000</span><span class="p">,</span> <span class="n">end_idx</span><span class="o">=</span><span class="mi">300_000</span><span class="p">):</span>
+    <span class="n">session_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+    <span class="n">wfs</span> <span class="o">=</span> <span class="n">mk_session_block_wf_store</span><span class="p">(</span><span class="n">rootdir</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">LiveWf</span><span class="p">()</span> <span class="k">as</span> <span class="n">live_wf</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">bt</span><span class="p">,</span> <span class="n">tt</span> <span class="ow">in</span> <span class="n">chunk_indices</span><span class="p">(</span><span class="n">chk_size</span><span class="o">=</span><span class="n">chk_size</span><span class="p">,</span> <span class="n">end_idx</span><span class="o">=</span><span class="n">end_idx</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bt</span><span class="si">=}</span><span class="s1">, </span><span class="si">{</span><span class="n">tt</span><span class="si">=}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">wfs</span><span class="p">[</span><span class="n">session_id</span><span class="p">,</span> <span class="n">bt</span><span class="p">]</span> <span class="o">=</span> <span class="n">live_wf</span><span class="p">[</span><span class="n">bt</span><span class="p">:</span><span class="n">tt</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="get_root_dir"><a class="viewcode-back" href="../../module_docs/know/audio_to_store.html#know.audio_to_store.get_root_dir">[docs]</a><span class="k">def</span> <span class="nf">get_root_dir</span><span class="p">(</span><span class="n">rootdir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;get a rootdir (a default one, or validate the one given etc.)&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">rootdir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rootdir</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">os</span>
+
+        <span class="n">rootdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;tmp&#39;</span><span class="p">,</span> <span class="s1">&#39;qchack&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rootdir</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">):</span>
+            <span class="n">rootdir</span> <span class="o">+=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span>
+
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">rootdir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rootdir</span></div>
+
+
+<span class="c1"># chk_format=&#39;h&#39; is equivalent to a PCM16 codec</span>
+<span class="n">pcm16_encode</span><span class="p">,</span> <span class="n">pcm16_decode</span> <span class="o">=</span> <span class="n">mk_encoder_and_decoder</span><span class="p">(</span><span class="n">chk_format</span><span class="o">=</span><span class="s1">&#39;h&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">wf_to_pcm16_bytes</span><span class="p">(</span><span class="n">wf</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">pcm16_encode</span><span class="p">(</span><span class="n">wf</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">pcm16__bytes_to_wf</span><span class="p">(</span><span class="n">b</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">pcm16_decode</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+
+    <span class="c1"># import soundfile as sf</span>
+    <span class="c1"># return sf.read(BytesIO(b), dtype=&#39;int16&#39;)</span>
+
+
+<span class="kn">import</span> <span class="nn">struct</span>
+
+<span class="n">DFLT_SR</span> <span class="o">=</span> <span class="mi">44100</span>
+<span class="n">DFLT_SAMPLE_WIDTH</span> <span class="o">=</span> <span class="mi">2</span>
+
+
+<span class="k">def</span> <span class="nf">wav_header</span><span class="p">(</span><span class="n">n_bytes</span><span class="p">,</span> <span class="n">sr</span><span class="o">=</span><span class="n">DFLT_SR</span><span class="p">,</span> <span class="n">n_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sample_width_bytes</span><span class="o">=</span><span class="n">DFLT_SAMPLE_WIDTH</span><span class="p">):</span>
+    <span class="n">WAVE_FORMAT_PCM</span> <span class="o">=</span> <span class="mh">0x0001</span>
+    <span class="n">bytes_to_add</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;RIFF&#39;</span>
+
+    <span class="n">_nframes</span> <span class="o">=</span> <span class="n">n_bytes</span> <span class="o">//</span> <span class="p">(</span><span class="n">n_channels</span> <span class="o">*</span> <span class="n">sample_width_bytes</span><span class="p">)</span>
+    <span class="n">_datalength</span> <span class="o">=</span> <span class="n">_nframes</span> <span class="o">*</span> <span class="n">n_channels</span> <span class="o">*</span> <span class="n">sample_width_bytes</span>
+
+    <span class="n">bytes_to_add</span> <span class="o">+=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span>
+        <span class="s1">&#39;&lt;L4s4sLHHLLHH4s&#39;</span><span class="p">,</span>
+        <span class="mi">36</span> <span class="o">+</span> <span class="n">_datalength</span><span class="p">,</span>
+        <span class="sa">b</span><span class="s1">&#39;WAVE&#39;</span><span class="p">,</span>
+        <span class="sa">b</span><span class="s1">&#39;fmt &#39;</span><span class="p">,</span>
+        <span class="mi">16</span><span class="p">,</span>
+        <span class="n">WAVE_FORMAT_PCM</span><span class="p">,</span>
+        <span class="n">n_channels</span><span class="p">,</span>
+        <span class="n">sr</span><span class="p">,</span>
+        <span class="n">n_channels</span> <span class="o">*</span> <span class="n">sr</span> <span class="o">*</span> <span class="n">sample_width_bytes</span><span class="p">,</span>
+        <span class="n">n_channels</span> <span class="o">*</span> <span class="n">sample_width_bytes</span><span class="p">,</span>
+        <span class="n">sample_width_bytes</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="sa">b</span><span class="s1">&#39;data&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">bytes_to_add</span> <span class="o">+=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;&lt;L&#39;</span><span class="p">,</span> <span class="n">_datalength</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">bytes_to_add</span>
+
+
+<span class="k">def</span> <span class="nf">wf_to_wav_bytes</span><span class="p">(</span><span class="n">wf</span><span class="p">,</span> <span class="n">sr</span><span class="o">=</span><span class="n">DFLT_SR</span><span class="p">,</span> <span class="n">sample_width_bytes</span><span class="o">=</span><span class="n">DFLT_SAMPLE_WIDTH</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">wav_header</span><span class="p">(</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">wf</span><span class="p">)</span> <span class="o">*</span> <span class="n">sample_width_bytes</span><span class="p">,</span> <span class="n">sr</span><span class="o">=</span><span class="n">sr</span><span class="p">,</span> <span class="n">sample_width_bytes</span><span class="o">=</span><span class="n">sample_width_bytes</span>
+    <span class="p">)</span> <span class="o">+</span> <span class="n">pcm16_encode</span><span class="p">(</span><span class="n">wf</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">wav_bytes_to_wf</span><span class="p">(</span><span class="n">b</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">):</span>
+    <span class="c1"># TODO: Be safer; use wave package to parse header and decode accordingly</span>
+    <span class="k">return</span> <span class="n">pcm16_decode</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">44</span><span class="p">:])</span>
+
+
+<span class="k">def</span> <span class="nf">_wrap_in_tuple</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="p">,)</span>
+
+
+<span class="k">def</span> <span class="nf">_all_but_last</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">mk_key_trans</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value_trans</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key_type</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">Formatter</span>
+
+    <span class="n">format_dict</span><span class="p">,</span> <span class="n">process_info_dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>  <span class="c1"># defaults</span>
+    <span class="n">str_formatter</span> <span class="o">=</span> <span class="n">Formatter</span><span class="p">()</span>
+    <span class="n">str_formatter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">template</span><span class="p">)</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="nb">map</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">str_formatter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">template</span><span class="p">))))</span>
+    <span class="k">if</span> <span class="n">pattern</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">format_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">pattern</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">value_trans</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">process_info_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">value_trans</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">}</span>
+    <span class="n">converter</span> <span class="o">=</span> <span class="n">StrTupleDict</span><span class="p">(</span>
+        <span class="n">template</span><span class="p">,</span> <span class="n">format_dict</span><span class="o">=</span><span class="n">format_dict</span><span class="p">,</span> <span class="n">process_info_dict</span><span class="o">=</span><span class="n">process_info_dict</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">key_type</span> <span class="ow">is</span> <span class="nb">tuple</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">wrap_kvs</span><span class="p">(</span>
+            <span class="n">key_of_id</span><span class="o">=</span><span class="n">converter</span><span class="o">.</span><span class="n">str_to_tuple</span><span class="p">,</span> <span class="n">id_of_key</span><span class="o">=</span><span class="n">converter</span><span class="o">.</span><span class="n">tuple_to_str</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">key_type</span> <span class="o">==</span> <span class="s1">&#39;single&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">wrap_kvs</span><span class="p">(</span>
+            <span class="n">key_of_id</span><span class="o">=</span><span class="n">Pipe</span><span class="p">(</span><span class="n">converter</span><span class="o">.</span><span class="n">str_to_tuple</span><span class="p">,</span> <span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
+            <span class="n">id_of_key</span><span class="o">=</span><span class="n">Pipe</span><span class="p">(</span><span class="n">_wrap_in_tuple</span><span class="p">,</span> <span class="n">converter</span><span class="o">.</span><span class="n">tuple_to_str</span><span class="p">),</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">mk_session_store</span><span class="p">(</span><span class="n">rootdir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+    <span class="n">rootdir</span> <span class="o">=</span> <span class="n">get_root_dir</span><span class="p">(</span><span class="n">rootdir</span><span class="p">)</span>
+
+    <span class="kn">from</span> <span class="nn">dol.filesys</span> <span class="kn">import</span> <span class="n">DirCollection</span><span class="p">,</span> <span class="n">mk_relative_path_store</span>
+
+    <span class="n">key_trans</span> <span class="o">=</span> <span class="n">mk_key_trans</span><span class="p">(</span>
+        <span class="n">template</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{session}</span><span class="s1">/&#39;</span><span class="p">,</span>
+        <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;\d+&#39;</span><span class="p">,</span>  <span class="c1"># for extra format protection</span>
+        <span class="n">value_trans</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+        <span class="n">key_type</span><span class="o">=</span><span class="s1">&#39;single&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="nd">@key_trans</span>
+    <span class="nd">@mk_relative_path_store</span><span class="p">(</span><span class="n">prefix_attr</span><span class="o">=</span><span class="s1">&#39;rootdir&#39;</span><span class="p">)</span>
+    <span class="k">class</span> <span class="nc">SessionStore</span><span class="p">(</span><span class="n">DirCollection</span><span class="p">):</span>
+        <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">mk_block_store</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rootdir</span><span class="si">}</span><span class="s2">&#39;, ...)&quot;</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">SessionStore</span><span class="p">(</span><span class="n">rootdir</span><span class="p">,</span> <span class="n">max_levels</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">s</span>
+
+
+<span class="k">def</span> <span class="nf">mk_block_store</span><span class="p">(</span><span class="n">rootdir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+    <span class="n">rootdir</span> <span class="o">=</span> <span class="n">get_root_dir</span><span class="p">(</span><span class="n">rootdir</span><span class="p">)</span>
+
+    <span class="n">wrapper</span> <span class="o">=</span> <span class="n">Pipe</span><span class="p">(</span>
+        <span class="n">mk_dirs_if_missing</span><span class="p">,</span>
+        <span class="n">mk_key_trans</span><span class="p">(</span>
+            <span class="n">template</span><span class="o">=</span><span class="s1">&#39;d/</span><span class="si">{block}</span><span class="s1">.pcm&#39;</span><span class="p">,</span>
+            <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;\d+&#39;</span><span class="p">,</span>  <span class="c1"># for extra format protection</span>
+            <span class="n">value_trans</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+            <span class="n">key_type</span><span class="o">=</span><span class="s1">&#39;single&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">wrap_kvs</span><span class="p">(</span><span class="n">data_of_obj</span><span class="o">=</span><span class="n">wf_to_pcm16_bytes</span><span class="p">,</span> <span class="n">obj_of_data</span><span class="o">=</span><span class="n">pcm16__bytes_to_wf</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="nd">@wrapper</span>
+    <span class="k">class</span> <span class="nc">BlockStore</span><span class="p">(</span><span class="n">RelPathFileBytesPersister</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Block reader store&quot;&quot;&quot;</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">BlockStore</span><span class="p">(</span><span class="n">rootdir</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">s</span>
+
+
+<span class="k">def</span> <span class="nf">mk_session_block_wf_store</span><span class="p">(</span>
+    <span class="n">rootdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{session}</span><span class="s1">/d/</span><span class="si">{block}</span><span class="s1">.pcm&#39;</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;\d+&#39;</span><span class="p">,</span> <span class="n">value_trans</span><span class="o">=</span><span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SessionBlockWaveformStoreType</span><span class="p">:</span>
+
+    <span class="n">rootdir</span> <span class="o">=</span> <span class="n">get_root_dir</span><span class="p">(</span><span class="n">rootdir</span><span class="p">)</span>
+    <span class="n">key_trans</span> <span class="o">=</span> <span class="n">mk_key_trans</span><span class="p">(</span>
+        <span class="n">template</span><span class="o">=</span><span class="n">template</span><span class="p">,</span>
+        <span class="n">pattern</span><span class="o">=</span><span class="n">pattern</span><span class="p">,</span>  <span class="c1"># for extra format protection</span>
+        <span class="n">value_trans</span><span class="o">=</span><span class="n">value_trans</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">template</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.wav&#39;</span><span class="p">):</span>
+        <span class="n">wf_to_bytes</span> <span class="o">=</span> <span class="n">wf_to_wav_bytes</span>
+        <span class="n">bytes_to_wf</span> <span class="o">=</span> <span class="n">wav_bytes_to_wf</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">wf_to_bytes</span> <span class="o">=</span> <span class="n">wf_to_pcm16_bytes</span>
+        <span class="n">bytes_to_wf</span> <span class="o">=</span> <span class="n">pcm16__bytes_to_wf</span>
+
+    <span class="n">wrapper</span> <span class="o">=</span> <span class="n">Pipe</span><span class="p">(</span>
+        <span class="n">mk_dirs_if_missing</span><span class="p">,</span>
+        <span class="n">key_trans</span><span class="p">,</span>
+        <span class="n">wrap_kvs</span><span class="p">(</span><span class="n">data_of_obj</span><span class="o">=</span><span class="n">wf_to_bytes</span><span class="p">,</span> <span class="n">obj_of_data</span><span class="o">=</span><span class="n">bytes_to_wf</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="nd">@wrapper</span>
+    <span class="k">class</span> <span class="nc">PcmPersister</span><span class="p">(</span><span class="n">RelPathFileBytesPersister</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Persist pcm audio bytes&quot;&quot;&quot;</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">PcmPersister</span><span class="p">(</span><span class="n">rootdir</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">s</span>
+
+
+<div class="viewcode-block" id="mk_mongo_single_data"><a class="viewcode-back" href="../../module_docs/know/audio_to_store.html#know.audio_to_store.mk_mongo_single_data">[docs]</a><span class="k">def</span> <span class="nf">mk_mongo_single_data</span><span class="p">(</span>
+    <span class="n">mgc</span><span class="o">=</span><span class="s1">&#39;mongodol/test&#39;</span><span class="p">,</span> <span class="n">key_fields</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;session&#39;</span><span class="p">,</span> <span class="s1">&#39;block&#39;</span><span class="p">),</span> <span class="n">data_field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;data&#39;</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;s[session, block] waveform store with a mongoDB backend&quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+    <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+    <span class="kn">from</span> <span class="nn">mongodol.stores</span> <span class="kn">import</span> <span class="n">MongoTupleKeyStore</span>
+    <span class="kn">from</span> <span class="nn">dol</span> <span class="kn">import</span> <span class="n">wrap_kvs</span>
+
+    <span class="k">def</span> <span class="nf">itemsetter</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">container_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A (single item) dual of itemgetter. To call repeatedly on the same container, use lambda: mutable_container_reference&quot;&quot;&quot;</span>
+        <span class="n">container</span> <span class="o">=</span> <span class="n">container_factory</span><span class="p">()</span>
+        <span class="n">container</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
+        <span class="k">return</span> <span class="n">container</span>
+
+    <span class="c1"># Note: Could also add input type validation in data_of_obj</span>
+    <span class="n">wrapper</span> <span class="o">=</span> <span class="n">wrap_kvs</span><span class="p">(</span>
+        <span class="n">data_of_obj</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">itemsetter</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">data_field</span><span class="p">),</span>
+        <span class="n">obj_of_data</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="n">data_field</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">db_name</span><span class="p">,</span> <span class="n">col_name</span> <span class="o">=</span> <span class="n">mgc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span><span class="p">(</span>
+        <span class="n">MongoTupleKeyStore</span><span class="p">(</span>
+            <span class="n">db_name</span><span class="p">,</span> <span class="n">col_name</span><span class="p">,</span> <span class="n">key_fields</span><span class="o">=</span><span class="n">key_fields</span><span class="p">,</span> <span class="n">data_fields</span><span class="o">=</span><span class="p">(</span><span class="n">data_field</span><span class="p">,)</span>
+        <span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">mk_session_block_bytes_store</span><span class="p">(</span><span class="n">rootdir</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SessionBlockBytesStoreType</span><span class="p">:</span>
+
+    <span class="n">rootdir</span> <span class="o">=</span> <span class="n">get_root_dir</span><span class="p">(</span><span class="n">rootdir</span><span class="p">)</span>
+
+    <span class="n">wrapper</span> <span class="o">=</span> <span class="n">Pipe</span><span class="p">(</span>
+        <span class="n">mk_dirs_if_missing</span><span class="p">,</span>
+        <span class="n">mk_key_trans</span><span class="p">(</span>
+            <span class="n">template</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{session}</span><span class="s1">/d/</span><span class="si">{block}</span><span class="s1">.pcm&#39;</span><span class="p">,</span>
+            <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;\d+&#39;</span><span class="p">,</span>  <span class="c1"># for extra format protection</span>
+            <span class="n">value_trans</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="nd">@wrapper</span>
+    <span class="k">class</span> <span class="nc">PcmPersister</span><span class="p">(</span><span class="n">RelPathFileBytesPersister</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Persist pcm audio bytes&quot;&quot;&quot;</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">PcmPersister</span><span class="p">(</span><span class="n">rootdir</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">s</span>
+
+
+<span class="k">def</span> <span class="nf">persistence_demo</span><span class="p">(</span><span class="n">rootdir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">mk_session_block_bytes_store</span><span class="p">(</span><span class="n">rootdir</span><span class="p">)</span>
+    <span class="c1"># delete if present</span>
+    <span class="k">if</span> <span class="p">(</span><span class="mi">298094</span><span class="p">,</span> <span class="mi">343</span><span class="p">)</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">s</span><span class="p">[</span><span class="mi">298094</span><span class="p">,</span> <span class="mi">343</span><span class="p">]</span>
+    <span class="k">if</span> <span class="p">(</span><span class="mi">298094</span><span class="p">,</span> <span class="mi">998</span><span class="p">)</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">s</span><span class="p">[</span><span class="mi">298094</span><span class="p">,</span> <span class="mi">998</span><span class="p">]</span>
+    <span class="c1"># write to these keys</span>
+    <span class="n">s</span><span class="p">[</span><span class="mi">298094</span><span class="p">,</span> <span class="mi">343</span><span class="p">]</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;298094_343&#39;</span>
+    <span class="n">s</span><span class="p">[</span><span class="mi">298094</span><span class="p">,</span> <span class="mi">998</span><span class="p">]</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;298094_998&#39;</span>
+    <span class="c1"># see that these keys now exist</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="mi">298094</span><span class="p">,</span> <span class="mi">343</span><span class="p">)</span> <span class="ow">in</span> <span class="n">s</span> <span class="ow">and</span> <span class="p">(</span><span class="mi">298094</span><span class="p">,</span> <span class="mi">998</span><span class="p">)</span> <span class="ow">in</span> <span class="n">s</span>  <span class="c1"># verify that these keys exist</span>
+    <span class="c1"># ... and have the desired data</span>
+    <span class="k">assert</span> <span class="n">s</span><span class="p">[</span><span class="mi">298094</span><span class="p">,</span> <span class="mi">343</span><span class="p">]</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;298094_343&#39;</span>
+    <span class="k">assert</span> <span class="n">s</span><span class="p">[</span><span class="mi">298094</span><span class="p">,</span> <span class="mi">998</span><span class="p">]</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;298094_998&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">demo_live_data_acquisition</span><span class="p">(</span>
+    <span class="n">live_source</span><span class="o">=</span><span class="n">LiveWf</span><span class="p">,</span>
+    <span class="n">store</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+        <span class="n">SessionBlockStoreType</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">SessionBlockStoreType</span><span class="p">]</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">mk_session_block_wf_store</span><span class="p">,</span>
+    <span class="n">chk_size</span><span class="o">=</span><span class="mi">100_000</span><span class="p">,</span>
+    <span class="n">end_idx</span><span class="o">=</span><span class="mi">300_000</span><span class="p">,</span>
+    <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">live_source</span> <span class="o">=</span> <span class="n">get_resource</span><span class="p">(</span><span class="n">live_source</span><span class="p">,</span> <span class="n">dflt_callback</span><span class="o">=</span><span class="n">LiveWf</span><span class="p">)</span>
+    <span class="n">store</span> <span class="o">=</span> <span class="n">get_resource</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">dflt_callback</span><span class="o">=</span><span class="n">mk_session_block_wf_store</span><span class="p">)</span>
+
+    <span class="n">session_id</span><span class="p">:</span> <span class="n">SessionId</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">live_source</span><span class="p">:</span>
+        <span class="c1"># range(start, stop, step)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">bt</span><span class="p">,</span> <span class="n">tt</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chunk_indices</span><span class="p">(</span><span class="n">chk_size</span><span class="o">=</span><span class="n">chk_size</span><span class="p">,</span> <span class="n">end_idx</span><span class="o">=</span><span class="n">end_idx</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="p">:</span>
+                <span class="n">logger</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">i</span><span class="si">=}</span><span class="s1">: </span><span class="si">{</span><span class="n">bt</span><span class="si">=}</span><span class="s1">, </span><span class="si">{</span><span class="n">tt</span><span class="si">=}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">block</span><span class="p">:</span> <span class="n">BlockId</span> <span class="o">=</span> <span class="n">bt</span>
+            <span class="n">store</span><span class="p">[</span><span class="n">session_id</span><span class="p">,</span> <span class="n">block</span><span class="p">]</span> <span class="o">=</span> <span class="n">live_source</span><span class="p">[</span><span class="n">bt</span><span class="p">:</span><span class="n">tt</span><span class="p">]</span>  <span class="c1"># &lt;-- The important part</span>
+            <span class="c1"># store.add(live_source[bt:tt])</span>
+
+    <span class="k">return</span> <span class="n">store</span>
+
+
+<span class="k">def</span> <span class="nf">iterate_chunks</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">chk_size</span><span class="p">,</span> <span class="n">chk_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">intervals</span> <span class="o">=</span> <span class="n">chunk_indices</span><span class="p">(</span>
+        <span class="n">chk_size</span><span class="o">=</span><span class="n">chk_size</span><span class="p">,</span> <span class="n">chk_step</span><span class="o">=</span><span class="n">chk_step</span><span class="p">,</span> <span class="n">start_idx</span><span class="o">=</span><span class="n">start_idx</span><span class="p">,</span> <span class="n">end_idx</span><span class="o">=</span><span class="n">end_idx</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">audio_only_live_process</span><span class="p">(</span>
+    <span class="n">live_source</span><span class="o">=</span><span class="n">LiveWf</span><span class="p">,</span>
+    <span class="n">store</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+        <span class="n">SessionBlockStoreType</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">SessionBlockStoreType</span><span class="p">]</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">mk_session_block_wf_store</span><span class="p">,</span>
+    <span class="n">chk_size</span><span class="o">=</span><span class="mi">100_000</span><span class="p">,</span>
+    <span class="n">end_idx</span><span class="o">=</span><span class="mi">300_000</span><span class="p">,</span>
+    <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">live_source</span> <span class="o">=</span> <span class="n">get_resource</span><span class="p">(</span><span class="n">live_source</span><span class="p">,</span> <span class="n">dflt_callback</span><span class="o">=</span><span class="n">LiveWf</span><span class="p">)</span>
+    <span class="n">store</span> <span class="o">=</span> <span class="n">get_resource</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">dflt_callback</span><span class="o">=</span><span class="n">mk_session_block_wf_store</span><span class="p">)</span>
+
+    <span class="n">session_id</span><span class="p">:</span> <span class="n">SessionId</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">live_source</span><span class="p">:</span>
+        <span class="c1"># range(start, stop, step)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">bt</span><span class="p">,</span> <span class="n">tt</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chunk_indices</span><span class="p">(</span><span class="n">chk_size</span><span class="o">=</span><span class="n">chk_size</span><span class="p">,</span> <span class="n">end_idx</span><span class="o">=</span><span class="n">end_idx</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="p">:</span>
+                <span class="n">logger</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">i</span><span class="si">=}</span><span class="s1">: </span><span class="si">{</span><span class="n">bt</span><span class="si">=}</span><span class="s1">, </span><span class="si">{</span><span class="n">tt</span><span class="si">=}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">block</span><span class="p">:</span> <span class="n">BlockId</span> <span class="o">=</span> <span class="n">bt</span>
+            <span class="n">store</span><span class="p">[</span><span class="n">session_id</span><span class="p">,</span> <span class="n">block</span><span class="p">]</span> <span class="o">=</span> <span class="n">live_source</span><span class="p">[</span><span class="n">bt</span><span class="p">:</span><span class="n">tt</span><span class="p">]</span>  <span class="c1"># &lt;-- The important part</span>
+            <span class="c1"># store.add(live_source[bt:tt])</span>
+
+    <span class="k">return</span> <span class="n">store</span>
+
+
+<span class="c1"># TODOs:</span>
+<span class="c1"># multichannel: keyboard + audio</span>
+<span class="c1"># nice to have (for testing): Emulate sensors with data generators</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">know</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know.html">know</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/audio_to_store.html">know.audio_to_store</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/keyboard_and_audio.html">know.examples.keyboard_and_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/scrap/architectures.html">know.scrap.architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/scrap/pieces.html">know.scrap.pieces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/util.html">know.util</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;NO COPYRIGHT.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
