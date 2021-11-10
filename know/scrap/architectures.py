@@ -69,9 +69,8 @@ class WithSlabs:
         for multi_service_output in self:
             if callback:
                 callback_output = callback(multi_service_output)
-                if sentinel_func:
-                    if sentinel_func(callback_output):
-                        break
+                if sentinel_func and sentinel_func(callback_output):
+                    break
 
 
 def test_multi_iterator():

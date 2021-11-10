@@ -5,16 +5,16 @@ import time
 from typing import Callable, NewType, Any
 import json
 from stream2py.stream_buffer import StreamBuffer
-from stream2py.sources.keyboard_input import KeyboardInputSourceReader
-from stream2py.sources.audio import (
+from keyboardstream2py.keyboard_input import KeyboardInputSourceReader
+from audiostream2py.audio import (
     PyAudioSourceReader,
     find_a_default_input_device_index,
 )
 
 from i2 import ContextFanout
 
-AudioData = NewType('', Any)
-KeyboardData = NewType('', Any)
+AudioData = NewType('AudioData', Any)
+KeyboardData = NewType('KeyboardData', Any)
 AudioDataCallback = Callable[[AudioData], Any]
 KeyboardDataCallback = Callable[[KeyboardData], Any]
 
@@ -36,6 +36,8 @@ def default_keyboard_event_callback(keyboard_data):
         # print(f"{type(keyboard_data)=}, {len(keyboard_data)=}")
         index, keyboard_timestamp, char = keyboard_data
         print(f'[Keyboard] {keyboard_timestamp}: {char=} ({ord(char)=})', end='\n\r')
+        if keyboard_data_signals_an_interrupt(keyboard_data):
+            raise KeyboardInterrupt('You want to stop?')
 
 
 def keyboard_data_signals_an_interrupt(
@@ -129,13 +131,17 @@ def keyboard_and_audio(
 
     slabs = ContextFanout(audio=audio_stream_buffer, keyboard=keyboard_stream_buffer)
 
+    from i2.multi_object import FuncFanout
     # TODO: Use a multi obj for this
-    def audio_and_keyboard_data_callback(data):
-        audio_data, keyboard_data = data
-        if keyboard_data_signals_an_interrupt(keyboard_data):
-            raise KeyboardInterrupt('You want to stop?')
-        return audio_data_callback(audio_data), keyboard_data_callback(keyboard_data)
-
+    # def audio_and_keyboard_data_callback(data):
+    #     audio_data, keyboard_data = data
+    #     if keyboard_data_signals_an_interrupt(keyboard_data):
+    #         raise KeyboardInterrupt('You want to stop?')
+    #     return audio_data_callback(audio_data), keyboard_data_callback(keyboard_data)
+    audio_and_keyboard_data_callback = FuncFanout({
+        'audio': audio_data_callback,
+        'keyboard': keyboard_data_callback,
+    })
     ws = WithSlabs(
         slabs,
         services={
