@@ -1,11 +1,11 @@
 """Util objects"""
 from dataclasses import dataclass
-from typing import Callable, Any, Iterable, Dict, NewType, Mapping
+from typing import Callable, Any, Iterable, Dict, Mapping, Iterator
 import itertools
 
-from i2 import ContextFanout, FuncFanout, MultiObj
+from i2 import ContextFanout, FuncFanout, MultiObj, Pipe
 
-from atypes import Slab, Hunk, FiltFunc
+from atypes import Slab, Hunk, FiltFunc, MyType
 from creek import Creek
 from creek.util import to_iterator
 from taped import chunk_indices
@@ -18,6 +18,13 @@ StreamId = str
 
 always: FiltFunc
 Hunker: HunkerType
+
+SlabService = MyType(
+    'Consumer', Callable[[Slab], Any], doc='A function that will call slabs iteratively'
+)
+Name = str
+# BoolFunc = Callable[[...], bool]
+FiltFunc = Callable[[Any], bool]
 
 
 class _MultiIterator(MultiObj):
@@ -53,6 +60,26 @@ def any_value_is_none(d: Mapping):
     """Returns True if any value of the mapping is None"""
     return any(d[k] is None for k in d)
 
+
+def let_through(x):
+    return x
+
+
+def iterate(iterators: Iterable[Iterator]):
+    while True:
+        items = apply(next, iterators)
+        yield items
+
+
+def iterate_dict_values(iterator_dict: Mapping[Name, Iterator]):
+    while True:
+        try:
+            yield {k: next(v, None) for k, v in iterator_dict.items()}
+        except StopIteration:
+            break
+
+
+apply = Pipe(map, tuple)
 
 StopCondition = Callable[[Any], bool]
 
@@ -95,17 +122,81 @@ class MultiIterable:
         return itertools.takewhile(predicate, self)
 
 
-class DictZip:
-    def __init__(self, *unnamed, takewhile=None, **named):
-        self.multi_iterator = _MultiIterator(*unnamed, **named)
-        self.objects = self.multi_iterator.objects
-        if takewhile is None:
-            takewhile = always_true
-        self.takewhile = takewhile
+# TODO: Default consumer(s) (e.g. data-safe prints?)
+# TODO: Default slabs? (iterate through
+@dataclass
+class SlabsPush:
+    slabs: Iterable[Slab]
+    services: Mapping[Name, SlabService]
+
+    def __post_init__(self):
+        if isinstance(self.services, FuncFanout):
+            self.multi_service = self.services
+        else:
+            # TODO: Add capability (in FuncFanout) to get a mix of (un)named consumers
+            self.multi_service = FuncFanout(**self.services)
+        self.slabs_and_services_context = ContextFanout(
+            slabs=self.slabs, **self.multi_service
+        )
 
     def __iter__(self):
-        while self.takewhile(d := next(self.multi_iterator)):
-            yield d
+        with self.slabs_and_services_context:  # enter all contained contexts
+            # get an iterable slabs object
+            if isinstance(self.slabs, ContextFanout):
+                its = tuple(getattr(self.slabs, s) for s in self.slabs)
+                slabs = iterate(its)
+                # slabs = iterate_dict_values(self.slabs)
+            else:
+                slabs = self.slabs
+            # Now iterate...
+            for slab in slabs:
+                yield self.multi_service(slab)  # ... calling the services on each slab
+
+    def __call__(
+        self, callback: Callable = None, sentinel_func: FiltFunc = None,
+    ):
+        for multi_service_output in self:
+            if callback:
+                callback_output = callback(multi_service_output)
+                if sentinel_func and sentinel_func(callback_output):
+                    break
+
+
+@dataclass
+class SlabsPush2:
+    slabs: Iterable[Slab]
+    services: Mapping[Name, SlabService]
+
+    def __post_init__(self):
+        if isinstance(self.services, FuncFanout):
+            self.multi_service = self.services
+        else:
+            # TODO: Add capability (in FuncFanout) to get a mix of (un)named consumers
+            self.multi_service = FuncFanout(**self.services)
+        self.slabs_and_services_context = ContextFanout(
+            slabs=self.slabs, **self.multi_service
+        )
+
+    def __iter__(self):
+        with self.slabs_and_services_context:  # enter all contained contexts
+            # get an iterable slabs object
+            if isinstance(self.slabs, ContextFanout):
+                slabs = iterate_dict_values(self.slabs)
+            else:
+                slabs = self.slabs
+            # Now iterate...
+            for slab in slabs:
+                yield self.multi_service(slab)  # ... calling the services on each slab
+
+    def __call__(
+        self, callback: Callable = None, sentinel_func: FiltFunc = None,
+    ):
+        for multi_service_output in self:
+            if callback:
+                callback_output = callback(multi_service_output)
+                if sentinel_func and sentinel_func(callback_output):
+                    break
+
 
 
 @dataclass
@@ -119,6 +210,19 @@ class Slabbing:
                 callback_output = self.slab_callback(slab)
 
         return callback_output
+
+
+class DictZip:
+    def __init__(self, *unnamed, takewhile=None, **named):
+        self.multi_iterator = _MultiIterator(*unnamed, **named)
+        self.objects = self.multi_iterator.objects
+        if takewhile is None:
+            takewhile = always_true
+        self.takewhile = takewhile
+
+    def __iter__(self):
+        while self.takewhile(d := next(self.multi_iterator)):
+            yield d
 
 
 @dataclass

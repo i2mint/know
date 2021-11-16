@@ -28,6 +28,17 @@ def default_audio_callback(audio_data):
         )
 
 
+def full_audio_print(audio_data):
+    if audio_data is not None:
+        (audio_timestamp, waveform, frame_count, time_info, status_flags,) = audio_data
+        # print(f"{type(audio_data)=}")
+        print(
+            f'   [Audio] {audio_timestamp=}: {len(waveform)=} {type(waveform).__name__}'
+            f' {frame_count=}, {time_info=}, {status_flags=}',
+            end='\n\r',
+        )
+
+
 def default_keyboard_event_callback(keyboard_data):
     """Prints some data extracted from keyboard_data
     :param keyboard_data: Input character
@@ -126,34 +137,88 @@ def keyboard_and_audio(
         source_reader=KeyboardInputSourceReader(), maxlen=maxlen
     )
 
-    from know.scrap.architectures import WithSlabs
+    from know.util import SlabsPush
     from i2 import HandleExceptions
 
     slabs = ContextFanout(audio=audio_stream_buffer, keyboard=keyboard_stream_buffer)
 
+    # with HandleExceptions({KeyboardInterrupt: 'You made an interrupt key combo!'}):
+    #     for slab in slabs:
+    #         print(slab)
+
+    # with HandleExceptions({KeyboardInterrupt: 'You made an interrupt key combo!'}):
+    #     for _ in iter(slabs):
+    #         print(slabs)
+    #         if not slabs['audio'].is_running:
+    #             break
+    #
+    # print(f'\nQuitting the app...\n')
+    #
+    #
     from i2.multi_object import FuncFanout
     # TODO: Use a multi obj for this
-    # def audio_and_keyboard_data_callback(data):
-    #     audio_data, keyboard_data = data
-    #     if keyboard_data_signals_an_interrupt(keyboard_data):
-    #         raise KeyboardInterrupt('You want to stop?')
-    #     return audio_data_callback(audio_data), keyboard_data_callback(keyboard_data)
-    audio_and_keyboard_data_callback = FuncFanout({
-        'audio': audio_data_callback,
-        'keyboard': keyboard_data_callback,
-    })
-    ws = WithSlabs(
+
+    def audio_and_keyboard_data_callback(data):
+        audio_data, keyboard_data = data
+        if keyboard_data_signals_an_interrupt(keyboard_data):
+            raise KeyboardInterrupt('You want to stop?')
+        return audio_data_callback(audio_data), keyboard_data_callback(keyboard_data)
+
+    def print_raw(data):
+        audio_data, keyboard_data = data
+        if keyboard_data_signals_an_interrupt(keyboard_data):
+            raise KeyboardInterrupt('You want to stop.')
+        if keyboard_data is not None:
+            print(f'{keyboard_data=}\n', end='\n\r')
+        full_audio_print(audio_data)
+
+
+        # return keyboard_data
+    # audio_and_keyboard_data_callback = FuncFanout({
+    #     'audio': audio_data_callback,
+    #     'keyboard': keyboard_data_callback,
+    # })
+
+    # ws = SlabsPush(
+    #     slabs,
+    #     services={
+    #         # 'print': audio_and_keyboard_data_callback,
+    #         'print_raw': print_raw
+    #     },
+    # )
+
+    # Make SlabsPush2 work
+    def dict_print_raw(data):
+        audio_data = data.get('audio_data', None)
+        keyboard_data = data.get('keyboard_data', None)
+        if keyboard_data_signals_an_interrupt(keyboard_data):
+            raise KeyboardInterrupt('You want to stop.')
+        if keyboard_data is not None:
+            print(f'{keyboard_data=}\n', end='\n\r')
+        full_audio_print(audio_data)
+
+    from know.util import SlabsPush2
+
+    ws = SlabsPush2(
         slabs,
         services={
-            'print': audio_and_keyboard_data_callback,
-            # 'stop': stop_criteria
+            # 'print': audio_and_keyboard_data_callback,
+            'print_raw': dict_print_raw
         },
     )
+
+    # for _ in iter(ws):
+    #     if not ws.slabs['audio'].is_running:
+    #         print("audio isn't running anymore!")
+    #         break
 
     with HandleExceptions({KeyboardInterrupt: 'You made an interrupt key combo!'}):
         for _ in iter(ws):
             if not ws.slabs['audio'].is_running:
+                print("audio isn't running anymore!")
                 break
+
+
 
     print(f'\nQuitting the app...\n')
 

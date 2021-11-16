@@ -36,47 +36,13 @@ class MultiIterator(MultiObj):
         return dict(self._gen_next())
 
 
-# TODO: Default consumer(s) (e.g. data-safe prints?)
-# TODO: Default slabs? (iterate through
-@dataclass
-class WithSlabs:
-    slabs: Iterable[Slab]
-    services: Mapping[Name, Service]
-
-    def __post_init__(self):
-        if isinstance(self.services, FuncFanout):
-            self.multi_service = self.services
-        else:
-            # TODO: Add capability (in FuncFanout) to get a mix of (un)named consumers
-            self.multi_service = FuncFanout(**self.services)
-        self.slabs_and_services_context = ContextFanout(
-            slabs=self.slabs, **self.multi_service
-        )
-
-    def __iter__(self):
-        with self.slabs_and_services_context:
-            if isinstance(self.slabs, ContextFanout):
-                its = tuple(getattr(self.slabs, s) for s in self.slabs)
-                slabs = iterate(its)
-            else:
-                slabs = self.slabs
-            for slab in slabs:
-                yield self.multi_service(slab)
-
-    def __call__(
-        self, callback: Callable = None, sentinel_func: FiltFunc = None,
-    ):
-        for multi_service_output in self:
-            if callback:
-                callback_output = callback(multi_service_output)
-                if sentinel_func and sentinel_func(callback_output):
-                    break
-
 
 def test_multi_iterator():
     # get_multi_iterable = lambda: MultiIterable(
     #     audio=iter([1, 2, 3]), keyboard=iter([4, 5, 6])
     # )
+
+    from know.util import SlabsPush
 
     def is_none(x):
         return x is None
@@ -102,7 +68,7 @@ def test_multi_iterator():
 
     slabs = MultiIterator(audio=iter([1, 2, 3]), keyboard=iter([4, 5, 6]))
     services = {'let_through': let_through, 'log': print}
-    app = WithSlabs(slabs=slabs, services=services)
+    app = SlabsPush(slabs=slabs, services=services)
 
     assert list(app) == [
         {'audio': 1, 'keyboard': 4},
