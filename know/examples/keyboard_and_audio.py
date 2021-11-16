@@ -189,8 +189,8 @@ def keyboard_and_audio(
 
     # Make SlabsPush2 work
     def dict_print_raw(data):
-        audio_data = data.get('audio_data', None)
-        keyboard_data = data.get('keyboard_data', None)
+        audio_data = data.get('audio', None)
+        keyboard_data = data.get('keyboard', None)
         if keyboard_data_signals_an_interrupt(keyboard_data):
             raise KeyboardInterrupt('You want to stop.')
         if keyboard_data is not None:

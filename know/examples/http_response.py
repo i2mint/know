@@ -10,9 +10,9 @@ HTTP Response streaming reader with no external dependencies
 """
 
 import urllib.request
-from typing import Union
+from typing import Union, Optional
 
-
+import io
 from stream2py import SourceReader
 from stream2py.utility.typing_hints import ComparableType
 
@@ -23,14 +23,16 @@ class HTTPResponseReader(SourceReader):
     _init_kwargs: dict
     _url: str
     _response = ''
+
     def __init__(
         self,
         url,
         *,
         method: str = 'GET',
-        headers: dict = {},
+        headers: Optional[dict] = None,
         body: Union[str, bytes] = '',
         response_format: str = 'bytes',
+        response_read_args: tuple = (),
         encoding: str = '',
     ):
         """
@@ -39,21 +41,30 @@ class HTTPResponseReader(SourceReader):
         :param body: The body to send with the request. Must be a string or bytes (JSON bodies should be passed through json.dumps)
         :param response_format: Format to map the response to. Accepts 'bytes' or 'str' (defaults to 'bytes')
         """
-        self._init_kwargs = dict(method=method, headers=headers, body=body, response_format=response_format, encoding=encoding)
+        headers = headers or {}
+        self._init_kwargs = dict(
+            method=method,
+            headers=headers,
+            body=body,
+            response_format=response_format,
+            encoding=encoding,
+        )
         self.data = None
         if method.upper() == 'GET':
             body = None
 
         self._url = url
         self._n_bytes_read = 0
-        self._request = urllib.request.Request(url, data=body, headers=headers, method=method)
+        self._request = urllib.request.Request(
+            url, data=body, headers=headers, method=method
+        )
+        self.response_read_args = response_read_args or ()
 
     @property
     def info(self) -> dict:
         """
         Provides a dict with init kwargs and read status
 
-        >>> from stream2py.sources.net import HTTPResponseReader
         >>> from pprint import pprint
         >>> source = HTTPResponseReader('http://zombo.com')
         >>> pprint(source.info) # doctest: +SKIP
@@ -79,10 +90,12 @@ class HTTPResponseReader(SourceReader):
         :param data: (start_index, end_index)
         :return: Union[str, bytes]
         """
-        return self._data[data[0]:data[1]]
+        return self._data[data[0] : data[1]]
 
     def open(self):
-        request = urllib.request.Request(self._url, headers=self._init_kwargs['headers'])
+        request = urllib.request.Request(
+            self._url, headers=self._init_kwargs['headers']
+        )
         self._response = urllib.request.urlopen(request)
 
     def close(self):
@@ -90,11 +103,11 @@ class HTTPResponseReader(SourceReader):
             self._response.__exit__()
             self._response = None
 
-    def read(self, *args):
+    def read(self):
         """Returns a chunk of raw binary data.
         """
         encoding = self._init_kwargs.get('encoding')
-        result = self._response.read(*args)
+        result = self._response.read(*self.response_read_args)
         if encoding:
             result = result.decode(encoding)
         return result
@@ -106,6 +119,7 @@ def _test_run_HTTPResponseReader(url, **kwargs):
     :param readerClass: HTTPResponseReader class or subclass
     """
     from pprint import pprint
+
     output = ''
 
     source = HTTPResponseReader(url, **kwargs)
