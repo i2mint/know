@@ -36,7 +36,6 @@ class MultiIterator(MultiObj):
         return dict(self._gen_next())
 
 
-
 def test_multi_iterator():
     # get_multi_iterable = lambda: MultiIterable(
     #     audio=iter([1, 2, 3]), keyboard=iter([4, 5, 6])

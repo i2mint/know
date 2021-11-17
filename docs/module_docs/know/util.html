@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>know.util &#8212; know 0.1.1 documentation</title>
+    <title>know.util &#8212; know 0.1.2 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -45,6 +45,17 @@
 <dt id="know.util.FixedStepHunker">
 <em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">FixedStepHunker</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src</span></em>, <em class="sig-param"><span class="n">chk_size</span></em>, <em class="sig-param"><span class="n">chk_step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">start_idx</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">end_idx</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#FixedStepHunker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.FixedStepHunker" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py exception">
+<dt id="know.util.IteratorExit">
+<em class="property">exception </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">IteratorExit</code><a class="reference internal" href="../../_modules/know/util.html#IteratorExit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.IteratorExit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when an iterator should quit being iterated on, signaling this event
+any process that cares to catch the signal.
+We chose to inherit directly from <code class="docutils literal notranslate"><span class="pre">BaseException</span></code> instead of <code class="docutils literal notranslate"><span class="pre">Exception</span></code>
+for the same reason that <code class="docutils literal notranslate"><span class="pre">GeneratorExit</span></code> does: Because it’s not technically
+an error.</p>
+<p>See: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#GeneratorExit">https://docs.python.org/3/library/exceptions.html#GeneratorExit</a></p>
+</dd></dl>
 
 <dl class="py class">
 <dt id="know.util.LiveProcess">
@@ -96,6 +107,16 @@ There’s nothing to stop the iteration</p>
 <em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">Slabbing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">slabs</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span>Slab<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">slab_callback</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span>Slab<span class="p">]</span><span class="p">, </span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#Slabbing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.Slabbing" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py class">
+<dt id="know.util.SlabsPush">
+<em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">SlabsPush</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">slabs</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span>Slab<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">services</span><span class="p">:</span> <span class="n">Mapping<span class="p">[</span>str<span class="p">, </span>Consumer<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#SlabsPush"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.SlabsPush" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="know.util.SlabsPushTuple">
+<em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">SlabsPushTuple</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">slabs</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span>Slab<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">services</span><span class="p">:</span> <span class="n">Mapping<span class="p">[</span>str<span class="p">, </span>Consumer<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#SlabsPushTuple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.SlabsPushTuple" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py function">
 <dt id="know.util.always_false">
 <code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">always_false</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> &#x2192; False<a class="reference internal" href="../../_modules/know/util.html#always_false"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.always_false" title="Permalink to this definition">¶</a></dt>
@@ -137,7 +158,10 @@ There’s nothing to stop the iteration</p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../know.html">know</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_to_store.html">know.audio_to_store</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/http_response.html">HTTP Response streaming reader with no external dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/http_sensor.html">know.examples.http_sensor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/keyboard_and_audio.html">know.examples.keyboard_and_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="http_sensor_sim.html">know.http_sensor_sim</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scrap/architectures.html">know.scrap.architectures</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scrap/pieces.html">know.scrap.pieces</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">know.util</a></li>

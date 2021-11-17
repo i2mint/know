@@ -173,15 +173,16 @@ def keyboard_and_audio(
         },
     )
 
-    with HandleExceptions({
-        KeyboardInterrupt: 'You made an interrupt key combo!',
-        IteratorExit: 'An iterator raised a IteratorExit'
-    }):
+    with HandleExceptions(
+        {
+            KeyboardInterrupt: 'You made an interrupt key combo!',
+            IteratorExit: 'An iterator raised a IteratorExit',
+        }
+    ):
         for _ in iter(ws):
             if not ws.slabs['audio'].is_running:
                 print("audio isn't running anymore!")
                 break
-
 
     print(f'\nQuitting the app...\n')
 

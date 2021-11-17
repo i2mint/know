@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>know.scrap.architectures &#8212; know 0.1.1 documentation</title>
+    <title>know.scrap.architectures &#8212; know 0.1.2 documentation</title>
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
@@ -75,48 +75,12 @@
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gen_next</span><span class="p">())</span></div>
 
 
-<span class="c1"># TODO: Default consumer(s) (e.g. data-safe prints?)</span>
-<span class="c1"># TODO: Default slabs? (iterate through</span>
-<div class="viewcode-block" id="WithSlabs"><a class="viewcode-back" href="../../../module_docs/know/scrap/architectures.html#know.scrap.architectures.WithSlabs">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">WithSlabs</span><span class="p">:</span>
-    <span class="n">slabs</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Slab</span><span class="p">]</span>
-    <span class="n">services</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Name</span><span class="p">,</span> <span class="n">Service</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">,</span> <span class="n">FuncFanout</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">multi_service</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">services</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># TODO: Add capability (in FuncFanout) to get a mix of (un)named consumers</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">multi_service</span> <span class="o">=</span> <span class="n">FuncFanout</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">slabs_and_services_context</span> <span class="o">=</span> <span class="n">ContextFanout</span><span class="p">(</span>
-            <span class="n">slabs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">slabs</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">multi_service</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">slabs_and_services_context</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slabs</span><span class="p">,</span> <span class="n">ContextFanout</span><span class="p">):</span>
-                <span class="n">its</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slabs</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">slabs</span><span class="p">)</span>
-                <span class="n">slabs</span> <span class="o">=</span> <span class="n">iterate</span><span class="p">(</span><span class="n">its</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">slabs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">slabs</span>
-            <span class="k">for</span> <span class="n">slab</span> <span class="ow">in</span> <span class="n">slabs</span><span class="p">:</span>
-                <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">multi_service</span><span class="p">(</span><span class="n">slab</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sentinel_func</span><span class="p">:</span> <span class="n">FiltFunc</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="k">for</span> <span class="n">multi_service_output</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">callback</span><span class="p">:</span>
-                <span class="n">callback_output</span> <span class="o">=</span> <span class="n">callback</span><span class="p">(</span><span class="n">multi_service_output</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">sentinel_func</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">sentinel_func</span><span class="p">(</span><span class="n">callback_output</span><span class="p">):</span>
-                        <span class="k">break</span></div>
-
-
 <span class="k">def</span> <span class="nf">test_multi_iterator</span><span class="p">():</span>
     <span class="c1"># get_multi_iterable = lambda: MultiIterable(</span>
     <span class="c1">#     audio=iter([1, 2, 3]), keyboard=iter([4, 5, 6])</span>
     <span class="c1"># )</span>
+
+    <span class="kn">from</span> <span class="nn">know.util</span> <span class="kn">import</span> <span class="n">SlabsPushTuple</span>
 
     <span class="k">def</span> <span class="nf">is_none</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span>
@@ -142,7 +106,7 @@
 
     <span class="n">slabs</span> <span class="o">=</span> <span class="n">MultiIterator</span><span class="p">(</span><span class="n">audio</span><span class="o">=</span><span class="nb">iter</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span> <span class="n">keyboard</span><span class="o">=</span><span class="nb">iter</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]))</span>
     <span class="n">services</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;let_through&#39;</span><span class="p">:</span> <span class="n">let_through</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="nb">print</span><span class="p">}</span>
-    <span class="n">app</span> <span class="o">=</span> <span class="n">WithSlabs</span><span class="p">(</span><span class="n">slabs</span><span class="o">=</span><span class="n">slabs</span><span class="p">,</span> <span class="n">services</span><span class="o">=</span><span class="n">services</span><span class="p">)</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">SlabsPushTuple</span><span class="p">(</span><span class="n">slabs</span><span class="o">=</span><span class="n">slabs</span><span class="p">,</span> <span class="n">services</span><span class="o">=</span><span class="n">services</span><span class="p">)</span>
 
     <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">app</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span>
         <span class="p">{</span><span class="s1">&#39;audio&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;keyboard&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
@@ -171,7 +135,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know.html">know</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/audio_to_store.html">know.audio_to_store</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/examples/http_response.html">HTTP Response streaming reader with no external dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/examples/http_sensor.html">know.examples.http_sensor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/examples/keyboard_and_audio.html">know.examples.keyboard_and_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/http_sensor_sim.html">know.http_sensor_sim</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/scrap/architectures.html">know.scrap.architectures</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/scrap/pieces.html">know.scrap.pieces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/util.html">know.util</a></li>
