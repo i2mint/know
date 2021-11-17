@@ -27,6 +27,17 @@ Name = str
 FiltFunc = Callable[[Any], bool]
 
 
+class IteratorExit(BaseException):
+    """Raised when an iterator should quit being iterated on, signaling this event
+    any process that cares to catch the signal.
+    We chose to inherit directly from `BaseException` instead of `Exception`
+    for the same reason that `GeneratorExit` does: Because it's not technically
+    an error.
+
+    See: https://docs.python.org/3/library/exceptions.html#GeneratorExit
+    """
+
+
 class _MultiIterator(MultiObj):
     """Helper class for DictZip"""
 
@@ -75,7 +86,7 @@ def iterate_dict_values(iterator_dict: Mapping[Name, Iterator]):
     while True:
         try:
             yield {k: next(v, None) for k, v in iterator_dict.items()}
-        except StopIteration:
+        except IteratorExit:
             break
 
 
@@ -125,7 +136,7 @@ class MultiIterable:
 # TODO: Default consumer(s) (e.g. data-safe prints?)
 # TODO: Default slabs? (iterate through
 @dataclass
-class SlabsPush:
+class SlabsPushTuple:
     slabs: Iterable[Slab]
     services: Mapping[Name, SlabService]
 
@@ -163,7 +174,7 @@ class SlabsPush:
 
 
 @dataclass
-class SlabsPush2:
+class SlabsPush:
     slabs: Iterable[Slab]
     services: Mapping[Name, SlabService]
 
@@ -173,6 +184,8 @@ class SlabsPush2:
         else:
             # TODO: Add capability (in FuncFanout) to get a mix of (un)named consumers
             self.multi_service = FuncFanout(**self.services)
+        # Put slabs and multi_services in a ContextFanout so that
+        # anything that needs to be contextualized, will.
         self.slabs_and_services_context = ContextFanout(
             slabs=self.slabs, **self.multi_service
         )
@@ -180,6 +193,7 @@ class SlabsPush2:
     def __iter__(self):
         with self.slabs_and_services_context:  # enter all contained contexts
             # get an iterable slabs object
+            # TODO: not sure this ContextFanout is the right check
             if isinstance(self.slabs, ContextFanout):
                 slabs = iterate_dict_values(self.slabs)
             else:

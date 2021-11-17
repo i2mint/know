@@ -1,7 +1,5 @@
-"""Keyboard and audio acquisition"""
-import time
-
 """Example of processing audio and keyboard streams"""
+import time
 from typing import Callable, NewType, Any
 import json
 from stream2py.stream_buffer import StreamBuffer
@@ -137,26 +135,10 @@ def keyboard_and_audio(
         source_reader=KeyboardInputSourceReader(), maxlen=maxlen
     )
 
-    from know.util import SlabsPush
+    from know.util import SlabsPushTuple
     from i2 import HandleExceptions
 
     slabs = ContextFanout(audio=audio_stream_buffer, keyboard=keyboard_stream_buffer)
-
-    # with HandleExceptions({KeyboardInterrupt: 'You made an interrupt key combo!'}):
-    #     for slab in slabs:
-    #         print(slab)
-
-    # with HandleExceptions({KeyboardInterrupt: 'You made an interrupt key combo!'}):
-    #     for _ in iter(slabs):
-    #         print(slabs)
-    #         if not slabs['audio'].is_running:
-    #             break
-    #
-    # print(f'\nQuitting the app...\n')
-    #
-    #
-    from i2.multi_object import FuncFanout
-    # TODO: Use a multi obj for this
 
     def audio_and_keyboard_data_callback(data):
         audio_data, keyboard_data = data
@@ -172,34 +154,18 @@ def keyboard_and_audio(
             print(f'{keyboard_data=}\n', end='\n\r')
         full_audio_print(audio_data)
 
-
-        # return keyboard_data
-    # audio_and_keyboard_data_callback = FuncFanout({
-    #     'audio': audio_data_callback,
-    #     'keyboard': keyboard_data_callback,
-    # })
-
-    # ws = SlabsPush(
-    #     slabs,
-    #     services={
-    #         # 'print': audio_and_keyboard_data_callback,
-    #         'print_raw': print_raw
-    #     },
-    # )
-
-    # Make SlabsPush2 work
     def dict_print_raw(data):
-        audio_data = data.get('audio', None)
-        keyboard_data = data.get('keyboard', None)
+        audio_data = data['audio']
+        keyboard_data = data['keyboard']
         if keyboard_data_signals_an_interrupt(keyboard_data):
             raise KeyboardInterrupt('You want to stop.')
         if keyboard_data is not None:
             print(f'{keyboard_data=}\n', end='\n\r')
         full_audio_print(audio_data)
 
-    from know.util import SlabsPush2
+    from know.util import SlabsPush, IteratorExit
 
-    ws = SlabsPush2(
+    ws = SlabsPush(
         slabs,
         services={
             # 'print': audio_and_keyboard_data_callback,
@@ -207,17 +173,14 @@ def keyboard_and_audio(
         },
     )
 
-    # for _ in iter(ws):
-    #     if not ws.slabs['audio'].is_running:
-    #         print("audio isn't running anymore!")
-    #         break
-
-    with HandleExceptions({KeyboardInterrupt: 'You made an interrupt key combo!'}):
+    with HandleExceptions({
+        KeyboardInterrupt: 'You made an interrupt key combo!',
+        IteratorExit: 'An iterator raised a IteratorExit'
+    }):
         for _ in iter(ws):
             if not ws.slabs['audio'].is_running:
                 print("audio isn't running anymore!")
                 break
-
 
 
     print(f'\nQuitting the app...\n')

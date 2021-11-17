@@ -42,7 +42,7 @@ def test_multi_iterator():
     #     audio=iter([1, 2, 3]), keyboard=iter([4, 5, 6])
     # )
 
-    from know.util import SlabsPush
+    from know.util import SlabsPushTuple
 
     def is_none(x):
         return x is None
@@ -68,7 +68,7 @@ def test_multi_iterator():
 
     slabs = MultiIterator(audio=iter([1, 2, 3]), keyboard=iter([4, 5, 6]))
     services = {'let_through': let_through, 'log': print}
-    app = SlabsPush(slabs=slabs, services=services)
+    app = SlabsPushTuple(slabs=slabs, services=services)
 
     assert list(app) == [
         {'audio': 1, 'keyboard': 4},
