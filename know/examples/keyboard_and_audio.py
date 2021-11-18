@@ -1,4 +1,6 @@
-"""Example of processing audio and keyboard streams"""
+"""
+Example of processing audio and keyboard streams
+"""
 import json
 from stream2py.stream_buffer import StreamBuffer
 from keyboardstream2py.keyboard_input import KeyboardInputSourceReader
