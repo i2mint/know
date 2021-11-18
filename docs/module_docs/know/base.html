@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>know.base &#8212; know 0.1.4 documentation</title>
+    <title>know.base &#8212; know 0.1.5 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -50,6 +50,30 @@ Typically, a slab will be the aggregation of multiple information streams that
 happened around the same time.</p>
 <p><code class="docutils literal notranslate"><span class="pre">SlabsIter</span></code> is a tool that allows you to source multiple streams into a stream of
 slabs that can contain the original data, or other datas computed from it, or both.</p>
+<p>Note to developers looking into the code: The overview of the <code class="docutils literal notranslate"><span class="pre">SlabsIter</span></code> class:</p>
+<blockquote>
+<div><p>class SlabsIter:
+…     def _call_on_scope(self, scope):
+…         ‘’’Calls the components 1 by 1, sourcing inputs and writing outputs in scope’’’
+…
+…     def <a href="#id1"><span class="problematic" id="id2">**</span></a>next**(self):
+…         ‘’’Get the next slab by calling _call_on_scope on an new empty scope.
+…         At least one of the components will have to be argument-less and provide
+…         some data for other components to get their inputs from, if any are needed.
+…         ‘’’
+…         return self._call_on_scope(scope={})
+…
+…     def <a href="#id3"><span class="problematic" id="id4">**</span></a>iter**(self):
+…         ‘’’Iterates over slabs until a handle exception is raised.’’’
+…         # Simplified code:
+…         with self:  # enter all the contexts that need to be entered
+…             while True:  # loop until you encounter a handled exception
+…                 try:
+…                     yield next(self)
+…                 except self.handle_exceptions as exc_val:
+…                     # use specific exceptions to signal that iteration should stop
+…                     break</p>
+</div></blockquote>
 <dl class="py exception">
 <dt id="know.base.ExceptionalException">
 <em class="property">exception </em><code class="sig-prename descclassname">know.base.</code><code class="sig-name descname">ExceptionalException</code><a class="reference internal" href="../../_modules/know/base.html#ExceptionalException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.base.ExceptionalException" title="Permalink to this definition">¶</a></dt>
@@ -125,7 +149,7 @@ from statistics import stdev</p>
 …
 …     return SlabsIter(
 …         # The first three components get data from the sensors.
-…         # The <a href="#id1"><span class="problematic" id="id2">*</span></a>_read objects are all callable, returning the next
+…         # The <a href="#id5"><span class="problematic" id="id6">*</span></a>_read objects are all callable, returning the next
 …         # chunk of data for that sensor, if any.
 …         audio=audio_sensor_read,
 …         light=light_sensor_read,
