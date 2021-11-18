@@ -104,38 +104,6 @@ def log_and_return(msg, logger=print):
     return msg
 
 
-# TODO: Could be made more flexible, or explicit. Used only with forms:
-#   func(), func(exc_val), func(calling_obj), func(exc_val, calling_obj)
-def call_using_args_if_needed(func, *args, **kwargs):
-    """Call `func` using the provided arguments only if `func` has arguments.
-
-    Use case:
-
-    We'd like the exception handlers to be easy to express.
-    Maybe you need the object raising the exception to handle it,
-    maybe you just want to log the event.
-    In the first case, you the handler needs the said object to be passed to it,
-    in the second, we don't need any arguments at all.
-
-    `call_using_args_if_needed` helps out here
-
-    In this case, you need the input arg (21):
-
-    >>> call_using_args_if_needed(lambda x: x * 2, 21)
-    42
-
-    In this case you don't:
-
-    >>> call_using_args_if_needed(lambda: 77, 21)
-    77
-    """
-    if len(Sig(func)) == 0:
-        # if signature of function has no arguments
-        return func()
-    else:  # otherwise, use the provided arguments
-        return func(*args, **kwargs)
-
-
 # TODO: Could consider (topologically) ordering the exceptions to reduce the matching
 #  possibilities (see _handle_exception)
 def _get_handle_exceptions(
@@ -150,21 +118,21 @@ def _get_handle_exceptions(
 
 
 def _handle_exception(
-    calling_object, exc_val: BaseException, handle_exceptions: HandledExceptionsMap
+    instance, exc_val: BaseException, handle_exceptions: HandledExceptionsMap
 ) -> ExceptionHandlerOutput:
     """Looks for an exception type matching exc_val and calls the corresponding
     handler with
     """
+    inputs = dict(exc_val=exc_val, instance=instance)
     if type(exc_val) in handle_exceptions:  # try precise matching first
         exception_handler = handle_exceptions[type(exc_val)]
-        return call_using_args_if_needed(
-            exception_handler, exc_val, calling_object
-        )
+        return _call_from_dict(inputs, exception_handler, Sig(exception_handler))
+
     else:  # if not, find the first matching parent
         for exc_type, exception_handler in handle_exceptions.items():
             if isinstance(exc_val, exc_type):
-                return call_using_args_if_needed(
-                    exception_handler, exc_val, calling_object
+                return _call_from_dict(
+                    inputs, exception_handler, Sig(exception_handler)
                 )
     # You never should get this far, but if you do, there's a problem, let's scream it:
     raise ExceptionalException(
@@ -176,6 +144,21 @@ def _call_from_dict(kwargs: dict, func: Callable, sig: Sig):
     """A i2.call_forgivingly optimized for our purpose
 
     The sig argument needs to be the Sig(func) to work correctly.
+
+    Two uses cases here:
+
+    - using a scope dict as both the source of `SlabsIter` components, and as a place
+    to temporarily store the outputs of these components.
+
+    - exception handlers: We'd like the exception handlers to be easy to express.
+    Maybe you need the object raising the exception to handle it,
+    maybe you just want to log the event.
+    In the first case, you the handler needs the said object to be passed to it,
+    in the second, we don't need any arguments at all.
+    With _call_from_dict, we don't have to choose, we just have to impose that
+    the handler use specific keywords (namely `exc_val` and/or `instance`)
+    when there are inputs.
+
     """
     args, kwargs = sig.args_and_kwargs_from_kwargs(
         kwargs,

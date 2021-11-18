@@ -56,7 +56,7 @@ def keyboard_and_audio(
     )
 
     def stop_if_audio_not_running(audio):
-        if not audio.is_running():
+        if audio is not None and not audio.is_running():
             raise IteratorExit("audio isn't running anymore!")
 
     def audio_print(audio):
@@ -76,7 +76,7 @@ def keyboard_and_audio(
         audio=audio_stream_buffer,
         keyboard=keyboard_stream_buffer,
         # check audio and keyboard for stopping signals
-        _audio_stop=stop_if_audio_not_running,
+        # _audio_stop=stop_if_audio_not_running,
         _keyboard_stop=keyboard_stop,
         # handle signals
         handle_exceptions=(IteratorExit, KeyboardInterrupt),
