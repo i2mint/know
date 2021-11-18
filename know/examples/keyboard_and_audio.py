@@ -1,6 +1,4 @@
 """Example of processing audio and keyboard streams"""
-import time
-from typing import Callable, NewType, Any
 import json
 from stream2py.stream_buffer import StreamBuffer
 from keyboardstream2py.keyboard_input import KeyboardInputSourceReader
@@ -8,16 +6,102 @@ from audiostream2py.audio import (
     PyAudioSourceReader,
     find_a_default_input_device_index,
 )
-
-from i2 import ContextFanout
-
-AudioData = NewType('AudioData', Any)
-KeyboardData = NewType('KeyboardData', Any)
-AudioDataCallback = Callable[[AudioData], Any]
-KeyboardDataCallback = Callable[[KeyboardData], Any]
+from know.base import SlabsIter, IteratorExit
 
 
-def default_audio_callback(audio_data):
+def keyboard_and_audio(
+    input_device_index=None,  # find index with PyAudioSourceReader.list_device_info()
+    rate=44100,
+    width=2,
+    channels=1,
+    frames_per_buffer=44100,  # same as sample rate for 1 second intervals
+    seconds_to_keep_in_stream_buffer=60,
+):
+    """Starts two independent streams: one for audio and another for keyboard inputs.
+    Prints stream type, timestamp, and additional info about data:
+    Shows input key pressed for keyboard and byte count for audio
+
+    Press Esc key to quit.
+
+    :param input_device_index: find index with PyAudioSourceReader.list_device_info()
+    :param rate: audio sample rate
+    :param width: audio byte width
+    :param channels: number of audio input channels
+    :param frames_per_buffer: audio samples per buffer
+    :param seconds_to_keep_in_stream_buffer: max size of audio buffer before data falls off
+    :return: None
+    """
+
+    input_device_index = handle_input_device_index(input_device_index)
+
+    # converts seconds_to_keep_in_stream_buffer to max number of buffers of size
+    # frames_per_buffer
+    maxlen = PyAudioSourceReader.audio_buffer_size_seconds_to_maxlen(
+        buffer_size_seconds=seconds_to_keep_in_stream_buffer,
+        rate=rate,
+        frames_per_buffer=frames_per_buffer,
+    )
+    audio_source_reader = PyAudioSourceReader(
+        rate=rate,
+        width=width,
+        channels=channels,
+        unsigned=True,
+        input_device_index=input_device_index,
+        frames_per_buffer=frames_per_buffer,
+    )
+    audio_stream_buffer = StreamBuffer(source_reader=audio_source_reader, maxlen=maxlen)
+
+    keyboard_stream_buffer = StreamBuffer(
+        source_reader=KeyboardInputSourceReader(), maxlen=maxlen
+    )
+
+    def stop_if_audio_not_running(audio):
+        if not audio.is_running():
+            raise IteratorExit("audio isn't running anymore!")
+
+    def audio_print(audio):
+        full_audio_print(audio)
+
+    def keyboard_stop(keyboard):
+        if keyboard_data_signals_an_interrupt(keyboard):
+            print('A feel a disturbance in the force...')
+            raise KeyboardInterrupt('You want to stop.')
+
+    def keyboard_print(keyboard):
+        if keyboard is not None:
+            print(f'{keyboard=}\n', end='\n\r')
+
+    app = SlabsIter(
+        # source the data
+        audio=audio_stream_buffer,
+        keyboard=keyboard_stream_buffer,
+        # check audio and keyboard for stopping signals
+        _audio_stop=stop_if_audio_not_running,
+        _keyboard_stop=keyboard_stop,
+        # handle signals
+        handle_exceptions=(IteratorExit, KeyboardInterrupt),
+        # do stuff
+        audio_print=audio_print,
+        keyboard_print=keyboard_print,
+    )
+
+    app()
+
+    print(f'\nQuitting the app...\n')
+
+
+def handle_input_device_index(input_device_index, verbose=1):
+    if input_device_index is None:
+        input_device_index = find_a_default_input_device_index()
+
+    audio_src_info = PyAudioSourceReader.info_of_input_device_index(input_device_index)
+    if verbose:
+        print(f'Starting audio device: {json.dumps(audio_src_info, indent=2)}\n')
+
+    return input_device_index
+
+
+def lite_audio_callback(audio_data):
     if audio_data is not None:
         (audio_timestamp, waveform, frame_count, time_info, status_flags,) = audio_data
         print(
@@ -35,18 +119,6 @@ def full_audio_print(audio_data):
             f' {frame_count=}, {time_info=}, {status_flags=}',
             end='\n\r',
         )
-
-
-def default_keyboard_event_callback(keyboard_data):
-    """Prints some data extracted from keyboard_data
-    :param keyboard_data: Input character
-    """
-    if keyboard_data is not None:
-        # print(f"{type(keyboard_data)=}, {len(keyboard_data)=}")
-        index, keyboard_timestamp, char = keyboard_data
-        print(f'[Keyboard] {keyboard_timestamp}: {char=} ({ord(char)=})', end='\n\r')
-        if keyboard_data_signals_an_interrupt(keyboard_data):
-            raise KeyboardInterrupt('You want to stop?')
 
 
 def keyboard_data_signals_an_interrupt(
@@ -75,100 +147,6 @@ def keyboard_data_signals_an_interrupt(
             return f'ascii code: {ord(char)} (See https://theasciicode.com.ar/)'
         else:
             return False
-
-
-def handle_input_device_index(input_device_index, verbose=1):
-    if input_device_index is None:
-        input_device_index = find_a_default_input_device_index()
-
-    audio_src_info = PyAudioSourceReader.info_of_input_device_index(input_device_index)
-    if verbose:
-        print(f'Starting audio device: {json.dumps(audio_src_info, indent=2)}\n')
-
-    return input_device_index
-
-
-def keyboard_and_audio(
-    input_device_index=None,  # find index with PyAudioSourceReader.list_device_info()
-    rate=44100,
-    width=2,
-    channels=1,
-    frames_per_buffer=44100,  # same as sample rate for 1 second intervals
-    seconds_to_keep_in_stream_buffer=60,
-    audio_data_callback: AudioDataCallback = default_audio_callback,
-    keyboard_data_callback: KeyboardDataCallback = default_keyboard_event_callback,
-):
-    """Starts two independent streams: one for audio and another for keyboard inputs.
-    Prints stream type, timestamp, and additional info about data:
-    Shows input key pressed for keyboard and byte count for audio
-
-    Press Esc key to quit.
-
-    :param input_device_index: find index with PyAudioSourceReader.list_device_info()
-    :param rate: audio sample rate
-    :param width: audio byte width
-    :param channels: number of audio input channels
-    :param frames_per_buffer: audio samples per buffer
-    :param seconds_to_keep_in_stream_buffer: max size of audio buffer before data falls off
-    :return: None
-    """
-
-    input_device_index = handle_input_device_index(input_device_index)
-
-    # converts seconds_to_keep_in_stream_buffer to max number of buffers of size frames_per_buffer
-    maxlen = PyAudioSourceReader.audio_buffer_size_seconds_to_maxlen(
-        buffer_size_seconds=seconds_to_keep_in_stream_buffer,
-        rate=rate,
-        frames_per_buffer=frames_per_buffer,
-    )
-    audio_source_reader = PyAudioSourceReader(
-        rate=rate,
-        width=width,
-        channels=channels,
-        unsigned=True,
-        input_device_index=input_device_index,
-        frames_per_buffer=frames_per_buffer,
-    )
-
-    audio_stream_buffer = StreamBuffer(source_reader=audio_source_reader, maxlen=maxlen)
-    keyboard_stream_buffer = StreamBuffer(
-        source_reader=KeyboardInputSourceReader(), maxlen=maxlen
-    )
-
-    from i2 import ContextFanout
-
-    def audio_print(audio):
-        full_audio_print(audio)
-
-    def keyboard_print(keyboard):
-        if keyboard_data_signals_an_interrupt(keyboard):
-            raise KeyboardInterrupt('You want to stop.')
-        if keyboard is not None:
-            print(f'{keyboard=}\n', end='\n\r')
-
-    from know.base import SlabsIter, IteratorExit
-
-    # TODO: Get SlabsIter to take care of the context fanout.
-    #  It does already (on iteration), but audio=audio_stream_buffer.__next__
-    #  specification raises RuntimeError: Readers should be made after starting
-    #  because out of context.
-    with ContextFanout(audio_stream_buffer, keyboard_stream_buffer):
-        sp = SlabsIter(
-            audio=audio_stream_buffer.__next__,
-            keyboard=keyboard_stream_buffer.__next__,
-            audio_print=audio_print,
-            keyboard_print=keyboard_print,
-            handle_exceptions=(IteratorExit, KeyboardInterrupt),
-        )
-
-        # Note: Don't need a `with sp` anymore since sp.__iter__ does it for me!
-        for _ in iter(sp):
-            pass
-        # if not ws['audio_stream_buffer'].is_running:
-        #     print("audio isn't running anymore!")
-        #     break
-
-    print(f'\nQuitting the app...\n')
 
 
 if __name__ == '__main__':

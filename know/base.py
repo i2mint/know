@@ -104,6 +104,8 @@ def log_and_return(msg, logger=print):
     return msg
 
 
+# TODO: Could be made more flexible, or explicit. Used only with forms:
+#   func(), func(exc_val), func(calling_obj), func(exc_val, calling_obj)
 def call_using_args_if_needed(func, *args, **kwargs):
     """Call `func` using the provided arguments only if `func` has arguments.
 
@@ -155,11 +157,15 @@ def _handle_exception(
     """
     if type(exc_val) in handle_exceptions:  # try precise matching first
         exception_handler = handle_exceptions[type(exc_val)]
-        return call_using_args_if_needed(exception_handler, calling_object)
+        return call_using_args_if_needed(
+            exception_handler, exc_val, calling_object
+        )
     else:  # if not, find the first matching parent
         for exc_type, exception_handler in handle_exceptions.items():
             if isinstance(exc_val, exc_type):
-                return call_using_args_if_needed(exception_handler, calling_object)
+                return call_using_args_if_needed(
+                    exception_handler, exc_val, calling_object
+                )
     # You never should get this far, but if you do, there's a problem, let's scream it:
     raise ExceptionalException(
         f"I couldn't find that exception in my handlers: {exc_val}"
@@ -362,3 +368,7 @@ class SlabsIter:
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         return self._output_of_context_enter.__exit__(exc_type, exc_val, exc_tb)
+
+    def __call__(self):
+        for _ in self:
+            pass
