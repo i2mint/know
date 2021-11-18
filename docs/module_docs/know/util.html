@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>know.util &mdash; know 0.1.6 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script src="../../_static/toggleprompt.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="prev" title="know.scrap.pieces" href="scrap/pieces.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> know
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../know.html">know</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_to_store.html">know.audio_to_store</a></li>
+<li class="toctree-l1"><a class="reference internal" href="base.html">know.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/http_response.html">HTTP Response streaming reader with no external dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/http_sensor.html">know.examples.http_sensor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/keyboard_and_audio.html">know.examples.keyboard_and_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="http_sensor_sim.html">know.http_sensor_sim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scrap/architectures.html">know.scrap.architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scrap/pieces.html">know.scrap.pieces</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">know.util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">know</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>know.util</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/know/util.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-know.util">
+<span id="know-util"></span><h1>know.util<a class="headerlink" href="#module-know.util" title="Permalink to this headline">¶</a></h1>
+<p>Util objects</p>
+<dl class="py class">
+<dt id="know.util.FixedStepHunker">
+<em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">FixedStepHunker</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src</span></em>, <em class="sig-param"><span class="n">chk_size</span></em>, <em class="sig-param"><span class="n">chk_step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">start_idx</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">end_idx</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#FixedStepHunker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.FixedStepHunker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="know.util.LiveProcess">
+<em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">LiveProcess</code><span class="sig-paren">(</span><em class="sig-param">streams: Dict[str, Iterable], slab_callback: Callable[[Slab], Any] = &lt;built-in function print&gt;, walk: Callable = &lt;class 'know.util.DictZip'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#LiveProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.LiveProcess" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="know.util.LiveProcess.slab_callback">
+<code class="sig-name descname">slab_callback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#know.util.LiveProcess.slab_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>print(value, …, sep=’ ‘, end=’n’, file=sys.stdout, flush=False)</p>
+<p>Prints the values to a stream, or to sys.stdout by default.
+Optional keyword arguments:
+file:  a file-like object (stream); defaults to the current sys.stdout.
+sep:   string inserted between values, default a space.
+end:   string appended after the last value, default a newline.
+flush: whether to forcibly flush the stream.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="know.util.MultiIterable">
+<em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">MultiIterable</code><span class="sig-paren">(</span><em class="sig-param">*unnamed, stop_condition: Callable[[Any], bool] = &lt;function always_false&gt;, **named</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#MultiIterable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.MultiIterable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Join several iterables together.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">know.util</span> <span class="kn">import</span> <span class="n">any_value_is_none</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">any_value_is_none</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="nb">any</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">d</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mk_multi_iterable</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">MultiIterable</span><span class="p">,</span> <span class="n">stop_condition</span><span class="o">=</span><span class="n">any_value_is_none</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mi</span> <span class="o">=</span> <span class="n">mk_multi_iterable</span><span class="p">(</span><span class="n">lets</span><span class="o">=</span><span class="s1">&#39;abc&#39;</span><span class="p">,</span> <span class="n">nums</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">mi</span><span class="p">)</span>
+<span class="go">[{&#39;lets&#39;: &#39;a&#39;, &#39;nums&#39;: 1}, {&#39;lets&#39;: &#39;b&#39;, &#39;nums&#39;: 2}, {&#39;lets&#39;: &#39;c&#39;, &#39;nums&#39;: 3}]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mi</span> <span class="o">=</span> <span class="n">MultiIterable</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">stop_condition</span><span class="o">=</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">mi</span><span class="p">)</span>
+<span class="go">[{&#39;x&#39;: 5, &#39;y&#39;: 1}, {&#39;x&#39;: 4, &#39;y&#39;: 2}]</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="know.util.MultiIterable.takewhile">
+<code class="sig-name descname">takewhile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">predicate</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#MultiIterable.takewhile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.MultiIterable.takewhile" title="Permalink to this definition">¶</a></dt>
+<dd><p>itertools.takewhile applied to self, with a bit of syntactic sugar
+There’s nothing to stop the iteration</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="know.util.SlabsPush">
+<em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">SlabsPush</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">slabs</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span>Slab<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">services</span><span class="p">:</span> <span class="n">Mapping<span class="p">[</span>str<span class="p">, </span>Consumer<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#SlabsPush"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.SlabsPush" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="know.util.SlabsPushTuple">
+<em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">SlabsPushTuple</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">slabs</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span>Slab<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">services</span><span class="p">:</span> <span class="n">Mapping<span class="p">[</span>str<span class="p">, </span>Consumer<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#SlabsPushTuple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.SlabsPushTuple" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="know.util.always_false">
+<code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">always_false</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> &#x2192; False<a class="reference internal" href="../../_modules/know/util.html#always_false"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.always_false" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns False, regardless of input. Meant for stopping (filter) functions</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="know.util.always_true">
+<code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">always_true</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span><span class="p">:</span> <span class="n">Any</span></em><span class="sig-paren">)</span> &#x2192; True<a class="reference internal" href="../../_modules/know/util.html#always_true"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.always_true" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True, regardless of input. Meant for filter functions.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="know.util.any_value_is_none">
+<code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">any_value_is_none</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span><span class="p">:</span> <span class="n">Mapping</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#any_value_is_none"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.any_value_is_none" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if any value of the mapping is None</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="scrap/pieces.html" class="btn btn-neutral float-left" title="know.scrap.pieces" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
