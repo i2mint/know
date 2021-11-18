@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>know.base &mdash; know 0.1.6 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <title>know.base &mdash; know 0.1.7 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
@@ -183,6 +183,8 @@
     <span class="k">return</span> <span class="n">msg</span>
 
 
+<span class="c1"># TODO: Could be made more flexible, or explicit. Used only with forms:</span>
+<span class="c1">#   func(), func(exc_val), func(calling_obj), func(exc_val, calling_obj)</span>
 <div class="viewcode-block" id="call_using_args_if_needed"><a class="viewcode-back" href="../../module_docs/know/base.html#know.base.call_using_args_if_needed">[docs]</a><span class="k">def</span> <span class="nf">call_using_args_if_needed</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Call `func` using the provided arguments only if `func` has arguments.</span>
 
@@ -234,11 +236,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">exc_val</span><span class="p">)</span> <span class="ow">in</span> <span class="n">handle_exceptions</span><span class="p">:</span>  <span class="c1"># try precise matching first</span>
         <span class="n">exception_handler</span> <span class="o">=</span> <span class="n">handle_exceptions</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">exc_val</span><span class="p">)]</span>
-        <span class="k">return</span> <span class="n">call_using_args_if_needed</span><span class="p">(</span><span class="n">exception_handler</span><span class="p">,</span> <span class="n">calling_object</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">call_using_args_if_needed</span><span class="p">(</span><span class="n">exception_handler</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">calling_object</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>  <span class="c1"># if not, find the first matching parent</span>
         <span class="k">for</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exception_handler</span> <span class="ow">in</span> <span class="n">handle_exceptions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">call_using_args_if_needed</span><span class="p">(</span><span class="n">exception_handler</span><span class="p">,</span> <span class="n">calling_object</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">call_using_args_if_needed</span><span class="p">(</span>
+                    <span class="n">exception_handler</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">calling_object</span>
+                <span class="p">)</span>
     <span class="c1"># You never should get this far, but if you do, there&#39;s a problem, let&#39;s scream it:</span>
     <span class="k">raise</span> <span class="n">ExceptionalException</span><span class="p">(</span>
         <span class="sa">f</span><span class="s2">&quot;I couldn&#39;t find that exception in my handlers: </span><span class="si">{</span><span class="n">exc_val</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -440,7 +444,11 @@
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_of_context_enter</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_of_context_enter</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">pass</span></div>
 </pre></div>
 
            </div>

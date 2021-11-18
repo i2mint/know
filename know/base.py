@@ -157,9 +157,7 @@ def _handle_exception(
     """
     if type(exc_val) in handle_exceptions:  # try precise matching first
         exception_handler = handle_exceptions[type(exc_val)]
-        return call_using_args_if_needed(
-            exception_handler, exc_val, calling_object
-        )
+        return call_using_args_if_needed(exception_handler, exc_val, calling_object)
     else:  # if not, find the first matching parent
         for exc_type, exception_handler in handle_exceptions.items():
             if isinstance(exc_val, exc_type):
