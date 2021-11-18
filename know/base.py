@@ -10,31 +10,55 @@ happened around the same time.
 
 `SlabsIter` is a tool that allows you to source multiple streams into a stream of
 slabs that can contain the original data, or other datas computed from it, or both.
+
+Note to developers looking into the code: The overview of the `SlabsIter` class:
+
+>>> class SlabsIter:
+...     def _call_on_scope(self, scope):
+...         '''Calls the components 1 by 1, sourcing inputs and writing outputs in scope'''
+...
+...     def __next__(self):
+...         '''Get the next slab by calling _call_on_scope on an new empty scope.
+...         At least one of the components will have to be argument-less and provide
+...         some data for other components to get their inputs from, if any are needed.
+...         '''
+...         return self._call_on_scope(scope={})
+...
+...     def __iter__(self):
+...         '''Iterates over slabs until a handle exception is raised.'''
+...         # Simplified code:
+...         with self:  # enter all the contexts that need to be entered
+...             while True:  # loop until you encounter a handled exception
+...                 try:
+...                     yield next(self)
+...                 except self.handle_exceptions as exc_val:
+...                     # use specific exceptions to signal that iteration should stop
+...                     break
 """
 
 # The main
 # ```
-# class SlabsIter:
-#     def _call_on_scope(self, scope):
-#     """Calls the components 1 by 1, sourcing inputs and writing outputs in scope"""
-#
-#     def __next__(self):
-#         """Get the next slab by calling _call_on_scope on an new empty scope.
-#         At least one of the components will have to be argument-less and provide
-#         some data for other components to get their inputs from, if any are needed.
-#         """
-#         return self._call_on_scope(scope={})
-#
-#     def __iter__(self):
-#         """Iterates over slabs until a handle exception is raised."""
-#         # Simplified code:
-#         with self:  # enter all the contexts that need to be entered
-#             while True:  # loop until you encounter a handled exception
-#                 try:
-#                     yield next(self)
-#                 except self.handle_exceptions as exc_val:
-#                     # use specific exceptions to signal that iteration should stop
-#                     break
+class SlabsIter:
+    def _call_on_scope(self, scope):
+        """Calls the components 1 by 1, sourcing inputs and writing outputs in scope"""
+
+    def __next__(self):
+        """Get the next slab by calling _call_on_scope on an new empty scope.
+        At least one of the components will have to be argument-less and provide
+        some data for other components to get their inputs from, if any are needed.
+        """
+        return self._call_on_scope(scope={})
+
+    def __iter__(self):
+        """Iterates over slabs until a handle exception is raised."""
+        # Simplified code:
+        with self:  # enter all the contexts that need to be entered
+            while True:  # loop until you encounter a handled exception
+                try:
+                    yield next(self)
+                except self.handle_exceptions as exc_val:
+                    # use specific exceptions to signal that iteration should stop
+                    break
 
 
 # ```
