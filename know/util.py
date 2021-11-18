@@ -8,6 +8,7 @@ from i2 import ContextFanout, FuncFanout, MultiObj, Pipe
 from atypes import Slab, Hunk, FiltFunc, MyType
 from creek import Creek
 from creek.util import to_iterator
+from know.base import do_not_break, IteratorExit
 from taped import chunk_indices
 
 SlabCallback = Callable[[Slab], Any]
@@ -25,17 +26,6 @@ SlabService = MyType(
 Name = str
 # BoolFunc = Callable[[...], bool]
 FiltFunc = Callable[[Any], bool]
-
-
-class IteratorExit(BaseException):
-    """Raised when an iterator should quit being iterated on, signaling this event
-    any process that cares to catch the signal.
-    We chose to inherit directly from `BaseException` instead of `Exception`
-    for the same reason that `GeneratorExit` does: Because it's not technically
-    an error.
-
-    See: https://docs.python.org/3/library/exceptions.html#GeneratorExit
-    """
 
 
 class _MultiIterator(MultiObj):
@@ -212,17 +202,11 @@ class SlabsPush:
                     break
 
 
-@dataclass
-class Slabbing:
-    slabs: Slabs
-    slab_callback: SlabCallback
-
-    def __call__(self):
-        with ContextFanout(self.slabs, self.slab_callback):
-            for slab in self.slabs:
-                callback_output = self.slab_callback(slab)
-
-        return callback_output
+do_not_break.__doc__ = (
+    'Sentinel that should be used to signal SlabsIter iteration not to break. '
+    'This sentinel should be returned by exception handlers if they want to tell '
+    'the iteration not to stop (in all other cases, the iteration will stop)'
+)
 
 
 class DictZip:

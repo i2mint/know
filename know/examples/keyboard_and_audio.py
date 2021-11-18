@@ -135,54 +135,38 @@ def keyboard_and_audio(
         source_reader=KeyboardInputSourceReader(), maxlen=maxlen
     )
 
-    from know.util import SlabsPushTuple
-    from i2 import HandleExceptions
+    from i2 import ContextFanout
 
-    slabs = ContextFanout(audio=audio_stream_buffer, keyboard=keyboard_stream_buffer)
+    def audio_print(audio):
+        full_audio_print(audio)
 
-    def audio_and_keyboard_data_callback(data):
-        audio_data, keyboard_data = data
-        if keyboard_data_signals_an_interrupt(keyboard_data):
-            raise KeyboardInterrupt('You want to stop?')
-        return audio_data_callback(audio_data), keyboard_data_callback(keyboard_data)
-
-    def print_raw(data):
-        audio_data, keyboard_data = data
-        if keyboard_data_signals_an_interrupt(keyboard_data):
+    def keyboard_print(keyboard):
+        if keyboard_data_signals_an_interrupt(keyboard):
             raise KeyboardInterrupt('You want to stop.')
-        if keyboard_data is not None:
-            print(f'{keyboard_data=}\n', end='\n\r')
-        full_audio_print(audio_data)
+        if keyboard is not None:
+            print(f'{keyboard=}\n', end='\n\r')
 
-    def dict_print_raw(data):
-        audio_data = data['audio']
-        keyboard_data = data['keyboard']
-        if keyboard_data_signals_an_interrupt(keyboard_data):
-            raise KeyboardInterrupt('You want to stop.')
-        if keyboard_data is not None:
-            print(f'{keyboard_data=}\n', end='\n\r')
-        full_audio_print(audio_data)
+    from know.base import SlabsIter, IteratorExit
 
-    from know.util import SlabsPush, IteratorExit
+    # TODO: Get SlabsIter to take care of the context fanout.
+    #  It does already (on iteration), but audio=audio_stream_buffer.__next__
+    #  specification raises RuntimeError: Readers should be made after starting
+    #  because out of context.
+    with ContextFanout(audio_stream_buffer, keyboard_stream_buffer):
+        sp = SlabsIter(
+            audio=audio_stream_buffer.__next__,
+            keyboard=keyboard_stream_buffer.__next__,
+            audio_print=audio_print,
+            keyboard_print=keyboard_print,
+            handle_exceptions=(IteratorExit, KeyboardInterrupt),
+        )
 
-    ws = SlabsPush(
-        slabs,
-        services={
-            # 'print': audio_and_keyboard_data_callback,
-            'print_raw': dict_print_raw
-        },
-    )
-
-    with HandleExceptions(
-        {
-            KeyboardInterrupt: 'You made an interrupt key combo!',
-            IteratorExit: 'An iterator raised a IteratorExit',
-        }
-    ):
-        for _ in iter(ws):
-            if not ws.slabs['audio'].is_running:
-                print("audio isn't running anymore!")
-                break
+        # Note: Don't need a `with sp` anymore since sp.__iter__ does it for me!
+        for _ in iter(sp):
+            pass
+        # if not ws['audio_stream_buffer'].is_running:
+        #     print("audio isn't running anymore!")
+        #     break
 
     print(f'\nQuitting the app...\n')
 
