@@ -4,6 +4,7 @@
 
    module_docs/know
    module_docs/know/audio_to_store
+   module_docs/know/base
    module_docs/know/examples/http_response
    module_docs/know/examples/http_sensor
    module_docs/know/examples/keyboard_and_audio

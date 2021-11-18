@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>know.util &#8212; know 0.1.2 documentation</title>
+    <title>know.util &#8212; know 0.1.3 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -47,6 +47,7 @@
 <span class="kn">from</span> <span class="nn">atypes</span> <span class="kn">import</span> <span class="n">Slab</span><span class="p">,</span> <span class="n">Hunk</span><span class="p">,</span> <span class="n">FiltFunc</span><span class="p">,</span> <span class="n">MyType</span>
 <span class="kn">from</span> <span class="nn">creek</span> <span class="kn">import</span> <span class="n">Creek</span>
 <span class="kn">from</span> <span class="nn">creek.util</span> <span class="kn">import</span> <span class="n">to_iterator</span>
+<span class="kn">from</span> <span class="nn">know.base</span> <span class="kn">import</span> <span class="n">do_not_break</span><span class="p">,</span> <span class="n">IteratorExit</span>
 <span class="kn">from</span> <span class="nn">taped</span> <span class="kn">import</span> <span class="n">chunk_indices</span>
 
 <span class="n">SlabCallback</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Slab</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span>
@@ -64,17 +65,6 @@
 <span class="n">Name</span> <span class="o">=</span> <span class="nb">str</span>
 <span class="c1"># BoolFunc = Callable[[...], bool]</span>
 <span class="n">FiltFunc</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span>
-
-
-<div class="viewcode-block" id="IteratorExit"><a class="viewcode-back" href="../../module_docs/know/util.html#know.util.IteratorExit">[docs]</a><span class="k">class</span> <span class="nc">IteratorExit</span><span class="p">(</span><span class="ne">BaseException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Raised when an iterator should quit being iterated on, signaling this event</span>
-<span class="sd">    any process that cares to catch the signal.</span>
-<span class="sd">    We chose to inherit directly from `BaseException` instead of `Exception`</span>
-<span class="sd">    for the same reason that `GeneratorExit` does: Because it&#39;s not technically</span>
-<span class="sd">    an error.</span>
-
-<span class="sd">    See: https://docs.python.org/3/library/exceptions.html#GeneratorExit</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
 
 
 <span class="k">class</span> <span class="nc">_MultiIterator</span><span class="p">(</span><span class="n">MultiObj</span><span class="p">):</span>
@@ -251,17 +241,11 @@
                     <span class="k">break</span></div>
 
 
-<div class="viewcode-block" id="Slabbing"><a class="viewcode-back" href="../../module_docs/know/util.html#know.util.Slabbing">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">Slabbing</span><span class="p">:</span>
-    <span class="n">slabs</span><span class="p">:</span> <span class="n">Slabs</span>
-    <span class="n">slab_callback</span><span class="p">:</span> <span class="n">SlabCallback</span>
-
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">ContextFanout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slabs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slab_callback</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">slab</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">slabs</span><span class="p">:</span>
-                <span class="n">callback_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">slab_callback</span><span class="p">(</span><span class="n">slab</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">callback_output</span></div>
+<span class="n">do_not_break</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s1">&#39;Sentinel that should be used to signal SlabsIter iteration not to break. &#39;</span>
+    <span class="s1">&#39;This sentinel should be returned by exception handlers if they want to tell &#39;</span>
+    <span class="s1">&#39;the iteration not to stop (in all other cases, the iteration will stop)&#39;</span>
+<span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">DictZip</span><span class="p">:</span>
@@ -362,6 +346,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know.html">know</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/audio_to_store.html">know.audio_to_store</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/base.html">know.base</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/http_response.html">HTTP Response streaming reader with no external dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/http_sensor.html">know.examples.http_sensor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/keyboard_and_audio.html">know.examples.keyboard_and_audio</a></li>

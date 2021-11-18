@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>know.base &#8212; know 0.1.3 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../_static/toggleprompt.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="HTTP Response streaming reader with no external dependencies" href="examples/http_response.html" />
+    <link rel="prev" title="know.audio_to_store" href="audio_to_store.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-know.base">
+<span id="know-base"></span><h1>know.base<a class="headerlink" href="#module-know.base" title="Permalink to this headline">¶</a></h1>
+<p>Base objects for know</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">SlabsIter</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="p">:</span>  <span class="c1"># enter all the contexts that need to be entered</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>  <span class="c1"># loop until you encounter a handled exception</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="k">except</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_exceptions</span> <span class="k">as</span> <span class="n">exc_val</span><span class="p">:</span>
+                    <span class="c1"># use specific exceptions to signal that iteration should stop</span>
+                    <span class="k">break</span>
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_on_scope</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="p">{})</span>
+
+    <span class="k">def</span> <span class="nf">_call_on_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
+        <span class="c1"># for each component</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">component</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># call the component using scope to source any arguments it needs</span>
+            <span class="c1"># and write the result in scope, under the component&#39;s name.</span>
+            <span class="n">scope</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_call_from_dict</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigs</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">scope</span>
+</pre></div>
+</div>
+<dl class="py exception">
+<dt id="know.base.ExceptionalException">
+<em class="property">exception </em><code class="sig-prename descclassname">know.base.</code><code class="sig-name descname">ExceptionalException</code><a class="reference internal" href="../../_modules/know/base.html#ExceptionalException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.base.ExceptionalException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when an exception was supposed to be handled, but no matching handler
+was found.</p>
+<p>See the <code class="docutils literal notranslate"><span class="pre">_handle_exception</span></code> function, where it is raised.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="know.base.IteratorExit">
+<em class="property">exception </em><code class="sig-prename descclassname">know.base.</code><code class="sig-name descname">IteratorExit</code><a class="reference internal" href="../../_modules/know/base.html#IteratorExit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.base.IteratorExit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when an iterator should quit being iterated on, signaling this event
+any process that cares to catch the signal.
+We chose to inherit directly from <code class="docutils literal notranslate"><span class="pre">BaseException</span></code> instead of <code class="docutils literal notranslate"><span class="pre">Exception</span></code>
+for the same reason that <code class="docutils literal notranslate"><span class="pre">GeneratorExit</span></code> does: Because it’s not technically
+an error.</p>
+<p>See: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#GeneratorExit">https://docs.python.org/3/library/exceptions.html#GeneratorExit</a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="know.base.SlabsIter">
+<em class="property">class </em><code class="sig-prename descclassname">know.base.</code><code class="sig-name descname">SlabsIter</code><span class="sig-paren">(</span><em class="sig-param">handle_exceptions=(&lt;class 'StopIteration'&gt;</em>, <em class="sig-param">&lt;class 'know.base.IteratorExit'&gt;</em>, <em class="sig-param">&lt;class 'KeyboardInterrupt'&gt;)</em>, <em class="sig-param">**components</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/base.html#SlabsIter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.base.SlabsIter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object to source and create multiple streams.</p>
+<p>A slab is a collection of items of a same interval of time.
+We represent a slab using a <code class="docutils literal notranslate"><span class="pre">dict</span></code> or mapping.
+Typically, a slab will be the aggregation of multiple information streams that
+happened around the same time.</p>
+<p>For example, say and edge device had a microphone, light, and movement sensor.
+An aggregate reading of these sensors could give you something like:</p>
+<blockquote>
+<div><p>slab = {‘audio’: [1, 2, 4], ‘light’: 126, ‘movement’: None}</p>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">movement</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code> because the sensor is off. If it were on, we’d have True or
+False as values.</p>
+<p>From this information, you’d like to compute a <code class="docutils literal notranslate"><span class="pre">turn_mov_on</span></code> value based on the
+formula</p>
+<blockquote>
+<div><p>from statistics import stdev
+vol = stdev
+should_turn_movement_sensor_on = lambda audio, light: vol(audio) * light &gt; 50000</p>
+</div></blockquote>
+<p>The produce of the volume and the lumens gives you 192, so you now have…</p>
+<blockquote>
+<div><p>slab = {‘audio’: [1, 2, 4], ‘light’: 126, ‘turn_mov_on’: False, ‘movement’: None}</p>
+</div></blockquote>
+<p>The next slab that comes in is</p>
+<blockquote>
+<div><p>slab = {‘audio’: [-96, 89, -92], ‘light’: 501, ‘movement’: None}</p>
+</div></blockquote>
+<p>which puts us over the threshold so</p>
+<blockquote>
+<div><p>slab = {
+…     ‘audio’: [-96, 89, -92], ‘light’: 501, ‘turn_mov_on’: True, ‘movement’: None
+… }</p>
+</div></blockquote>
+<p>and the movement sensor is turned on, the movement is detected, a <code class="docutils literal notranslate"><span class="pre">human_presence</span></code>
+signal is computed, and a notification sent if that metric is above a given theshold.</p>
+<p>The point here is that we incrementally compute various fields, enhancing our slab
+of information, and we do so iteratively over over slab that is streaming to us
+from our smart home device.</p>
+<p><code class="docutils literal notranslate"><span class="pre">SlabsIter</span></code> is there to help you create such slabs, from source to enhanced.</p>
+<p>The situation above would look something along like this:</p>
+<blockquote>
+<div><p>from know.base import SlabsIter
+from statistics import stdev</p>
+<p>vol = stdev</p>
+<p>def make_a_slabs_iter():
+…
+…     # Mocking the sensor readers
+…     audio_sensor_read = iter([[1, 2, 3], [-96, 87, -92], [320, -96, 99]]).**next**
+…     light_sensor_read = iter([126, 501, 523]).**next**
+…     movement_sensor_read = iter([None, None, True]).**next**
+…
+…     return SlabsIter(
+…         # The first three components get data from the sensors.
+…         # The <a href="#id1"><span class="problematic" id="id2">*</span></a>_read objects are all callable, returning the next
+…         # chunk of data for that sensor, if any.
+…         audio=audio_sensor_read,
+…         light=light_sensor_read,
+…         movement=movement_sensor_read,
+…         # The next
+…         should_turn_movement_sensor_on = lambda audio, light: vol(audio) * light &gt; 50000,
+…         human_presence_score = lambda audio, light, movement: movement and sum([vol(audio), light]),
+…         should_notify = lambda human_presence_score: human_presence_score and human_presence_score &gt; 700,
+…         notify = lambda should_notify: print(‘someone is there’) if should_notify else None
+…     )
+…</p>
+<p>si = make_a_slabs_iter()
+next(si)  # doctest: +NORMALIZE_WHITESPACE
+{‘audio’: [1, 2, 3],
+‘light’: 126,
+‘movement’: None,
+‘should_turn_movement_sensor_on’: False,
+‘human_presence_score’: None,
+‘should_notify’: None,
+‘notify’: None}
+next(si)  # doctest: +NORMALIZE_WHITESPACE
+{‘audio’: [-96, 87, -92],
+‘light’: 501,
+‘movement’: None,
+‘should_turn_movement_sensor_on’: True,
+‘human_presence_score’: None,
+‘should_notify’: None,
+‘notify’: None}
+next(si)  # doctest: +NORMALIZE_WHITESPACE
+someone is there
+{‘audio’: [320, -96, 99],
+‘light’: 523,
+‘movement’: True,
+‘should_turn_movement_sensor_on’: True,
+‘human_presence_score’: 731.1353726143957,
+‘should_notify’: True,
+‘notify’: None}</p>
+</div></blockquote>
+<p>If you ask for the next slab, you’ll get a <code class="docutils literal notranslate"><span class="pre">StopIteration</span></code> (raised by the mocked
+sources since they reached the end of their iterators).</p>
+<blockquote>
+<div><p>next(si)  # doctest: +NORMALIZE_WHITESPACE
+Traceback (most recent call last):
+…
+StopIteration</p>
+</div></blockquote>
+<p>That said, if you iterate through a <code class="docutils literal notranslate"><span class="pre">SlabsIter</span></code> that handles the <code class="docutils literal notranslate"><span class="pre">StopIteration</span></code>
+exception (it does by default), you’ll reach the end of you iteration gracefully.</p>
+<blockquote>
+<div><p>si = make_a_slabs_iter()
+for slab in si:
+…     pass
+someone is there
+si = make_a_slabs_iter()
+slabs = list(si)  # gather all the slabs
+someone is there
+len(slabs)
+3
+slabs[-1]  # doctest: +NORMALIZE_WHITESPACE
+{‘audio’: [320, -96, 99],
+‘light’: 523,
+‘movement’: True,
+‘should_turn_movement_sensor_on’: True,
+‘human_presence_score’: 731.1353726143957,
+‘should_notify’: True,
+‘notify’: None}</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="know.base.call_using_args_if_needed">
+<code class="sig-prename descclassname">know.base.</code><code class="sig-name descname">call_using_args_if_needed</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/base.html#call_using_args_if_needed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.base.call_using_args_if_needed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call <code class="docutils literal notranslate"><span class="pre">func</span></code> using the provided arguments only if <code class="docutils literal notranslate"><span class="pre">func</span></code> has arguments.</p>
+<p>Use case:</p>
+<p>We’d like the exception handlers to be easy to express.
+Maybe you need the object raising the exception to handle it,
+maybe you just want to log the event.
+In the first case, you the handler needs the said object to be passed to it,
+in the second, we don’t need any arguments at all.</p>
+<p><code class="docutils literal notranslate"><span class="pre">call_using_args_if_needed</span></code> helps out here</p>
+<p>In this case, you need the input arg (21):</p>
+<blockquote>
+<div><p>call_using_args_if_needed(lambda x: x * 2, 21)
+42</p>
+</div></blockquote>
+<p>In this case you don’t:</p>
+<blockquote>
+<div><p>call_using_args_if_needed(lambda: 77, 21)
+77</p>
+</div></blockquote>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">know</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../know.html">know</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_to_store.html">know.audio_to_store</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">know.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/http_response.html">HTTP Response streaming reader with no external dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/http_sensor.html">know.examples.http_sensor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/keyboard_and_audio.html">know.examples.keyboard_and_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="http_sensor_sim.html">know.http_sensor_sim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scrap/architectures.html">know.scrap.architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scrap/pieces.html">know.scrap.pieces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html">know.util</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="audio_to_store.html" title="previous chapter">know.audio_to_store</a></li>
+      <li>Next: <a href="examples/http_response.html" title="next chapter">HTTP Response streaming reader with no external dependencies</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;NO COPYRIGHT.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/module_docs/know/base.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
