@@ -1,29 +1,44 @@
 """Base objects for know
 
-```
-class SlabsIter:
-    def __iter__(self):
-        with self:  # enter all the contexts that need to be entered
-            while True:  # loop until you encounter a handled exception
-                try:
-                    yield next(self)
-                except self.handle_exceptions as exc_val:
-                    # use specific exceptions to signal that iteration should stop
-                    break
+The main object of this module is `SlabsIter`, and object to source and manipulate
+multiple streams.
 
-    def __next__(self):
-        return self._call_on_scope(scope={})
+A slab is a collection of items of a same interval of time.
+We represent a slab using a `dict` or mapping.
+Typically, a slab will be the aggregation of multiple information streams that
+happened around the same time.
 
-    def _call_on_scope(self, scope):
-        # for each component
-        for name, component in self.components.items():
-            # call the component using scope to source any arguments it needs
-            # and write the result in scope, under the component's name.
-            scope[name] = _call_from_dict(scope, component, self.sigs[name])
-        return scope
-```
-
+`SlabsIter` is a tool that allows you to source multiple streams into a stream of
+slabs that can contain the original data, or other datas computed from it, or both.
 """
+
+# The main
+# ```
+# class SlabsIter:
+#     def _call_on_scope(self, scope):
+#     """Calls the components 1 by 1, sourcing inputs and writing outputs in scope"""
+#
+#     def __next__(self):
+#         """Get the next slab by calling _call_on_scope on an new empty scope.
+#         At least one of the components will have to be argument-less and provide
+#         some data for other components to get their inputs from, if any are needed.
+#         """
+#         return self._call_on_scope(scope={})
+#
+#     def __iter__(self):
+#         """Iterates over slabs until a handle exception is raised."""
+#         # Simplified code:
+#         with self:  # enter all the contexts that need to be entered
+#             while True:  # loop until you encounter a handled exception
+#                 try:
+#                     yield next(self)
+#                 except self.handle_exceptions as exc_val:
+#                     # use specific exceptions to signal that iteration should stop
+#                     break
+
+
+# ```
+
 from typing import Callable, Mapping, Iterable, Union, NewType, Any
 from i2 import Sig, ContextFanout
 
@@ -169,7 +184,7 @@ def _call_from_dict(kwargs: dict, func: Callable, sig: Sig):
 
 # TODO: Postelize (or add tooling for) the components specification and add validation.
 class SlabsIter:
-    """Object to source and create multiple streams.
+    """Object to source and manipulate multiple streams.
     
     A slab is a collection of items of a same interval of time.
     We represent a slab using a `dict` or mapping.
@@ -311,7 +326,24 @@ class SlabsIter:
         }
         self.context = ContextFanout(**components)
 
+    def _call_on_scope(self, scope: Mapping):
+        """Calls the components 1 by 1, sourcing inputs and writing outputs in scope"""
+        # for each component
+        for name, component in self.components.items():
+            # call the component using scope to source any arguments it needs
+            # and write the result in scope, under the component's name.
+            scope[name] = _call_from_dict(scope, component, self.sigs[name])
+        return scope
+
+    def __next__(self):
+        """Get the next slab by calling _call_on_scope on an new empty scope.
+        At least one of the components will have to be argument-less and provide
+        some data for other components to get their inputs from, if any are needed.
+        """
+        return self._call_on_scope(scope={})
+
     def __iter__(self):
+        """Iterates over slabs until a handle exception is raised."""
         with self:  # enter all the contexts that need to be entered
             while True:  # loop until you encounter a handled exception
                 try:
@@ -324,17 +356,6 @@ class SlabsIter:
                     if handler_output is not do_not_break:
                         self.exit_value = handler_output  # remember, in case useful
                         break
-
-    def __next__(self):
-        return self._call_on_scope(scope={})
-
-    def _call_on_scope(self, scope):
-        # for each component
-        for name, component in self.components.items():
-            # call the component using scope to source any arguments it needs
-            # and write the result in scope, under the component's name.
-            scope[name] = _call_from_dict(scope, component, self.sigs[name])
-        return scope
 
     def __enter__(self):
         self._output_of_context_enter = self.context.__enter__()
