@@ -1,0 +1,460 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>know.base &#8212; know 0.1.3 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../_static/toggleprompt.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for know.base</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Base objects for know</span>
+
+<span class="sd">```</span>
+<span class="sd">class SlabsIter:</span>
+<span class="sd">    def __iter__(self):</span>
+<span class="sd">        with self:  # enter all the contexts that need to be entered</span>
+<span class="sd">            while True:  # loop until you encounter a handled exception</span>
+<span class="sd">                try:</span>
+<span class="sd">                    yield next(self)</span>
+<span class="sd">                except self.handle_exceptions as exc_val:</span>
+<span class="sd">                    # use specific exceptions to signal that iteration should stop</span>
+<span class="sd">                    break</span>
+
+<span class="sd">    def __next__(self):</span>
+<span class="sd">        return self._call_on_scope(scope={})</span>
+
+<span class="sd">    def _call_on_scope(self, scope):</span>
+<span class="sd">        # for each component</span>
+<span class="sd">        for name, component in self.components.items():</span>
+<span class="sd">            # call the component using scope to source any arguments it needs</span>
+<span class="sd">            # and write the result in scope, under the component&#39;s name.</span>
+<span class="sd">            scope[name] = _call_from_dict(scope, component, self.sigs[name])</span>
+<span class="sd">        return scope</span>
+<span class="sd">```</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">NewType</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">i2</span> <span class="kn">import</span> <span class="n">Sig</span><span class="p">,</span> <span class="n">ContextFanout</span>
+
+
+<div class="viewcode-block" id="ExceptionalException"><a class="viewcode-back" href="../../module_docs/know/base.html#know.base.ExceptionalException">[docs]</a><span class="k">class</span> <span class="nc">ExceptionalException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when an exception was supposed to be handled, but no matching handler</span>
+<span class="sd">    was found.</span>
+
+<span class="sd">    See the `_handle_exception` function, where it is raised.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="IteratorExit"><a class="viewcode-back" href="../../module_docs/know/base.html#know.base.IteratorExit">[docs]</a><span class="k">class</span> <span class="nc">IteratorExit</span><span class="p">(</span><span class="ne">BaseException</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when an iterator should quit being iterated on, signaling this event</span>
+<span class="sd">    any process that cares to catch the signal.</span>
+<span class="sd">    We chose to inherit directly from `BaseException` instead of `Exception`</span>
+<span class="sd">    for the same reason that `GeneratorExit` does: Because it&#39;s not technically</span>
+<span class="sd">    an error.</span>
+
+<span class="sd">    See: https://docs.python.org/3/library/exceptions.html#GeneratorExit</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<span class="n">DFLT_INTERRUPT_EXCEPTIONS</span> <span class="o">=</span> <span class="p">(</span><span class="ne">StopIteration</span><span class="p">,</span> <span class="n">IteratorExit</span><span class="p">,</span> <span class="ne">KeyboardInterrupt</span><span class="p">)</span>
+
+
+<span class="n">DoNotBreak</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;DoNotBreak&#39;</span><span class="p">,</span> <span class="p">(),</span> <span class="p">{})</span>
+<span class="n">do_not_break</span> <span class="o">=</span> <span class="n">DoNotBreak</span><span class="p">()</span>
+<span class="n">do_not_break</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s1">&#39;A sentinel that exception handlers can use to indicate that iteration should &#39;</span>
+    <span class="s1">&#39;continue -- the default for exception handling is to break out of the iteration.&#39;</span>
+<span class="p">)</span>
+
+<span class="n">IgnoredOutput</span> <span class="o">=</span> <span class="n">Any</span>
+<span class="n">ExceptionHandlerOutput</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">IgnoredOutput</span><span class="p">,</span> <span class="n">DoNotBreak</span><span class="p">]</span>
+<span class="n">ExceptionHandler</span> <span class="o">=</span> <span class="n">NewType</span><span class="p">(</span><span class="s1">&#39;ExceptionHandler&#39;</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">ExceptionHandlerOutput</span><span class="p">])</span>
+<span class="n">ExceptionHandler</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s1">&#39;An exception handler is an argument-less callable that is called when a handled &#39;</span>
+    <span class="s1">&#39;exception occurs during iteration. Most often, the handler does nothing, but &#39;</span>
+    <span class="s1">&#39;could be used &#39;</span>
+    <span class="s1">&#39;whose output will be ignored, &#39;</span>
+    <span class="s1">&#39;unless it is do_not_break, which will signal that the iteration should continue.&#39;</span>
+<span class="p">)</span>
+<span class="c1"># TODO: Make HandledExceptionsMap into a NewType</span>
+
+<span class="c1"># doc: A map between exception types and exception handlers (callbacks)</span>
+<span class="n">ExceptionType</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="ne">BaseException</span><span class="p">)</span>
+<span class="n">HandledExceptionsMap</span> <span class="o">=</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">ExceptionType</span><span class="p">,</span> <span class="n">ExceptionHandler</span><span class="p">]</span>
+
+<span class="c1"># doc: If none of the exceptions need handlers, you can just specify a list of them</span>
+<span class="n">HandledExceptionsMapSpec</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span>
+    <span class="n">HandledExceptionsMap</span><span class="p">,</span>
+    <span class="n">Iterable</span><span class="p">[</span><span class="ne">BaseException</span><span class="p">],</span>  <span class="c1"># an iterable of exception types</span>
+    <span class="ne">BaseException</span><span class="p">,</span>  <span class="c1"># or just one exception type</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">do_nothing</span><span class="p">():</span>
+    <span class="k">pass</span>
+
+
+<span class="k">def</span> <span class="nf">log_and_return</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="nb">print</span><span class="p">):</span>
+    <span class="n">logger</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">msg</span>
+
+
+<div class="viewcode-block" id="call_using_args_if_needed"><a class="viewcode-back" href="../../module_docs/know/base.html#know.base.call_using_args_if_needed">[docs]</a><span class="k">def</span> <span class="nf">call_using_args_if_needed</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Call `func` using the provided arguments only if `func` has arguments.</span>
+
+<span class="sd">    Use case:</span>
+
+<span class="sd">    We&#39;d like the exception handlers to be easy to express.</span>
+<span class="sd">    Maybe you need the object raising the exception to handle it,</span>
+<span class="sd">    maybe you just want to log the event.</span>
+<span class="sd">    In the first case, you the handler needs the said object to be passed to it,</span>
+<span class="sd">    in the second, we don&#39;t need any arguments at all.</span>
+
+<span class="sd">    `call_using_args_if_needed` helps out here</span>
+
+<span class="sd">    In this case, you need the input arg (21):</span>
+
+<span class="sd">    &gt;&gt;&gt; call_using_args_if_needed(lambda x: x * 2, 21)</span>
+<span class="sd">    42</span>
+
+<span class="sd">    In this case you don&#39;t:</span>
+
+<span class="sd">    &gt;&gt;&gt; call_using_args_if_needed(lambda: 77, 21)</span>
+<span class="sd">    77</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">Sig</span><span class="p">(</span><span class="n">func</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># if signature of function has no arguments</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># otherwise, use the provided arguments</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<span class="c1"># TODO: Could consider (topologically) ordering the exceptions to reduce the matching</span>
+<span class="c1">#  possibilities (see _handle_exception)</span>
+<span class="k">def</span> <span class="nf">_get_handle_exceptions</span><span class="p">(</span>
+    <span class="n">handle_exceptions</span><span class="p">:</span> <span class="n">HandledExceptionsMapSpec</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HandledExceptionsMap</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">handle_exceptions</span><span class="p">,</span> <span class="ne">BaseException</span><span class="p">):</span>
+        <span class="c1"># Only one? Ensure there&#39;s a tuple of exceptions:</span>
+        <span class="n">handle_exceptions</span> <span class="o">=</span> <span class="p">(</span><span class="n">handle_exceptions</span><span class="p">,)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">handle_exceptions</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+        <span class="n">handle_exceptions</span> <span class="o">=</span> <span class="p">{</span><span class="n">exc_type</span><span class="p">:</span> <span class="n">do_nothing</span> <span class="k">for</span> <span class="n">exc_type</span> <span class="ow">in</span> <span class="n">handle_exceptions</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">handle_exceptions</span>
+
+
+<span class="k">def</span> <span class="nf">_handle_exception</span><span class="p">(</span>
+    <span class="n">calling_object</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">:</span> <span class="ne">BaseException</span><span class="p">,</span> <span class="n">handle_exceptions</span><span class="p">:</span> <span class="n">HandledExceptionsMap</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExceptionHandlerOutput</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Looks for an exception type matching exc_val and calls the corresponding</span>
+<span class="sd">    handler with</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">exc_val</span><span class="p">)</span> <span class="ow">in</span> <span class="n">handle_exceptions</span><span class="p">:</span>  <span class="c1"># try precise matching first</span>
+        <span class="n">exception_handler</span> <span class="o">=</span> <span class="n">handle_exceptions</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">exc_val</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">call_using_args_if_needed</span><span class="p">(</span><span class="n">exception_handler</span><span class="p">,</span> <span class="n">calling_object</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># if not, find the first matching parent</span>
+        <span class="k">for</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exception_handler</span> <span class="ow">in</span> <span class="n">handle_exceptions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">call_using_args_if_needed</span><span class="p">(</span><span class="n">exception_handler</span><span class="p">,</span> <span class="n">calling_object</span><span class="p">)</span>
+    <span class="c1"># You never should get this far, but if you do, there&#39;s a problem, let&#39;s scream it:</span>
+    <span class="k">raise</span> <span class="n">ExceptionalException</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;I couldn&#39;t find that exception in my handlers: </span><span class="si">{</span><span class="n">exc_val</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_call_from_dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">sig</span><span class="p">:</span> <span class="n">Sig</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A i2.call_forgivingly optimized for our purpose</span>
+
+<span class="sd">    The sig argument needs to be the Sig(func) to work correctly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">args_and_kwargs_from_kwargs</span><span class="p">(</span>
+        <span class="n">kwargs</span><span class="p">,</span>
+        <span class="n">allow_excess</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">ignore_kind</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">allow_partial</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">apply_defaults</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="c1"># TODO: Postelize (or add tooling for) the components specification and add validation.</span>
+<div class="viewcode-block" id="SlabsIter"><a class="viewcode-back" href="../../module_docs/know/base.html#know.base.SlabsIter">[docs]</a><span class="k">class</span> <span class="nc">SlabsIter</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Object to source and create multiple streams.</span>
+<span class="sd">    </span>
+<span class="sd">    A slab is a collection of items of a same interval of time.</span>
+<span class="sd">    We represent a slab using a `dict` or mapping.</span>
+<span class="sd">    Typically, a slab will be the aggregation of multiple information streams that</span>
+<span class="sd">    happened around the same time.</span>
+
+<span class="sd">    For example, say and edge device had a microphone, light, and movement sensor.</span>
+<span class="sd">    An aggregate reading of these sensors could give you something like:</span>
+
+<span class="sd">    &gt;&gt;&gt; slab = {&#39;audio&#39;: [1, 2, 4], &#39;light&#39;: 126, &#39;movement&#39;: None}</span>
+
+<span class="sd">    `movement` is `None` because the sensor is off. If it were on, we&#39;d have True or</span>
+<span class="sd">    False as values.</span>
+
+<span class="sd">    From this information, you&#39;d like to compute a `turn_mov_on` value based on the</span>
+<span class="sd">    formula</span>
+
+<span class="sd">    &gt;&gt;&gt; from statistics import stdev</span>
+<span class="sd">    &gt;&gt;&gt; vol = stdev</span>
+<span class="sd">    &gt;&gt;&gt; should_turn_movement_sensor_on = lambda audio, light: vol(audio) * light &gt; 50000</span>
+
+<span class="sd">    The produce of the volume and the lumens gives you 192, so you now have...</span>
+
+<span class="sd">    &gt;&gt;&gt; slab = {&#39;audio&#39;: [1, 2, 4], &#39;light&#39;: 126, &#39;turn_mov_on&#39;: False, &#39;movement&#39;: None}</span>
+
+<span class="sd">    The next slab that comes in is</span>
+
+<span class="sd">    &gt;&gt;&gt; slab = {&#39;audio&#39;: [-96, 89, -92], &#39;light&#39;: 501, &#39;movement&#39;: None}</span>
+
+<span class="sd">    which puts us over the threshold so</span>
+
+<span class="sd">    &gt;&gt;&gt; slab = {</span>
+<span class="sd">    ...     &#39;audio&#39;: [-96, 89, -92], &#39;light&#39;: 501, &#39;turn_mov_on&#39;: True, &#39;movement&#39;: None</span>
+<span class="sd">    ... }</span>
+
+<span class="sd">    and the movement sensor is turned on, the movement is detected, a `human_presence`</span>
+<span class="sd">    signal is computed, and a notification sent if that metric is above a given theshold.</span>
+
+<span class="sd">    The point here is that we incrementally compute various fields, enhancing our slab</span>
+<span class="sd">    of information, and we do so iteratively over over slab that is streaming to us</span>
+<span class="sd">    from our smart home device.</span>
+
+<span class="sd">    `SlabsIter` is there to help you create such slabs, from source to enhanced.</span>
+
+<span class="sd">    The situation above would look something along like this:</span>
+
+<span class="sd">    &gt;&gt;&gt; from know.base import SlabsIter</span>
+<span class="sd">    &gt;&gt;&gt; from statistics import stdev</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; vol = stdev</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; # Making a slabs iter object</span>
+<span class="sd">    &gt;&gt;&gt; def make_a_slabs_iter():</span>
+<span class="sd">    ...</span>
+<span class="sd">    ...     # Mocking the sensor readers</span>
+<span class="sd">    ...     audio_sensor_read = iter([[1, 2, 3], [-96, 87, -92], [320, -96, 99]]).__next__</span>
+<span class="sd">    ...     light_sensor_read = iter([126, 501, 523]).__next__</span>
+<span class="sd">    ...     movement_sensor_read = iter([None, None, True]).__next__</span>
+<span class="sd">    ...</span>
+<span class="sd">    ...     return SlabsIter(</span>
+<span class="sd">    ...         # The first three components get data from the sensors.</span>
+<span class="sd">    ...         # The *_read objects are all callable, returning the next</span>
+<span class="sd">    ...         # chunk of data for that sensor, if any.</span>
+<span class="sd">    ...         audio=audio_sensor_read,</span>
+<span class="sd">    ...         light=light_sensor_read,</span>
+<span class="sd">    ...         movement=movement_sensor_read,</span>
+<span class="sd">    ...         # The next</span>
+<span class="sd">    ...         should_turn_movement_sensor_on = lambda audio, light: vol(audio) * light &gt; 50000,</span>
+<span class="sd">    ...         human_presence_score = lambda audio, light, movement: movement and sum([vol(audio), light]),</span>
+<span class="sd">    ...         should_notify = lambda human_presence_score: human_presence_score and human_presence_score &gt; 700,</span>
+<span class="sd">    ...         notify = lambda should_notify: print(&#39;someone is there&#39;) if should_notify else None</span>
+<span class="sd">    ...     )</span>
+<span class="sd">    ...</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; si = make_a_slabs_iter()</span>
+<span class="sd">    &gt;&gt;&gt; next(si)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">    {&#39;audio&#39;: [1, 2, 3],</span>
+<span class="sd">     &#39;light&#39;: 126,</span>
+<span class="sd">     &#39;movement&#39;: None,</span>
+<span class="sd">     &#39;should_turn_movement_sensor_on&#39;: False,</span>
+<span class="sd">     &#39;human_presence_score&#39;: None,</span>
+<span class="sd">     &#39;should_notify&#39;: None,</span>
+<span class="sd">     &#39;notify&#39;: None}</span>
+<span class="sd">    &gt;&gt;&gt; next(si)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">    {&#39;audio&#39;: [-96, 87, -92],</span>
+<span class="sd">     &#39;light&#39;: 501,</span>
+<span class="sd">     &#39;movement&#39;: None,</span>
+<span class="sd">     &#39;should_turn_movement_sensor_on&#39;: True,</span>
+<span class="sd">     &#39;human_presence_score&#39;: None,</span>
+<span class="sd">     &#39;should_notify&#39;: None,</span>
+<span class="sd">     &#39;notify&#39;: None}</span>
+<span class="sd">    &gt;&gt;&gt; next(si)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">    someone is there</span>
+<span class="sd">    {&#39;audio&#39;: [320, -96, 99],</span>
+<span class="sd">     &#39;light&#39;: 523,</span>
+<span class="sd">     &#39;movement&#39;: True,</span>
+<span class="sd">     &#39;should_turn_movement_sensor_on&#39;: True,</span>
+<span class="sd">     &#39;human_presence_score&#39;: 731.1353726143957,</span>
+<span class="sd">     &#39;should_notify&#39;: True,</span>
+<span class="sd">     &#39;notify&#39;: None}</span>
+
+<span class="sd">    If you ask for the next slab, you&#39;ll get a `StopIteration` (raised by the mocked</span>
+<span class="sd">    sources since they reached the end of their iterators).</span>
+
+<span class="sd">    &gt;&gt;&gt; next(si)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">      ...</span>
+<span class="sd">    StopIteration</span>
+
+<span class="sd">    That said, if you iterate through a `SlabsIter` that handles the `StopIteration`</span>
+<span class="sd">    exception (it does by default), you&#39;ll reach the end of you iteration gracefully.</span>
+
+<span class="sd">    &gt;&gt;&gt; si = make_a_slabs_iter()</span>
+<span class="sd">    &gt;&gt;&gt; for slab in si:</span>
+<span class="sd">    ...     pass</span>
+<span class="sd">    someone is there</span>
+<span class="sd">    &gt;&gt;&gt; si = make_a_slabs_iter()</span>
+<span class="sd">    &gt;&gt;&gt; slabs = list(si)  # gather all the slabs</span>
+<span class="sd">    someone is there</span>
+<span class="sd">    &gt;&gt;&gt; len(slabs)</span>
+<span class="sd">    3</span>
+<span class="sd">    &gt;&gt;&gt; slabs[-1]  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">    {&#39;audio&#39;: [320, -96, 99],</span>
+<span class="sd">     &#39;light&#39;: 523,</span>
+<span class="sd">     &#39;movement&#39;: True,</span>
+<span class="sd">     &#39;should_turn_movement_sensor_on&#39;: True,</span>
+<span class="sd">     &#39;human_presence_score&#39;: 731.1353726143957,</span>
+<span class="sd">     &#39;should_notify&#39;: True,</span>
+<span class="sd">     &#39;notify&#39;: None}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle_exceptions</span><span class="o">=</span><span class="n">DFLT_INTERRUPT_EXCEPTIONS</span><span class="p">,</span> <span class="o">**</span><span class="n">components</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">components</span> <span class="o">=</span> <span class="n">components</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">handle_exceptions</span> <span class="o">=</span> <span class="n">_get_handle_exceptions</span><span class="p">(</span><span class="n">handle_exceptions</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_handled_exception_types</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle_exceptions</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">name</span><span class="p">:</span> <span class="n">Sig</span><span class="o">.</span><span class="n">sig_or_default</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">ContextFanout</span><span class="p">(</span><span class="o">**</span><span class="n">components</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="p">:</span>  <span class="c1"># enter all the contexts that need to be entered</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>  <span class="c1"># loop until you encounter a handled exception</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="k">except</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handled_exception_types</span> <span class="k">as</span> <span class="n">exc_val</span><span class="p">:</span>
+                    <span class="n">handler_output</span> <span class="o">=</span> <span class="n">_handle_exception</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_exceptions</span>
+                    <span class="p">)</span>
+                    <span class="c1"># break, unless the handler tells us not to</span>
+                    <span class="k">if</span> <span class="n">handler_output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">do_not_break</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">exit_value</span> <span class="o">=</span> <span class="n">handler_output</span>  <span class="c1"># remember, in case useful</span>
+                        <span class="k">break</span>
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_on_scope</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="p">{})</span>
+
+    <span class="k">def</span> <span class="nf">_call_on_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
+        <span class="c1"># for each component</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">component</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># call the component using scope to source any arguments it needs</span>
+            <span class="c1"># and write the result in scope, under the component&#39;s name.</span>
+            <span class="n">scope</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_call_from_dict</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigs</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">scope</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_of_context_enter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_of_context_enter</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">know</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know.html">know</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/audio_to_store.html">know.audio_to_store</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/base.html">know.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/http_response.html">HTTP Response streaming reader with no external dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/http_sensor.html">know.examples.http_sensor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/keyboard_and_audio.html">know.examples.keyboard_and_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/http_sensor_sim.html">know.http_sensor_sim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/scrap/architectures.html">know.scrap.architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/scrap/pieces.html">know.scrap.pieces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/util.html">know.util</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;NO COPYRIGHT.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
