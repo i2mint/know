@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>know.base &#8212; know 0.1.3 documentation</title>
+    <title>know.base &#8212; know 0.1.4 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -39,30 +39,45 @@
   <h1>Source code for know.base</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Base objects for know</span>
 
-<span class="sd">```</span>
-<span class="sd">class SlabsIter:</span>
-<span class="sd">    def __iter__(self):</span>
-<span class="sd">        with self:  # enter all the contexts that need to be entered</span>
-<span class="sd">            while True:  # loop until you encounter a handled exception</span>
-<span class="sd">                try:</span>
-<span class="sd">                    yield next(self)</span>
-<span class="sd">                except self.handle_exceptions as exc_val:</span>
-<span class="sd">                    # use specific exceptions to signal that iteration should stop</span>
-<span class="sd">                    break</span>
+<span class="sd">The main object of this module is `SlabsIter`, and object to source and manipulate</span>
+<span class="sd">multiple streams.</span>
 
-<span class="sd">    def __next__(self):</span>
-<span class="sd">        return self._call_on_scope(scope={})</span>
+<span class="sd">A slab is a collection of items of a same interval of time.</span>
+<span class="sd">We represent a slab using a `dict` or mapping.</span>
+<span class="sd">Typically, a slab will be the aggregation of multiple information streams that</span>
+<span class="sd">happened around the same time.</span>
 
-<span class="sd">    def _call_on_scope(self, scope):</span>
-<span class="sd">        # for each component</span>
-<span class="sd">        for name, component in self.components.items():</span>
-<span class="sd">            # call the component using scope to source any arguments it needs</span>
-<span class="sd">            # and write the result in scope, under the component&#39;s name.</span>
-<span class="sd">            scope[name] = _call_from_dict(scope, component, self.sigs[name])</span>
-<span class="sd">        return scope</span>
-<span class="sd">```</span>
-
+<span class="sd">`SlabsIter` is a tool that allows you to source multiple streams into a stream of</span>
+<span class="sd">slabs that can contain the original data, or other datas computed from it, or both.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># The main</span>
+<span class="c1"># ```</span>
+<span class="c1"># class SlabsIter:</span>
+<span class="c1">#     def _call_on_scope(self, scope):</span>
+<span class="c1">#     &quot;&quot;&quot;Calls the components 1 by 1, sourcing inputs and writing outputs in scope&quot;&quot;&quot;</span>
+<span class="c1">#</span>
+<span class="c1">#     def __next__(self):</span>
+<span class="c1">#         &quot;&quot;&quot;Get the next slab by calling _call_on_scope on an new empty scope.</span>
+<span class="c1">#         At least one of the components will have to be argument-less and provide</span>
+<span class="c1">#         some data for other components to get their inputs from, if any are needed.</span>
+<span class="c1">#         &quot;&quot;&quot;</span>
+<span class="c1">#         return self._call_on_scope(scope={})</span>
+<span class="c1">#</span>
+<span class="c1">#     def __iter__(self):</span>
+<span class="c1">#         &quot;&quot;&quot;Iterates over slabs until a handle exception is raised.&quot;&quot;&quot;</span>
+<span class="c1">#         # Simplified code:</span>
+<span class="c1">#         with self:  # enter all the contexts that need to be entered</span>
+<span class="c1">#             while True:  # loop until you encounter a handled exception</span>
+<span class="c1">#                 try:</span>
+<span class="c1">#                     yield next(self)</span>
+<span class="c1">#                 except self.handle_exceptions as exc_val:</span>
+<span class="c1">#                     # use specific exceptions to signal that iteration should stop</span>
+<span class="c1">#                     break</span>
+
+
+<span class="c1"># ```</span>
+
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">NewType</span><span class="p">,</span> <span class="n">Any</span>
 <span class="kn">from</span> <span class="nn">i2</span> <span class="kn">import</span> <span class="n">Sig</span><span class="p">,</span> <span class="n">ContextFanout</span>
 
@@ -208,7 +223,7 @@
 
 <span class="c1"># TODO: Postelize (or add tooling for) the components specification and add validation.</span>
 <div class="viewcode-block" id="SlabsIter"><a class="viewcode-back" href="../../module_docs/know/base.html#know.base.SlabsIter">[docs]</a><span class="k">class</span> <span class="nc">SlabsIter</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Object to source and create multiple streams.</span>
+    <span class="sd">&quot;&quot;&quot;Object to source and manipulate multiple streams.</span>
 <span class="sd">    </span>
 <span class="sd">    A slab is a collection of items of a same interval of time.</span>
 <span class="sd">    We represent a slab using a `dict` or mapping.</span>
@@ -350,7 +365,24 @@
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">ContextFanout</span><span class="p">(</span><span class="o">**</span><span class="n">components</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">_call_on_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calls the components 1 by 1, sourcing inputs and writing outputs in scope&quot;&quot;&quot;</span>
+        <span class="c1"># for each component</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">component</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># call the component using scope to source any arguments it needs</span>
+            <span class="c1"># and write the result in scope, under the component&#39;s name.</span>
+            <span class="n">scope</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_call_from_dict</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigs</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">scope</span>
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the next slab by calling _call_on_scope on an new empty scope.</span>
+<span class="sd">        At least one of the components will have to be argument-less and provide</span>
+<span class="sd">        some data for other components to get their inputs from, if any are needed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_on_scope</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="p">{})</span>
+
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Iterates over slabs until a handle exception is raised.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="p">:</span>  <span class="c1"># enter all the contexts that need to be entered</span>
             <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>  <span class="c1"># loop until you encounter a handled exception</span>
                 <span class="k">try</span><span class="p">:</span>
@@ -363,17 +395,6 @@
                     <span class="k">if</span> <span class="n">handler_output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">do_not_break</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">exit_value</span> <span class="o">=</span> <span class="n">handler_output</span>  <span class="c1"># remember, in case useful</span>
                         <span class="k">break</span>
-
-    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_on_scope</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="p">{})</span>
-
-    <span class="k">def</span> <span class="nf">_call_on_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
-        <span class="c1"># for each component</span>
-        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">component</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="c1"># call the component using scope to source any arguments it needs</span>
-            <span class="c1"># and write the result in scope, under the component&#39;s name.</span>
-            <span class="n">scope</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_call_from_dict</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigs</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">scope</span>
 
     <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_output_of_context_enter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
