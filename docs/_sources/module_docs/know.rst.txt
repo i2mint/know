@@ -1,4 +1,0 @@
-know
-====
-.. automodule:: know
-   :members:
