@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>know.examples.keyboard_and_audio &mdash; know 0.1.7 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>know.examples.keyboard_and_audio &mdash; know 0.1.8 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
@@ -77,7 +77,9 @@
            <div itemprop="articleBody">
              
   <h1>Source code for know.examples.keyboard_and_audio</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Example of processing audio and keyboard streams&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Example of processing audio and keyboard streams</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">stream2py.stream_buffer</span> <span class="kn">import</span> <span class="n">StreamBuffer</span>
 <span class="kn">from</span> <span class="nn">keyboardstream2py.keyboard_input</span> <span class="kn">import</span> <span class="n">KeyboardInputSourceReader</span>
@@ -135,7 +137,7 @@
     <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">stop_if_audio_not_running</span><span class="p">(</span><span class="n">audio</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">audio</span><span class="o">.</span><span class="n">is_running</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">audio</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">audio</span><span class="o">.</span><span class="n">is_running</span><span class="p">():</span>
             <span class="k">raise</span> <span class="n">IteratorExit</span><span class="p">(</span><span class="s2">&quot;audio isn&#39;t running anymore!&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">audio_print</span><span class="p">(</span><span class="n">audio</span><span class="p">):</span>
@@ -155,7 +157,7 @@
         <span class="n">audio</span><span class="o">=</span><span class="n">audio_stream_buffer</span><span class="p">,</span>
         <span class="n">keyboard</span><span class="o">=</span><span class="n">keyboard_stream_buffer</span><span class="p">,</span>
         <span class="c1"># check audio and keyboard for stopping signals</span>
-        <span class="n">_audio_stop</span><span class="o">=</span><span class="n">stop_if_audio_not_running</span><span class="p">,</span>
+        <span class="c1"># _audio_stop=stop_if_audio_not_running,</span>
         <span class="n">_keyboard_stop</span><span class="o">=</span><span class="n">keyboard_stop</span><span class="p">,</span>
         <span class="c1"># handle signals</span>
         <span class="n">handle_exceptions</span><span class="o">=</span><span class="p">(</span><span class="n">IteratorExit</span><span class="p">,</span> <span class="ne">KeyboardInterrupt</span><span class="p">),</span>
