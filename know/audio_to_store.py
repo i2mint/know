@@ -34,7 +34,7 @@ from typing import Protocol, Tuple, NewType, Any, Callable, Union
 from operator import itemgetter
 
 from atypes import WaveformBytes, Waveform, IntervalSlice, Segment
-from recode import mk_encoder_and_decoder
+from recode import mk_codec
 
 from dol import StrTupleDict, wrap_kvs
 from dol.filesys import RelPathFileBytesPersister
@@ -115,7 +115,7 @@ def get_root_dir(rootdir=None):
 
 
 # chk_format='h' is equivalent to a PCM16 codec
-pcm16_encode, pcm16_decode = mk_encoder_and_decoder(chk_format='h')
+pcm16_encode, pcm16_decode = mk_codec(chk_format='h')
 
 
 def wf_to_pcm16_bytes(wf):
