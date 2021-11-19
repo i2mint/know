@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>know.base &mdash; know 0.1.7 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <title>know.base &mdash; know 0.1.8 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
@@ -183,38 +183,6 @@
     <span class="k">return</span> <span class="n">msg</span>
 
 
-<span class="c1"># TODO: Could be made more flexible, or explicit. Used only with forms:</span>
-<span class="c1">#   func(), func(exc_val), func(calling_obj), func(exc_val, calling_obj)</span>
-<div class="viewcode-block" id="call_using_args_if_needed"><a class="viewcode-back" href="../../module_docs/know/base.html#know.base.call_using_args_if_needed">[docs]</a><span class="k">def</span> <span class="nf">call_using_args_if_needed</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Call `func` using the provided arguments only if `func` has arguments.</span>
-
-<span class="sd">    Use case:</span>
-
-<span class="sd">    We&#39;d like the exception handlers to be easy to express.</span>
-<span class="sd">    Maybe you need the object raising the exception to handle it,</span>
-<span class="sd">    maybe you just want to log the event.</span>
-<span class="sd">    In the first case, you the handler needs the said object to be passed to it,</span>
-<span class="sd">    in the second, we don&#39;t need any arguments at all.</span>
-
-<span class="sd">    `call_using_args_if_needed` helps out here</span>
-
-<span class="sd">    In this case, you need the input arg (21):</span>
-
-<span class="sd">    &gt;&gt;&gt; call_using_args_if_needed(lambda x: x * 2, 21)</span>
-<span class="sd">    42</span>
-
-<span class="sd">    In this case you don&#39;t:</span>
-
-<span class="sd">    &gt;&gt;&gt; call_using_args_if_needed(lambda: 77, 21)</span>
-<span class="sd">    77</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">Sig</span><span class="p">(</span><span class="n">func</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="c1"># if signature of function has no arguments</span>
-        <span class="k">return</span> <span class="n">func</span><span class="p">()</span>
-    <span class="k">else</span><span class="p">:</span>  <span class="c1"># otherwise, use the provided arguments</span>
-        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
-
 <span class="c1"># TODO: Could consider (topologically) ordering the exceptions to reduce the matching</span>
 <span class="c1">#  possibilities (see _handle_exception)</span>
 <span class="k">def</span> <span class="nf">_get_handle_exceptions</span><span class="p">(</span>
@@ -229,19 +197,21 @@
 
 
 <span class="k">def</span> <span class="nf">_handle_exception</span><span class="p">(</span>
-    <span class="n">calling_object</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">:</span> <span class="ne">BaseException</span><span class="p">,</span> <span class="n">handle_exceptions</span><span class="p">:</span> <span class="n">HandledExceptionsMap</span>
+    <span class="n">instance</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">:</span> <span class="ne">BaseException</span><span class="p">,</span> <span class="n">handle_exceptions</span><span class="p">:</span> <span class="n">HandledExceptionsMap</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExceptionHandlerOutput</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Looks for an exception type matching exc_val and calls the corresponding</span>
 <span class="sd">    handler with</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">exc_val</span><span class="o">=</span><span class="n">exc_val</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">instance</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">exc_val</span><span class="p">)</span> <span class="ow">in</span> <span class="n">handle_exceptions</span><span class="p">:</span>  <span class="c1"># try precise matching first</span>
         <span class="n">exception_handler</span> <span class="o">=</span> <span class="n">handle_exceptions</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">exc_val</span><span class="p">)]</span>
-        <span class="k">return</span> <span class="n">call_using_args_if_needed</span><span class="p">(</span><span class="n">exception_handler</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">calling_object</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_call_from_dict</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">exception_handler</span><span class="p">,</span> <span class="n">Sig</span><span class="p">(</span><span class="n">exception_handler</span><span class="p">))</span>
+
     <span class="k">else</span><span class="p">:</span>  <span class="c1"># if not, find the first matching parent</span>
         <span class="k">for</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exception_handler</span> <span class="ow">in</span> <span class="n">handle_exceptions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">call_using_args_if_needed</span><span class="p">(</span>
-                    <span class="n">exception_handler</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">calling_object</span>
+                <span class="k">return</span> <span class="n">_call_from_dict</span><span class="p">(</span>
+                    <span class="n">inputs</span><span class="p">,</span> <span class="n">exception_handler</span><span class="p">,</span> <span class="n">Sig</span><span class="p">(</span><span class="n">exception_handler</span><span class="p">)</span>
                 <span class="p">)</span>
     <span class="c1"># You never should get this far, but if you do, there&#39;s a problem, let&#39;s scream it:</span>
     <span class="k">raise</span> <span class="n">ExceptionalException</span><span class="p">(</span>
@@ -253,6 +223,21 @@
     <span class="sd">&quot;&quot;&quot;A i2.call_forgivingly optimized for our purpose</span>
 
 <span class="sd">    The sig argument needs to be the Sig(func) to work correctly.</span>
+
+<span class="sd">    Two uses cases here:</span>
+
+<span class="sd">    - using a scope dict as both the source of `SlabsIter` components, and as a place</span>
+<span class="sd">    to temporarily store the outputs of these components.</span>
+
+<span class="sd">    - exception handlers: We&#39;d like the exception handlers to be easy to express.</span>
+<span class="sd">    Maybe you need the object raising the exception to handle it,</span>
+<span class="sd">    maybe you just want to log the event.</span>
+<span class="sd">    In the first case, you the handler needs the said object to be passed to it,</span>
+<span class="sd">    in the second, we don&#39;t need any arguments at all.</span>
+<span class="sd">    With _call_from_dict, we don&#39;t have to choose, we just have to impose that</span>
+<span class="sd">    the handler use specific keywords (namely `exc_val` and/or `instance`)</span>
+<span class="sd">    when there are inputs.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">args_and_kwargs_from_kwargs</span><span class="p">(</span>
         <span class="n">kwargs</span><span class="p">,</span>
