@@ -11,4 +11,5 @@
    module_docs/know/http_sensor_sim
    module_docs/know/scrap/architectures
    module_docs/know/scrap/pieces
+   module_docs/know/tests/test_slabsIter
    module_docs/know/util
