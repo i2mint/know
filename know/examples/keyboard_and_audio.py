@@ -11,6 +11,93 @@ from audiostream2py.audio import (
 from know.base import SlabsIter, IteratorExit
 
 
+def mk_keyboard_and_audio_slabs_iter(
+    input_device_index=None,  # find index with PyAudioSourceReader.list_device_info()
+    rate=44100,
+    width=2,
+    channels=1,
+    frames_per_buffer=44100,  # same as sample rate for 1 second intervals
+    seconds_to_keep_in_stream_buffer=60,
+):
+    input_device_index = handle_input_device_index(input_device_index)
+
+    # converts seconds_to_keep_in_stream_buffer to max number of buffers of size
+    # frames_per_buffer
+    maxlen = PyAudioSourceReader.audio_buffer_size_seconds_to_maxlen(
+        buffer_size_seconds=seconds_to_keep_in_stream_buffer,
+        rate=rate,
+        frames_per_buffer=frames_per_buffer,
+    )
+
+    audio_reader = PyAudioSourceReader(
+        rate=rate,
+        width=width,
+        channels=channels,
+        unsigned=True,
+        input_device_index=input_device_index,
+        frames_per_buffer=frames_per_buffer,
+    ).stream_buffer(maxlen)
+
+    keyboard_reader = KeyboardInputSourceReader().stream_buffer(maxlen)
+
+    def stop_if_audio_not_running(audio_reader_instance):
+        if audio_reader_instance is not None and not audio_reader_instance.is_running:
+            raise IteratorExit("audio isn't running anymore!")
+
+    def audio_print(audio):
+        full_audio_print(audio)
+
+    def keyboard_stop(keyboard):
+        if keyboard_data_signals_an_interrupt(keyboard):
+            print('\nI feel a disturbance in the keyboard...')
+            raise KeyboardInterrupt('You keyed an exit combination. You want to stop.')
+
+    def keyboard_print(keyboard):
+        if keyboard is not None:
+            print(f'{keyboard=}\n', end='\n\r')
+
+    class LastCharPressed:
+        key = '*'
+
+        def __call__(self, keyboard):
+            if keyboard is not None:
+                idx, timestamp, key = keyboard
+                self.key = key
+            return self.key
+
+    from recode import mk_codec
+
+    codec = mk_codec('h')
+
+    def audio_to_wf(audio, bar_char=';)'):
+        from statistics import stdev
+        if audio is not None:
+            _, wf_bytes, *_ = audio
+            wf = codec.decode(wf_bytes)
+            vol = stdev(wf) / 200
+            n_bars = 1 + int(vol)
+            print(bar_char * n_bars, end='\n\r')
+
+    app = SlabsIter(
+        # source the data
+        audio=audio_reader,
+        keyboard=KeyboardInputSourceReader().stream_buffer(maxlen),
+        # check audio and keyboard for stopping signals
+        audio_reader_instance=lambda: audio_reader,  # to give access to the audio_reader
+        _audio_stop=stop_if_audio_not_running,
+        _keyboard_stop=keyboard_stop,
+        # handle signals
+        handle_exceptions=(IteratorExit, KeyboardInterrupt),
+        # do stuff
+        # audio_print=audio_print,
+        keyboard_print=keyboard_print,
+        bar_char=LastCharPressed(),
+        my_audio=audio_to_wf,
+    )
+
+    return app
+
+
 def keyboard_and_audio(
     input_device_index=None,  # find index with PyAudioSourceReader.list_device_info()
     rate=44100,
@@ -34,57 +121,13 @@ def keyboard_and_audio(
     :return: None
     """
 
-    input_device_index = handle_input_device_index(input_device_index)
-
-    # converts seconds_to_keep_in_stream_buffer to max number of buffers of size
-    # frames_per_buffer
-    maxlen = PyAudioSourceReader.audio_buffer_size_seconds_to_maxlen(
-        buffer_size_seconds=seconds_to_keep_in_stream_buffer,
-        rate=rate,
-        frames_per_buffer=frames_per_buffer,
-    )
-    audio_source_reader = PyAudioSourceReader(
+    app = mk_keyboard_and_audio_slabs_iter(
+        input_device_index=input_device_index,
         rate=rate,
         width=width,
         channels=channels,
-        unsigned=True,
-        input_device_index=input_device_index,
         frames_per_buffer=frames_per_buffer,
-    )
-    audio_stream_buffer = StreamBuffer(source_reader=audio_source_reader, maxlen=maxlen)
-
-    keyboard_stream_buffer = StreamBuffer(
-        source_reader=KeyboardInputSourceReader(), maxlen=maxlen
-    )
-
-    def stop_if_audio_not_running(audio):
-        if audio is not None and not audio.is_running():
-            raise IteratorExit("audio isn't running anymore!")
-
-    def audio_print(audio):
-        full_audio_print(audio)
-
-    def keyboard_stop(keyboard):
-        if keyboard_data_signals_an_interrupt(keyboard):
-            print('A feel a disturbance in the force...')
-            raise KeyboardInterrupt('You want to stop.')
-
-    def keyboard_print(keyboard):
-        if keyboard is not None:
-            print(f'{keyboard=}\n', end='\n\r')
-
-    app = SlabsIter(
-        # source the data
-        audio=audio_stream_buffer,
-        keyboard=keyboard_stream_buffer,
-        # check audio and keyboard for stopping signals
-        # _audio_stop=stop_if_audio_not_running,
-        _keyboard_stop=keyboard_stop,
-        # handle signals
-        handle_exceptions=(IteratorExit, KeyboardInterrupt),
-        # do stuff
-        audio_print=audio_print,
-        keyboard_print=keyboard_print,
+        seconds_to_keep_in_stream_buffer=seconds_to_keep_in_stream_buffer,
     )
 
     app()

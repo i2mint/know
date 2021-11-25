@@ -7,6 +7,9 @@ from typing import Callable, Iterable, Iterator
 from i2 import Pipe
 
 
+
+
+
 class MultiIterator(MultiObj):
     def _gen_next(self):
         for name, iterator in self.objects.items():

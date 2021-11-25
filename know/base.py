@@ -188,7 +188,7 @@ class SlabsIter:
     False as values.
 
     From this information, you'd like to compute a `turn_mov_on` value based on the
-    formula
+    formula.
 
     >>> from statistics import stdev
     >>> vol = stdev
@@ -349,9 +349,31 @@ class SlabsIter:
         self._output_of_context_enter = self.context.__enter__()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    def __exit__(self, exc_type=None, exc_val=None, exc_tb=None) -> None:
         return self._output_of_context_enter.__exit__(exc_type, exc_val, exc_tb)
 
     def __call__(self):
         for _ in self:
             pass
+
+    open = __enter__  # convenience alias
+    close = __exit__  # convenience alias
+
+    def dot_digraph(self):
+        from i2 import Sig
+        from lined import LineParametrized
+
+        def normalize_components(components):
+            for k, v in components.items():
+
+                @Sig(v)
+                def func(*args, **kwargs):
+                    return v(*args, **kwargs)
+
+                func.__name__ = k
+                yield k, func
+
+        c = dict(normalize_components(self.components))
+
+        p = LineParametrized(*c.values())
+        return p.dot_digraph(prefix='rankdir=TD')
