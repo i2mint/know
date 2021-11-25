@@ -71,6 +71,7 @@ def mk_keyboard_and_audio_slabs_iter(
 
     def audio_to_wf(audio, bar_char=';)'):
         from statistics import stdev
+
         if audio is not None:
             _, wf_bytes, *_ = audio
             wf = codec.decode(wf_bytes)
