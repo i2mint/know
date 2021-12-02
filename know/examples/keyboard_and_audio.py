@@ -4,23 +4,19 @@ Example of processing audio and keyboard streams
 import json
 from stream2py.stream_buffer import StreamBuffer
 from keyboardstream2py.keyboard_input import KeyboardInputSourceReader
-from audiostream2py.audio import (
-    PyAudioSourceReader,
-    find_a_default_input_device_index,
-)
+from audiostream2py import PyAudioSourceReader, get_input_device_index
 from know.base import SlabsIter, IteratorExit
 
 
-
 def keyboard_and_audio(
-    input_device_index=None,  # find index with PyAudioSourceReader.list_device_info()
+    input_device=None,
     rate=44100,
     width=2,
     channels=1,
     frames_per_buffer=44100,  # same as sample rate for 1 second intervals
     seconds_to_keep_in_stream_buffer=60,
     launch=True,
-    pipeline_commands=None
+    pipeline_commands=None,
 ):
     """Make an app that does something with live audio and keyboard event streams.
 
@@ -31,7 +27,7 @@ def keyboard_and_audio(
 
     Press Esc key to quit.
 
-    :param input_device_index: find index with PyAudioSourceReader.list_device_info()
+    :param input_device: Input device (index, name, pattern...)
     :param rate: audio sample rate
     :param width: audio byte width
     :param channels: number of audio input channels
@@ -41,7 +37,7 @@ def keyboard_and_audio(
     app object.
     :return: None
     """
-    input_device_index = handle_input_device_index(input_device_index)
+    input_device_index = get_input_device_index(input_device)
     pipeline_commands = pipeline_commands or dflt_slab_iter_commands
 
     # converts seconds_to_keep_in_stream_buffer to max number of buffers of size
@@ -77,18 +73,9 @@ def keyboard_and_audio(
         print(f'\nYour session is now over.\n')
 
 
-def handle_input_device_index(input_device_index, verbose=1):
-    if input_device_index is None:
-        input_device_index = find_a_default_input_device_index()
-
-    audio_src_info = PyAudioSourceReader.info_of_input_device_index(input_device_index)
-    if verbose:
-        print(f'Starting audio device: {json.dumps(audio_src_info, indent=2)}\n')
-
-    return input_device_index
-
 # ---------------------------------------------------------------------------------------
 # Example functions to use in a pipeline
+
 
 def lite_audio_callback(audio):
     if audio is not None:
@@ -183,6 +170,7 @@ def audio_to_wf(audio, bar_char=';)'):
         n_bars = 1 + int(vol)
         print(bar_char * n_bars, end='\n\r')
 
+
 # ---------------------------------------------------------------------------------------
 
 dflt_slab_iter_commands = dict(
@@ -191,7 +179,6 @@ dflt_slab_iter_commands = dict(
     # audio=audio_reader,
     # keyboard=KeyboardInputSourceReader().stream_buffer(maxlen),
     # audio_reader_instance=lambda: audio_reader,  # to give access to the audio_reader
-
     # # # Here's an example of what we can do in the pipeline
     # check audio and keyboard for stopping signals
     _audio_stop=stop_if_audio_not_running,
