@@ -67,8 +67,9 @@ DFLT_INTERRUPT_EXCEPTIONS = (StopIteration, IteratorExit, KeyboardInterrupt)
 DoNotBreak = type('DoNotBreak', (), {})
 do_not_break = DoNotBreak()
 do_not_break.__doc__ = (
-    'A sentinel that exception handlers can use to indicate that iteration should '
-    'continue -- the default for exception handling is to break out of the iteration.'
+    'Sentinel that should be used to signal SlabsIter iteration not to break. '
+    'This sentinel should be returned by exception handlers if they want to tell '
+    'the iteration not to stop (in all other cases, the iteration will stop)'
 )
 
 IgnoredOutput = Any
@@ -304,6 +305,7 @@ class SlabsIter:
      'notify': None}
 
     """
+    _output_of_context_enter = None
 
     def __init__(self, handle_exceptions=DFLT_INTERRUPT_EXCEPTIONS, **components):
         self.components = components
