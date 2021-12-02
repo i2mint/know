@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>know.examples.keyboard_and_audio &mdash; know 0.1.11 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>know.examples.keyboard_and_audio &mdash; know 0.1.12 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
@@ -91,6 +91,94 @@
 <span class="kn">from</span> <span class="nn">know.base</span> <span class="kn">import</span> <span class="n">SlabsIter</span><span class="p">,</span> <span class="n">IteratorExit</span>
 
 
+<span class="k">def</span> <span class="nf">mk_keyboard_and_audio_slabs_iter</span><span class="p">(</span>
+    <span class="n">input_device_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># find index with PyAudioSourceReader.list_device_info()</span>
+    <span class="n">rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">frames_per_buffer</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span>  <span class="c1"># same as sample rate for 1 second intervals</span>
+    <span class="n">seconds_to_keep_in_stream_buffer</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">input_device_index</span> <span class="o">=</span> <span class="n">handle_input_device_index</span><span class="p">(</span><span class="n">input_device_index</span><span class="p">)</span>
+
+    <span class="c1"># converts seconds_to_keep_in_stream_buffer to max number of buffers of size</span>
+    <span class="c1"># frames_per_buffer</span>
+    <span class="n">maxlen</span> <span class="o">=</span> <span class="n">PyAudioSourceReader</span><span class="o">.</span><span class="n">audio_buffer_size_seconds_to_maxlen</span><span class="p">(</span>
+        <span class="n">buffer_size_seconds</span><span class="o">=</span><span class="n">seconds_to_keep_in_stream_buffer</span><span class="p">,</span>
+        <span class="n">rate</span><span class="o">=</span><span class="n">rate</span><span class="p">,</span>
+        <span class="n">frames_per_buffer</span><span class="o">=</span><span class="n">frames_per_buffer</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">audio_reader</span> <span class="o">=</span> <span class="n">PyAudioSourceReader</span><span class="p">(</span>
+        <span class="n">rate</span><span class="o">=</span><span class="n">rate</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+        <span class="n">channels</span><span class="o">=</span><span class="n">channels</span><span class="p">,</span>
+        <span class="n">unsigned</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">input_device_index</span><span class="o">=</span><span class="n">input_device_index</span><span class="p">,</span>
+        <span class="n">frames_per_buffer</span><span class="o">=</span><span class="n">frames_per_buffer</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">stream_buffer</span><span class="p">(</span><span class="n">maxlen</span><span class="p">)</span>
+
+    <span class="n">keyboard_reader</span> <span class="o">=</span> <span class="n">KeyboardInputSourceReader</span><span class="p">()</span><span class="o">.</span><span class="n">stream_buffer</span><span class="p">(</span><span class="n">maxlen</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">stop_if_audio_not_running</span><span class="p">(</span><span class="n">audio_reader_instance</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">audio_reader_instance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">audio_reader_instance</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">IteratorExit</span><span class="p">(</span><span class="s2">&quot;audio isn&#39;t running anymore!&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">audio_print</span><span class="p">(</span><span class="n">audio</span><span class="p">):</span>
+        <span class="n">full_audio_print</span><span class="p">(</span><span class="n">audio</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">keyboard_stop</span><span class="p">(</span><span class="n">keyboard</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">keyboard_data_signals_an_interrupt</span><span class="p">(</span><span class="n">keyboard</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">I feel a disturbance in the keyboard...&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">KeyboardInterrupt</span><span class="p">(</span><span class="s1">&#39;You keyed an exit combination. You want to stop.&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">keyboard_print</span><span class="p">(</span><span class="n">keyboard</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">keyboard</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">keyboard</span><span class="si">=}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n\r</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">LastCharPressed</span><span class="p">:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+
+        <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyboard</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">keyboard</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">idx</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="n">keyboard</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span>
+
+    <span class="kn">from</span> <span class="nn">recode</span> <span class="kn">import</span> <span class="n">mk_codec</span>
+
+    <span class="n">codec</span> <span class="o">=</span> <span class="n">mk_codec</span><span class="p">(</span><span class="s1">&#39;h&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">audio_to_wf</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">bar_char</span><span class="o">=</span><span class="s1">&#39;;)&#39;</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">statistics</span> <span class="kn">import</span> <span class="n">stdev</span>
+
+        <span class="k">if</span> <span class="n">audio</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">wf_bytes</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">audio</span>
+            <span class="n">wf</span> <span class="o">=</span> <span class="n">codec</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">wf_bytes</span><span class="p">)</span>
+            <span class="n">vol</span> <span class="o">=</span> <span class="n">stdev</span><span class="p">(</span><span class="n">wf</span><span class="p">)</span> <span class="o">/</span> <span class="mi">200</span>
+            <span class="n">n_bars</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">vol</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">bar_char</span> <span class="o">*</span> <span class="n">n_bars</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n\r</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">app</span> <span class="o">=</span> <span class="n">SlabsIter</span><span class="p">(</span>
+        <span class="c1"># source the data</span>
+        <span class="n">audio</span><span class="o">=</span><span class="n">audio_reader</span><span class="p">,</span>
+        <span class="n">keyboard</span><span class="o">=</span><span class="n">KeyboardInputSourceReader</span><span class="p">()</span><span class="o">.</span><span class="n">stream_buffer</span><span class="p">(</span><span class="n">maxlen</span><span class="p">),</span>
+        <span class="c1"># check audio and keyboard for stopping signals</span>
+        <span class="n">audio_reader_instance</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">audio_reader</span><span class="p">,</span>  <span class="c1"># to give access to the audio_reader</span>
+        <span class="n">_audio_stop</span><span class="o">=</span><span class="n">stop_if_audio_not_running</span><span class="p">,</span>
+        <span class="n">_keyboard_stop</span><span class="o">=</span><span class="n">keyboard_stop</span><span class="p">,</span>
+        <span class="c1"># handle signals</span>
+        <span class="n">handle_exceptions</span><span class="o">=</span><span class="p">(</span><span class="n">IteratorExit</span><span class="p">,</span> <span class="ne">KeyboardInterrupt</span><span class="p">),</span>
+        <span class="c1"># do stuff</span>
+        <span class="c1"># audio_print=audio_print,</span>
+        <span class="n">keyboard_print</span><span class="o">=</span><span class="n">keyboard_print</span><span class="p">,</span>
+        <span class="n">bar_char</span><span class="o">=</span><span class="n">LastCharPressed</span><span class="p">(),</span>
+        <span class="n">my_audio</span><span class="o">=</span><span class="n">audio_to_wf</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">app</span>
+
+
 <div class="viewcode-block" id="keyboard_and_audio"><a class="viewcode-back" href="../../../module_docs/know/examples/keyboard_and_audio.html#know.examples.keyboard_and_audio.keyboard_and_audio">[docs]</a><span class="k">def</span> <span class="nf">keyboard_and_audio</span><span class="p">(</span>
     <span class="n">input_device_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># find index with PyAudioSourceReader.list_device_info()</span>
     <span class="n">rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span>
@@ -114,57 +202,13 @@
 <span class="sd">    :return: None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">input_device_index</span> <span class="o">=</span> <span class="n">handle_input_device_index</span><span class="p">(</span><span class="n">input_device_index</span><span class="p">)</span>
-
-    <span class="c1"># converts seconds_to_keep_in_stream_buffer to max number of buffers of size</span>
-    <span class="c1"># frames_per_buffer</span>
-    <span class="n">maxlen</span> <span class="o">=</span> <span class="n">PyAudioSourceReader</span><span class="o">.</span><span class="n">audio_buffer_size_seconds_to_maxlen</span><span class="p">(</span>
-        <span class="n">buffer_size_seconds</span><span class="o">=</span><span class="n">seconds_to_keep_in_stream_buffer</span><span class="p">,</span>
-        <span class="n">rate</span><span class="o">=</span><span class="n">rate</span><span class="p">,</span>
-        <span class="n">frames_per_buffer</span><span class="o">=</span><span class="n">frames_per_buffer</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">audio_source_reader</span> <span class="o">=</span> <span class="n">PyAudioSourceReader</span><span class="p">(</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">mk_keyboard_and_audio_slabs_iter</span><span class="p">(</span>
+        <span class="n">input_device_index</span><span class="o">=</span><span class="n">input_device_index</span><span class="p">,</span>
         <span class="n">rate</span><span class="o">=</span><span class="n">rate</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
         <span class="n">channels</span><span class="o">=</span><span class="n">channels</span><span class="p">,</span>
-        <span class="n">unsigned</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">input_device_index</span><span class="o">=</span><span class="n">input_device_index</span><span class="p">,</span>
         <span class="n">frames_per_buffer</span><span class="o">=</span><span class="n">frames_per_buffer</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">audio_stream_buffer</span> <span class="o">=</span> <span class="n">StreamBuffer</span><span class="p">(</span><span class="n">source_reader</span><span class="o">=</span><span class="n">audio_source_reader</span><span class="p">,</span> <span class="n">maxlen</span><span class="o">=</span><span class="n">maxlen</span><span class="p">)</span>
-
-    <span class="n">keyboard_stream_buffer</span> <span class="o">=</span> <span class="n">StreamBuffer</span><span class="p">(</span>
-        <span class="n">source_reader</span><span class="o">=</span><span class="n">KeyboardInputSourceReader</span><span class="p">(),</span> <span class="n">maxlen</span><span class="o">=</span><span class="n">maxlen</span>
-    <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">stop_if_audio_not_running</span><span class="p">(</span><span class="n">audio</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">audio</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">audio</span><span class="o">.</span><span class="n">is_running</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="n">IteratorExit</span><span class="p">(</span><span class="s2">&quot;audio isn&#39;t running anymore!&quot;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">audio_print</span><span class="p">(</span><span class="n">audio</span><span class="p">):</span>
-        <span class="n">full_audio_print</span><span class="p">(</span><span class="n">audio</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">keyboard_stop</span><span class="p">(</span><span class="n">keyboard</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">keyboard_data_signals_an_interrupt</span><span class="p">(</span><span class="n">keyboard</span><span class="p">):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;A feel a disturbance in the force...&#39;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">KeyboardInterrupt</span><span class="p">(</span><span class="s1">&#39;You want to stop.&#39;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">keyboard_print</span><span class="p">(</span><span class="n">keyboard</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">keyboard</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">keyboard</span><span class="si">=}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n\r</span><span class="s1">&#39;</span><span class="p">)</span>
-
-    <span class="n">app</span> <span class="o">=</span> <span class="n">SlabsIter</span><span class="p">(</span>
-        <span class="c1"># source the data</span>
-        <span class="n">audio</span><span class="o">=</span><span class="n">audio_stream_buffer</span><span class="p">,</span>
-        <span class="n">keyboard</span><span class="o">=</span><span class="n">keyboard_stream_buffer</span><span class="p">,</span>
-        <span class="c1"># check audio and keyboard for stopping signals</span>
-        <span class="c1"># _audio_stop=stop_if_audio_not_running,</span>
-        <span class="n">_keyboard_stop</span><span class="o">=</span><span class="n">keyboard_stop</span><span class="p">,</span>
-        <span class="c1"># handle signals</span>
-        <span class="n">handle_exceptions</span><span class="o">=</span><span class="p">(</span><span class="n">IteratorExit</span><span class="p">,</span> <span class="ne">KeyboardInterrupt</span><span class="p">),</span>
-        <span class="c1"># do stuff</span>
-        <span class="n">audio_print</span><span class="o">=</span><span class="n">audio_print</span><span class="p">,</span>
-        <span class="n">keyboard_print</span><span class="o">=</span><span class="n">keyboard_print</span><span class="p">,</span>
+        <span class="n">seconds_to_keep_in_stream_buffer</span><span class="o">=</span><span class="n">seconds_to_keep_in_stream_buffer</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">app</span><span class="p">()</span>
