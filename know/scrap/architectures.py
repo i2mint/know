@@ -41,7 +41,7 @@ def test_multi_iterator():
     #     audio=iter([1, 2, 3]), keyboard=iter([4, 5, 6])
     # )
 
-    from know.util import SlabsPushTuple
+    from know.scrap.pieces import SlabsPushTuple
 
     def is_none(x):
         return x is None

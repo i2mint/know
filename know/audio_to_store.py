@@ -37,8 +37,7 @@ from atypes import WaveformBytes, Waveform, IntervalSlice, Segment
 from recode import mk_codec
 
 from dol import StrTupleDict, wrap_kvs
-from dol.filesys import RelPathFileBytesPersister
-from dol.paths import mk_dirs_if_missing
+from dol.filesys import RelPathFileBytesPersister, mk_dirs_if_missing
 from lined import Pipe
 
 from taped import LiveWf, chunk_indices
@@ -99,7 +98,7 @@ def demo_audio_to_file(rootdir=None, chk_size=100_000, end_idx=300_000):
             wfs[session_id, bt] = live_wf[bt:tt]
 
 
-def get_root_dir(rootdir=None):
+def get_root_dir(rootdir=None, verbose=True):
     """get a rootdir (a default one, or validate the one given etc.)"""
     if rootdir is not None:
         return rootdir
@@ -111,6 +110,8 @@ def get_root_dir(rootdir=None):
             rootdir += os.path.sep
 
         os.makedirs(rootdir, exist_ok=True)
+        if verbose:
+            print(f"{rootdir=}")
         return rootdir
 
 

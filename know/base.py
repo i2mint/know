@@ -315,6 +315,7 @@ class SlabsIter:
             name: Sig.sig_or_default(func) for name, func in self.components.items()
         }
         self.context = ContextFanout(**components)
+        # assert all(map(callable, self.components)), "components need to all be callable"
 
     def _call_on_scope(self, scope: Mapping):
         """Calls the components 1 by 1, sourcing inputs and writing outputs in scope"""
@@ -347,12 +348,15 @@ class SlabsIter:
                         self.exit_value = handler_output  # remember, in case useful
                         break
 
-    def __enter__(self):
+    def open(self):
         self._output_of_context_enter = self.context.__enter__()
         return self
 
-    def __exit__(self, exc_type=None, exc_val=None, exc_tb=None) -> None:
+    def close(self, exc_type=None, exc_val=None, exc_tb=None) -> None:
         return self._output_of_context_enter.__exit__(exc_type, exc_val, exc_tb)
+
+    __enter__ = open
+    __exit__ = close
 
     def __call__(self):
         for _ in self:
