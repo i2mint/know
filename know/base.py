@@ -362,9 +362,6 @@ class SlabsIter:
         for _ in self:
             pass
 
-    open = __enter__  # convenience alias
-    close = __exit__  # convenience alias
-
     def dot_digraph(self):
         from i2 import Sig
         from lined import LineParametrized

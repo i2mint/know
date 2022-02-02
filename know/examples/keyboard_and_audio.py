@@ -37,7 +37,7 @@ def keyboard_and_audio(
     app object.
     :return: None
     """
-    input_device_index = get_input_device_index(input_device)
+    input_device_index = get_input_device_index(input_device=input_device)
     pipeline_commands = pipeline_commands or dflt_slab_iter_commands
 
     # converts seconds_to_keep_in_stream_buffer to max number of buffers of size
@@ -57,9 +57,13 @@ def keyboard_and_audio(
         frames_per_buffer=frames_per_buffer,
     ).stream_buffer(maxlen)
 
+    from stream2py.util import contextualize_with_instance
+    from functools import partial
+
     app = SlabsIter(
         # source the data
         audio=audio_reader,
+        # _print_info=partial(print, '', end='\n\r'),  # TODO: Address no_sig_kwargs err
         keyboard=KeyboardInputSourceReader().stream_buffer(maxlen),
         # check audio and keyboard for stopping signals
         audio_reader_instance=lambda: audio_reader,  # to give access to the audio_reader
@@ -159,17 +163,29 @@ from recode import mk_codec
 
 codec = mk_codec('h')
 
+def wf_to_print(wf, bar_char=';)'):
+    from statistics import stdev
+    if wf is not None:
+        vol = stdev(wf) / 200
+        n_bars = 1 + int(vol)
+        print(bar_char * n_bars, end='\n\r')
 
-def audio_to_wf(audio, bar_char=';)'):
+def audio_to_wf(audio):
     from statistics import stdev
 
     if audio is not None:
         _, wf_bytes, *_ = audio
         wf = codec.decode(wf_bytes)
-        vol = stdev(wf) / 200
-        n_bars = 1 + int(vol)
-        print(bar_char * n_bars, end='\n\r')
+        return wf
 
+        # vol = stdev(wf) / 200
+        # n_bars = 1 + int(vol)
+        # print(bar_char * n_bars, end='\n\r')
+
+
+def print_samples(wf):
+    if wf is not None:
+        print(wf[:11], end='\n\r')
 
 # ---------------------------------------------------------------------------------------
 
@@ -189,7 +205,9 @@ dflt_slab_iter_commands = dict(
     # audio_print=audio_print,
     keyboard_print=keyboard_print,
     bar_char=LastCharPressed(),
-    my_audio=audio_to_wf,
+    wf=audio_to_wf,
+    # __1=wf_to_print
+    __2=print_samples
 )
 
 
