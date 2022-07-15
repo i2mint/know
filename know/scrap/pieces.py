@@ -22,11 +22,13 @@ from know.util import (
     StreamId,
     Stream,
     SlabCallback,
+    HunkerType,
 )
 from taped import chunk_indices
 
 always: FiltFunc
 Hunker: HunkerType
+
 
 class MultiIterator(MultiObj):
     def _gen_next(self):
