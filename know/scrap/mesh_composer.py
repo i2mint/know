@@ -112,42 +112,33 @@ import wrapt
 from i2 import Sig, call_forgivingly
 from functools import partial
 
-
-def with_keyword_only_arguments(*, validator=None):
-    @wrapt.decorator
-    def wrapper(wrapped, instance, args, kwargs):
-        sig = Sig(wrapped)
-        call_forgivingly(validator, *args, **kwargs)
-        return wrapped(*args, **kwargs)
-
-    return wrapper
-
-
-def my_validator(x):
-    return len(x) != 3
-
-
-def raise_if_false(is_valid, _raise_obj):
-    if not is_valid:
-        raise raise_obj
-
-
-def raise_if_false(*, validator=None):
-    @wrapt.decorator
-    def wrapper(wrapped, instance, args, kwargs):
-        sig = Sig(wrapped)
-        call_forgivingly(validator, *args, **kwargs)
-        return wrapped(*args, **kwargs)
-
-    return wrapper
+#
+# def with_keyword_only_arguments(*, validator=None):
+#     @wrapt.decorator
+#     def wrapper(wrapped, instance, args, kwargs):
+#         sig = Sig(wrapped)
+#         call_forgivingly(validator, *args, **kwargs)
+#         return wrapped(*args, **kwargs)
+#
+#     return wrapper
+#
+#
+# def raise_if_false(*, validator=None):
+#     @wrapt.decorator
+#     def wrapper(wrapped, instance, args, kwargs):
+#         sig = Sig(wrapped)
+#         call_forgivingly(validator, *args, **kwargs)
+#         return wrapped(*args, **kwargs)
+#
+#     return wrapper
 
 
 class ValidationError(ValueError, TypeError):
     """To be raised when there's a validation error"""
 
 
-# Works, but not picklable (https://github.com/GrahamDumpleton/wrapt/issues/102 still
-# open)
+# Works, but not picklable
+# Due to https://github.com/GrahamDumpleton/wrapt/issues/102 still open?
 def add_validation(*, validator=None, raise_obj=ValidationError('Validation error')):
     @wrapt.decorator
     def raise_if_false(wrapped, instance, args, kwargs):
@@ -186,7 +177,15 @@ def test_validator():
     def foo(x):
         return x
 
-    from tested import validate_codec
+    assert foo([1, 2, 3]) == [1, 2, 3]
+
+    import pytest
+
+    with pytest.raises(ValidationError):
+        foo([1, 2])  # not of size 3 so should fail
+
+    # TODO: Make pickling work!!!
+    # from tested import validate_codec
 
     import pickle
 
