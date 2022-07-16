@@ -8,7 +8,9 @@ experience of a drag and drop GUI.
 """
 
 from dol.sources import AttrContainer
+from operator import itemgetter
 import numpy as np
+from typing import Any, Iterable, Tuple, Optional, Callable
 from inspect import signature
 
 from slang.chunkers import fixed_step_chunker, mk_chunker
@@ -38,7 +40,37 @@ def identity(obj):
 from atypes import WfStore
 
 
-class a:
+def _attr_name_and_obj_pairs(
+    o: Any, obj_filt: Optional[Callable] = None
+) -> Iterable[Tuple[str, Any]]:
+    obj_filt = obj_filt or (lambda x: True)
+    for attr_name in dir(o):
+        attr_obj = getattr(o, attr_name)
+        if obj_filt(attr_obj):
+            yield attr_name, attr_obj
+
+
+def flat_options(box):
+    for kind in box:
+        options = getattr(box, kind)
+        for option in options:
+            yield kind, option
+
+
+flat_options.dot_string = lambda box: map('.'.join, flat_options(box))
+
+
+class Box:
+    def __iter__(self):
+        yield from map(
+            itemgetter(0),
+            _attr_name_and_obj_pairs(
+                self, obj_filt=lambda x: isinstance(x, AttrContainer)
+            ),
+        )
+
+
+class MyBox(Box):
     wf_store = AttrContainer()
     chunker = AttrContainer(fixed_step=mk_chunker)
     featurizer = AttrContainer(
@@ -64,10 +96,98 @@ class a:
     )
 
 
-def test_a():
-    assert list(a.featurizer) == ['fft', 'vol']
-    assert 'StandardScaler' in a.learner
-    assert a.learner.StandardScaler == StandardScaler
+def test_mybox():
+    assert list(MyBox.featurizer) == ['fft', 'vol']
+    assert 'StandardScaler' in MyBox.learner
+    assert MyBox.learner.StandardScaler == StandardScaler
 
 
-test_a()
+test_mybox()
+
+
+# ---------------------------------------------------------------------------------------
+
+
+import wrapt
+from i2 import Sig, call_forgivingly
+from functools import partial
+
+
+def with_keyword_only_arguments(*, validator=None):
+    @wrapt.decorator
+    def wrapper(wrapped, instance, args, kwargs):
+        sig = Sig(wrapped)
+        call_forgivingly(validator, *args, **kwargs)
+        return wrapped(*args, **kwargs)
+
+    return wrapper
+
+
+def my_validator(x):
+    return len(x) != 3
+
+
+def raise_if_false(is_valid, _raise_obj):
+    if not is_valid:
+        raise raise_obj
+
+
+def raise_if_false(*, validator=None):
+    @wrapt.decorator
+    def wrapper(wrapped, instance, args, kwargs):
+        sig = Sig(wrapped)
+        call_forgivingly(validator, *args, **kwargs)
+        return wrapped(*args, **kwargs)
+
+    return wrapper
+
+
+class ValidationError(ValueError, TypeError):
+    """To be raised when there's a validation error"""
+
+
+# Works, but not picklable (https://github.com/GrahamDumpleton/wrapt/issues/102 still
+# open)
+def add_validation(*, validator=None, raise_obj=ValidationError('Validation error')):
+    @wrapt.decorator
+    def raise_if_false(wrapped, instance, args, kwargs):
+        output = wrapped(*args, **kwargs)
+        if not validator(output):
+            raise raise_obj
+        return output
+
+    return raise_if_false
+
+
+from i2 import wrap
+
+
+def _validation_ingress(*args, validator, raise_obj, **kwargs):
+    if validator is not None:
+        is_valid = call_forgivingly(validator, *args, **kwargs)
+        if not is_valid:
+            raise raise_obj
+    return args, kwargs
+
+
+# Works, but not picklable
+def add_validation(*, validator=None, raise_obj=ValidationError('Validation error')):
+    return partial(
+        wrap,
+        ingress=partial(_validation_ingress, validator=validator, raise_obj=raise_obj),
+    )
+
+
+def test_validator():
+    def my_validator(x):
+        return len(x) == 3
+
+    @add_validation(validator=my_validator)
+    def foo(x):
+        return x
+
+    from tested import validate_codec
+
+    import pickle
+
+    pickle.dumps(foo)
