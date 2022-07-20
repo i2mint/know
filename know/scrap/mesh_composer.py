@@ -59,8 +59,16 @@ def flat_options(box):
 
 flat_options.dot_string = lambda box: map('.'.join, flat_options(box))
 
-
 class Box:
+    """Experimental container, meant to evolve into something that has some dynamic,
+    context-based help (such as wrapping functions with defaults that are changed
+    according to the context, filtering the function proposals according to the
+    context (e.g. the functions already used in a pipeline) etc.
+
+    Note: Most of the time, making a AttrContainer instance is good enough.
+    In fact, at the point of writing this, Box does nothing extra (no data binding).
+
+    """
     def __iter__(self):
         yield from map(
             itemgetter(0),
@@ -69,6 +77,21 @@ class Box:
             ),
         )
 
+
+def box_items(box, path=()):
+    """Creates items of a flat mapping of the input box,
+    where keys are key tuples and values are the leafs of the input box
+    """
+    for k in box:
+        v = getattr(box, k)
+        if isinstance(v, (AttrContainer, Box)):
+            yield from box_items(v, path)
+        else:
+            yield path + (k,), v
+
+# def kv_to_box(kv_items):
+#     for k, v in kv_items:
+#         pass
 
 class MyBox(Box):
     wf_store = AttrContainer()
