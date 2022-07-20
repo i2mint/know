@@ -7,7 +7,7 @@ import io
 import re
 import os
 
-from dol import wrap_kvs, filt_iter, FilesOfZip, Files
+from dol import wrap_kvs, filt_iter, FilesOfZip, Files, Pipe
 import recode
 
 from i2 import wrap, Sig
@@ -46,21 +46,14 @@ def make_function_conjunction(func1, func2):
     return partial(_function_conjunction, func1=func1, func2=func2)
 
 
-# TODO: Make read_wav_bytes from sf.read with i2.wrap that transforms first arg of read
-#   and egress=itemgetter(0)
-def read_wav_bytes(b: bytes):
-    wf, sr = sf.read(io.BytesIO(b))
-    return wf
+read_wav_bytes = Pipe(recode.decode_wav_bytes, itemgetter(0))
 
 
 from know.scrap.mesh_composer import Box, box_items
 
 from dol.sources import AttrContainer
 from tested import validate_codec
-from i2 import Pipe
 from i2.deco import FuncFactory
-
-import soundfile as sf
 
 
 # ---------- First way: With a Box class -------------------
@@ -145,7 +138,9 @@ d = dict(
         key_filter=filt_iter,
         extract_extension=FuncFactory(extract_extension),
     ),
-    obj_trans=dict(make_codec=make_decoder, make_wav_bytes_reader=FuncFactory(read_wav_bytes)),
+    obj_trans=dict(
+        make_codec=make_decoder, make_wav_bytes_reader=FuncFactory(read_wav_bytes)
+    ),
     bool_funcs=dict(regular_expression_filter=regular_expression_filter,),
     aggregator=dict(counter=FuncFactory(Counter),),
 )
