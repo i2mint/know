@@ -3,12 +3,18 @@
 from functools import partial
 from operator import itemgetter
 from collections import Counter
-import io
 import re
 import os
 
 from dol import wrap_kvs, filt_iter, FilesOfZip, Files, Pipe
 import recode
+
+from know.scrap.mesh_composer import Box, box_items
+from dol.sources import AttrContainer
+from tested import validate_codec
+from i2.deco import FuncFactory, postprocess
+
+from collections import ChainMap
 
 from i2 import wrap, Sig
 
@@ -49,12 +55,69 @@ def make_function_conjunction(func1, func2):
 read_wav_bytes = Pipe(recode.decode_wav_bytes, itemgetter(0))
 
 
-from know.scrap.mesh_composer import Box, box_items
+dflt_store_contents = dict(
+    object_transformation=dict(default_wav_bytes_reader=read_wav_bytes),
+    aggregator=dict(counter=Counter),
+)
 
-from dol.sources import AttrContainer
-from tested import validate_codec
-from i2.deco import FuncFactory
+factories = dict(
+    source_reader=dict(
+        files_of_folder=FuncFactory(Files), files_of_zip=FuncFactory(FilesOfZip),
+    ),
+    store_transformers=dict(
+        key_transformer=key_transformer,
+        val_transformer=val_transformer,
+        key_filter=filt_iter,
+        extract_extension=FuncFactory(extract_extension),
+    ),
+    object_transformation=dict(
+        make_codec=make_decoder,
+    ),
+    boolean_functions=dict(regular_expression_filter=regular_expression_filter, ),
+)
+# mall = dict(object_transformation=DillFiles())
 
+from know.scrap.mall_making import mk_mall
+
+
+mall = mk_mall(
+    dflt_store_contents=dflt_store_contents,
+    factories_for_store=factories
+)
+
+# dflt_store_contents = dict(
+#     files_of_folder=FuncFactory(Files),
+#     files_of_zip=FuncFactory(FilesOfZip),
+#     key_transformer=key_transformer,
+#     val_transformer=val_transformer,
+#     key_filter=filt_iter,
+#     extract_extension=FuncFactory(extract_extension),
+#     make_codec=make_decoder,
+#     make_wav_bytes_reader=FuncFactory(read_wav_bytes),
+#     regular_expression_filter=regular_expression_filter,
+#     counter=Counter,
+# )
+
+d = dict(
+    kv_reader=dict(
+        files_of_folder=FuncFactory(Files), files_of_zip=FuncFactory(FilesOfZip),
+    ),
+    kv_trans=dict(
+        key_transformer=key_transformer,
+        val_transformer=val_transformer,
+        key_filter=filt_iter,
+        extract_extension=FuncFactory(extract_extension),
+    ),
+    obj_trans=dict(
+        make_codec=make_decoder, make_wav_bytes_reader=FuncFactory(read_wav_bytes)
+    ),
+    bool_funcs=dict(regular_expression_filter=regular_expression_filter,),
+    aggregator=dict(counter=FuncFactory(Counter),),
+)
+
+
+# ---------- Box -------------------
+# Experimenting with backend containers for pipeline ingredients
 
 # ---------- First way: With a Box class -------------------
 class DataPrepBox(Box):
