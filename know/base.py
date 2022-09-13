@@ -38,7 +38,7 @@ Note to developers looking into the code: The overview of the `SlabsIter` class:
 """
 
 
-from typing import Callable, Mapping, Iterable, Union, NewType, Any
+from typing import Callable, Mapping, Iterable, Union, NewType, Any, MutableMapping
 from i2 import Sig, ContextFanout
 
 
@@ -141,7 +141,7 @@ def _handle_exception(
     )
 
 
-def _call_from_dict(kwargs: dict, func: Callable, sig: Sig):
+def _call_from_dict(kwargs: MutableMapping, func: Callable, sig: Sig):
     """A i2.call_forgivingly optimized for our purpose
 
     The sig argument needs to be the Sig(func) to work correctly.
@@ -317,7 +317,7 @@ class SlabsIter:
         self.context = ContextFanout(**components)
         # assert all(map(callable, self.components)), "components need to all be callable"
 
-    def _call_on_scope(self, scope: Mapping):
+    def _call_on_scope(self, scope: MutableMapping):
         """Calls the components 1 by 1, sourcing inputs and writing outputs in scope"""
         # for each component
         for name, component in self.components.items():
