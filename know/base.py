@@ -355,12 +355,13 @@ class SlabsIter:
     def close(self, exc_type=None, exc_val=None, exc_tb=None) -> None:
         return self._output_of_context_enter.__exit__(exc_type, exc_val, exc_tb)
 
-    __enter__ = open
-    __exit__ = close
-
-    def __call__(self):
+    def run(self):
         for _ in self:
             pass
+
+    __enter__ = open
+    __exit__ = close
+    __call__ = run
 
     def dot_digraph(self):
         from i2 import Sig

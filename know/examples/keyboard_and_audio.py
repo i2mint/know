@@ -183,9 +183,9 @@ def audio_to_wf(audio):
         # print(bar_char * n_bars, end='\n\r')
 
 
-def print_samples(wf):
+def print_samples(wf, max_samples=11):
     if wf is not None:
-        print(wf[:11], end='\n\r')
+        print(wf[:max_samples], end='\n\r')
 
 # ---------------------------------------------------------------------------------------
 
@@ -206,8 +206,8 @@ dflt_slab_iter_commands = dict(
     keyboard_print=keyboard_print,
     bar_char=LastCharPressed(),
     wf=audio_to_wf,
-    # __1=wf_to_print
-    __2=print_samples
+    # __1=wf_to_print,
+    __2=print_samples,
 )
 
 
