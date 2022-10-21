@@ -7,7 +7,7 @@ from functools import partial
 from typing import Callable, Iterable
 from front import APP_KEY, RENDERING_KEY, ELEMENT_KEY, NAME_KEY
 from i2 import Pipe, Sig
-from front.crude import Crudifier
+from front.crude import Crudifier, prepare_for_crude_dispatch
 
 from streamlitfront import mk_app, binder as b
 from streamlitfront.elements import (
@@ -92,7 +92,6 @@ def mk_pipeline_maker_app_with_mall(
                             'value': b.selected_step_factory,
                         },
                         'kwargs': {
-                            ELEMENT_KEY: KwargsInput,
                             'func_sig': Sig(
                                 mall[step_factories][b.selected_step_factory()]
                             ),
@@ -145,26 +144,72 @@ def mk_pipeline_maker_app_with_mall(
 
 if __name__ == '__main__':
     # TODO: Try with know.malls.mk_mall:
+
     mall = dict(
-        step_factories=dict(
-            # Source Readers
-            files_of_folder=FuncFactory(Files),
-            files_of_zip=FuncFactory(FilesOfZip),
-            # Store Transformers
-            key_transformer=key_transformer,
-            val_transformer=val_transformer,
-            key_filter=filter_keys,
-            extract_extension=FuncFactory(extract_extension),
-            # Object Transformation
-            make_codec=make_decoder,
-            # Boolean Functions
-            regular_expression_filter=regular_expression_filter,
-            make_function_conjunction=make_function_conjunction,
-        ),
+        # Factory Input Stores
+        # TODO: Feed the following stores with real objects,
+        # I'll let them empty for now.
+        # This is clearly an ugly way to crudify params of functions that are part of
+        # the same mall. Let's think about a better solution.
+        # Source Readers
+            # files_of_folder
+        pattern_for_field=dict(), # dicts
+            # files_of_zip
+        open_kws=dict(), # dicts
+        # Store Transformers
+            # key_transformer
+        key_of_id=dict(), # functions
+        id_of_key=dict(), # functions
+            # val_transformer
+        obj_of_data=dict(), # functions
+            # key_filter
+        filt=dict(), # Union[Callable, Iterable]
+            # extract_extension (nothing to crudify)
+        # Object Transformation
+            # make_codec (nothing to crudify)
+        # Boolean Functions
+            # regular_expression_filter (nothing to crudify)
+            # make_function_conjunction
+        func1=dict(), # functions
+        func2=dict(), # functions
+        
+        # Output Store
         steps=dict(),
         pipelines=dict(),
         # exec_outputs=dict(),
     )
+
+    crudifier = partial(prepare_for_crude_dispatch, mall=mall)
+    
+    step_factories=dict(
+        # Source Readers
+        files_of_folder=crudifier(
+            FuncFactory(Files),
+            param_to_mall_map=['pattern_for_field']
+        ),
+        files_of_zip=crudifier(
+            FuncFactory(FilesOfZip),
+            param_to_mall_map=['open_kws']
+        ),
+        # Store Transformers
+        key_transformer=crudifier(
+            key_transformer,
+            param_to_mall_map=['key_of_id', 'id_of_key']
+        ),
+        val_transformer=crudifier(val_transformer, param_to_mall_map=['obj_of_data']),
+        key_filter=crudifier(filter_keys, param_to_mall_map=['filt']),
+        extract_extension=FuncFactory(extract_extension),
+        # Object Transformation
+        make_codec=make_decoder,
+        # Boolean Functions
+        regular_expression_filter=regular_expression_filter,
+        make_function_conjunction=crudifier(
+            make_function_conjunction,
+            param_to_mall_map=['func1', 'func2']
+        ),
+    )
+
+    mall['step_factories'] = step_factories
 
     app = mk_pipeline_maker_app_with_mall(
         mall, step_factories='step_factories', steps='steps', pipelines='pipelines'
