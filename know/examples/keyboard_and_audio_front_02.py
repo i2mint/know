@@ -4,7 +4,7 @@ from i2 import Sig
 
 # TODO: Generalize to a curriable alias handling function? It's a if_cond_val pattern.
 def none_if_none_string(x):
-    if isinstance(x, str) and x == 'None':
+    if isinstance(x, str) and x == "None":
         return None
     return x
 
@@ -23,7 +23,7 @@ def none_if_none_string_for_all_none_defaulted(func, exception_argnames=()):
 
 
 # config
-if __name__ == '__main__':
+if __name__ == "__main__":
     from streamlitfront import mk_app
 
     _keyboard_and_audio = none_if_none_string_for_all_none_defaulted(keyboard_and_audio)
