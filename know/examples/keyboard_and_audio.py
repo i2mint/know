@@ -199,9 +199,12 @@ def audio_to_wf(audio):
 
 
 def only_if(locals_condition, sentinel=None):
-    """Convenience wrapper to condition a function call on some function of it's inputs
+    """Convenience wrapper to condition a function call on some function of it's inputs.
 
-    >>> @only_if(lambda d: d['x'] > 0)
+    Important: The signature of locals_condition matter: It's through the names of it's arguments that ``only_if``
+    knows what values to extract from the inputs to compute the condition.
+
+    >>> @only_if(lambda x: x > 0)
     ... def foo(x, y=1):
     ...     return x + y
     >>>
@@ -211,23 +214,25 @@ def only_if(locals_condition, sentinel=None):
 
     ``None`` is just the default sentinel. You can specify your own:
 
-    >>> @only_if(lambda d: d['x'] > 0, sentinel='my_sentinel')
+    >>> @only_if(lambda y: (y % 2) == 0, sentinel='y_is_not_even')
     ... def foo(x, y=1):
     ...     return x + y
-    >>> foo(-1, y=2)
-    'my_sentinel'
-
+    >>> foo(x=1, y=2)
+    3
+    >>> foo(1, y=3)
+    'y_is_not_even'
 
     """
     from functools import wraps
-    from i2 import Sig
+    from i2 import Sig, call_forgivingly
 
     def wrapper(func):
         sig = Sig(func)
 
         @wraps(func)
         def locals_conditioned_func(*args, **kwargs):
-            if locals_condition(sig.kwargs_from_args_and_kwargs(args, kwargs)):
+            _kwargs = sig.kwargs_from_args_and_kwargs(args, kwargs)
+            if call_forgivingly(locals_condition, **_kwargs):
                 return func(*args, **kwargs)
             else:
                 return sentinel
