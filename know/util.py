@@ -12,19 +12,13 @@ Stream = Iterable
 StreamId = str
 
 SlabService = MyType(
-    'Consumer', Callable[[Slab], Any], doc='A function that will call slabs iteratively'
+    "Consumer", Callable[[Slab], Any], doc="A function that will call slabs iteratively"
 )
 Name = str
 # BoolFunc = Callable[[...], bool]
-FiltFunc = Callable[[Any], bool]
 
-SliceableFactory = NewType('SliceableFactory', Callable[..., Sliceable])
+SliceableFactory = NewType("SliceableFactory", Callable[..., Sliceable])
 
-
-from itertools import tee, count
-from i2 import ContextFanout, Pipe
-
-apply = Pipe(map, tuple)
 
 # def mk_audio_stream():
 #     return LiveWf(
@@ -36,8 +30,91 @@ apply = Pipe(map, tuple)
 #     )
 #
 
+########################################################################################
+
+from dataclasses import dataclass
+from typing import Callable, ContextManager, Iterable
+from i2 import Sig
+
+# Note: Could re-use ContextFanout, but didn't because I'm not sure the extra
+#  functionality is worth the extra complexity/dependence.
+#  Notes on how it can be done here: https://github.com/otosense/know/issues/4
+@dataclass
+class ContextualFunction:
+    """Wrap a function so that it's also a multi-context context manager.
+
+    This class makes callable instances that are also context managers.
+
+    This is useful when a function needs specific resources run, which are managed by
+    some context managers. What ``ContextualFunction`` does is bring both in one place
+    so that the callable is it's own context manager instance which you can enter,
+    call, and exit.
+
+    Note: This doesn't mean that a ``ContextualFunction`` will enter the context
+    automatically when you try to execute it. If this is needed, one can easily
+    make such a function with ``ContextualFunction`` though.
+
+    >>> from contextlib import contextmanager
+    >>>
+    >>> def mk_test_context(name, enter_obj=None, return_instance=True):
+    ...     @contextmanager
+    ...     def test_context():
+    ...         print(f'entering {name} context')
+    ...         yield enter_obj
+    ...         print(f'exiting {name} context')
+    ...     return test_context()
+    >>> foo_context = mk_test_context('foo')
+    >>> bar_context = mk_test_context('bar')
+    >>>
+    >>> contextual_func = ContextualFunction(
+    ...     lambda x: x + 1,
+    ...     contexts=[foo_context, bar_context]
+    ... )
+    >>>
+    >>> with contextual_func:
+    ...     print(f"{contextual_func(2)=}")
+    ...     print(f"{contextual_func(1414)=}")
+    entering foo context
+    entering bar context
+    contextual_func(2)=3
+    contextual_func(1414)=1415
+    exiting foo context
+    exiting bar context
+
+    See https://github.com/otosense/know/issues/4 for more info.
+
+    """
+
+    func: Callable
+    contexts: Iterable[ContextManager] = ()
+
+    def __post_init__(self):
+        self.__signature__ = Sig(self.func)
+
+    def __call__(self, *args, **kwargs):
+        return self.func(*args, **kwargs)
+
+    def __enter__(self):
+        for context in self.contexts:
+            context.__enter__()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        for context in self.contexts:
+            context.__exit__(exc_type, exc_val, exc_tb)
+
+
+########################################################################################
+
+
+from itertools import tee, count
+from i2 import ContextFanout, Pipe
+
+apply = Pipe(map, tuple)
+
+
 def pairwise(iterable):
-    's -> (s0,s1), (s1,s2), (s2, s3), ...'
+    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
     a, b = tee(iterable)
     next(b, None)
     return zip(a, b)
@@ -48,11 +125,9 @@ def fixed_step_chunk_intervals(chk_size, chk_step=None, start=0):
     Fixed size means all bt - tt are equal and consecutive bts are equidistant.
 
     >>> chk_intervals = fixed_step_chunk_intervals(chk_size=2, chk_step=0.5, start=3)
-    >>>
     >>> assert [
     ...     next(chk_intervals), next(chk_intervals), next(chk_intervals)
-    ... ] == [
-    ...     (3, 5), (3.5, 5.5), (4.0, 6.0)
+    ... ] == [(3, 5), (3.5, 5.5), (4.0, 6.0)]
     """
     chk_step = chk_step or chk_size
     yield from zip(count(start, chk_step), count(start + chk_size, chk_step))
@@ -134,4 +209,3 @@ def iterate_dict_values(iterator_dict: Mapping[Name, Iterator]):
             yield {k: next(v, None) for k, v in iterator_dict.items()}
         except IteratorExit:
             break
-
