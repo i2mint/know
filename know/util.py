@@ -40,19 +40,19 @@ from i2 import Sig
 #  functionality is worth the extra complexity/dependence.
 #  Notes on how it can be done here: https://github.com/otosense/know/issues/4
 @dataclass
-class ContextualFunction:
+class ContextualFunc:
     """Wrap a function so that it's also a multi-context context manager.
 
     This class makes callable instances that are also context managers.
 
     This is useful when a function needs specific resources run, which are managed by
-    some context managers. What ``ContextualFunction`` does is bring both in one place
+    some context managers. What ``ContextualFunc`` does is bring both in one place
     so that the callable is it's own context manager instance which you can enter,
     call, and exit.
 
-    Note: This doesn't mean that a ``ContextualFunction`` will enter the context
+    Note: This doesn't mean that a ``ContextualFunc`` will enter the context
     automatically when you try to execute it. If this is needed, one can easily
-    make such a function with ``ContextualFunction`` though.
+    make such a function with ``ContextualFunc`` though.
 
     >>> from contextlib import contextmanager
     >>>
@@ -66,7 +66,7 @@ class ContextualFunction:
     >>> foo_context = mk_test_context('foo')
     >>> bar_context = mk_test_context('bar')
     >>>
-    >>> contextual_func = ContextualFunction(
+    >>> contextual_func = ContextualFunc(
     ...     lambda x: x + 1,
     ...     contexts=[foo_context, bar_context]
     ... )
