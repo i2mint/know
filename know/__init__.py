@@ -31,5 +31,4 @@ With a variety of sources, target storage systems, etc.
 
 """
 
-from know.util import ContextFanout, any_value_is_none, ContextualFunction
-
+from know.util import ContextFanout, any_value_is_none, ContextualFunc

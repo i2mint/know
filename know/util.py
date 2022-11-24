@@ -47,7 +47,7 @@ class ContextualFunc:
 
     This is useful when a function needs specific resources run, which are managed by
     some context managers. What ``ContextualFunc`` does is bring both in one place
-    so that the callable is it's own context manager instance which you can enter,
+    so that the callable is its own context manager instance which you can enter,
     call, and exit.
 
     Note: This doesn't mean that a ``ContextualFunc`` will enter the context
