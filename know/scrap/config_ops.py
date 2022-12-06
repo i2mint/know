@@ -120,7 +120,6 @@ from streamlitfront.spec_maker import (
     App,
     View,
     TextSection,
-    get_stored_value,
     IntInput,
     FloatInput,
     TextInput,
@@ -137,7 +136,6 @@ _DFLT_CONVENTION_DICT = {
             'description': {ELEMENT_KEY: TextSection,},
             'execution': {
                 ELEMENT_KEY: ExecSection,
-                'stored_value_getter': get_stored_value,
                 'inputs': {
                     int: {ELEMENT_KEY: IntInput,},
                     float: {ELEMENT_KEY: FloatInput,},
@@ -156,7 +154,6 @@ render_1 = partial(
     description=partial(TextSection),
     execution=partial(
         ExecSection,
-        stored_value_getter=get_stored_value,
         inputs={
             int: partial(IntInput),
             float: partial(IntInput),
@@ -173,7 +170,6 @@ from i2.deco import FuncFactory
 render_2 = FuncFactory(View)(
     description=FuncFactory(TextSection),
     execution=FuncFactory(ExecSection)(
-        stored_value_getter=get_stored_value,
         inputs={
             int: partial(IntInput),
             float: partial(IntInput),
@@ -209,7 +205,6 @@ def _ensure_factory_if_callable(
 render_3 = FuncFactory(View)(
     description=TextSection,  # factory will be made from callable
     execution=FuncFactory(ExecSection)(
-        stored_value_getter=Literal(get_stored_value),
         # Literal: we actually want a function, not a factory here
         inputs={
             int: IntInput,  # factory will be made from callable
