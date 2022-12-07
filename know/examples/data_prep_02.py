@@ -1,6 +1,6 @@
-'''
+"""
 An app to take care of the initial 'sourcing' part of the data prep of audio ML
-'''
+"""
 from typing import Mapping
 from know.boxes import *
 from functools import partial
@@ -88,9 +88,7 @@ def mk_pipeline_maker_app_with_mall(
                 NAME_KEY: 'Pipeline Step Maker',
                 'execution': {
                     'inputs': {
-                        'step_factory': {
-                            'value': b.selected_step_factory,
-                        },
+                        'step_factory': {'value': b.selected_step_factory,},
                         'kwargs': {
                             'func_sig': Sig(
                                 mall[step_factories][b.selected_step_factory()]
@@ -123,17 +121,15 @@ def mk_pipeline_maker_app_with_mall(
                 NAME_KEY: 'Pipeline Executor',
                 'execution': {
                     'inputs': {
-                        'pipeline': {
-                            'value': b.selected_pipeline,
-                        },
+                        'pipeline': {'value': b.selected_pipeline,},
                         'kwargs': {
                             ELEMENT_KEY: KwargsInput,
                             'func_sig': get_selected_pipeline_sig(),
-                        }
+                        },
                     }
-                }
-            }
-        }
+                },
+            },
+        },
     }
 
     funcs = [mk_step, mk_pipeline, exec_pipeline]
@@ -152,27 +148,26 @@ if __name__ == '__main__':
         # This is clearly an ugly way to crudify params of functions that are part of
         # the same mall. Let's think about a better solution.
         # Source Readers
-            # files_of_folder
-        pattern_for_field=dict(), # dicts
-            # files_of_zip
-        open_kws=dict(), # dicts
+        # files_of_folder
+        pattern_for_field=dict(),  # dicts
+        # files_of_zip
+        open_kws=dict(),  # dicts
         # Store Transformers
-            # key_transformer
-        key_of_id=dict(), # functions
-        id_of_key=dict(), # functions
-            # val_transformer
-        obj_of_data=dict(), # functions
-            # key_filter
-        filt=dict(), # Union[Callable, Iterable]
-            # extract_extension (nothing to crudify)
+        # key_transformer
+        key_of_id=dict(),  # functions
+        id_of_key=dict(),  # functions
+        # val_transformer
+        obj_of_data=dict(),  # functions
+        # key_filter
+        filt=dict(),  # Union[Callable, Iterable]
+        # extract_extension (nothing to crudify)
         # Object Transformation
-            # make_codec (nothing to crudify)
+        # make_codec (nothing to crudify)
         # Boolean Functions
-            # regular_expression_filter (nothing to crudify)
-            # make_function_conjunction
-        func1=dict(), # functions
-        func2=dict(), # functions
-        
+        # regular_expression_filter (nothing to crudify)
+        # make_function_conjunction
+        func1=dict(),  # functions
+        func2=dict(),  # functions
         # Output Store
         steps=dict(),
         pipelines=dict(),
@@ -180,21 +175,16 @@ if __name__ == '__main__':
     )
 
     crudifier = partial(prepare_for_crude_dispatch, mall=mall)
-    
-    step_factories=dict(
+
+    step_factories = dict(
         # Source Readers
         files_of_folder=crudifier(
-            FuncFactory(Files),
-            param_to_mall_map=['pattern_for_field']
+            FuncFactory(Files), param_to_mall_map=['pattern_for_field']
         ),
-        files_of_zip=crudifier(
-            FuncFactory(FilesOfZip),
-            param_to_mall_map=['open_kws']
-        ),
+        files_of_zip=crudifier(FuncFactory(FilesOfZip), param_to_mall_map=['open_kws']),
         # Store Transformers
         key_transformer=crudifier(
-            key_transformer,
-            param_to_mall_map=['key_of_id', 'id_of_key']
+            key_transformer, param_to_mall_map=['key_of_id', 'id_of_key']
         ),
         val_transformer=crudifier(val_transformer, param_to_mall_map=['obj_of_data']),
         key_filter=crudifier(filter_keys, param_to_mall_map=['filt']),
@@ -204,8 +194,7 @@ if __name__ == '__main__':
         # Boolean Functions
         regular_expression_filter=regular_expression_filter,
         make_function_conjunction=crudifier(
-            make_function_conjunction,
-            param_to_mall_map=['func1', 'func2']
+            make_function_conjunction, param_to_mall_map=['func1', 'func2']
         ),
     )
 

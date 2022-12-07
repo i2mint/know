@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>know.base &mdash; know 0.1.12 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <title>know.base &mdash; know 0.1.13 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
@@ -43,11 +43,25 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know.html">know</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/audio_to_store.html">know.audio_to_store</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/base.html">know.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/boxes.html">know.boxes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/boxes/audio_ml.html">know.boxes.audio_ml</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/boxes/dols.html">know.boxes.dols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/boxes/general.html">know.boxes.general</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/audio_slab_iter_front.html">know.examples.audio_slab_iter_front</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/audio_slicing.html">know.examples.audio_slicing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/data_prep.html">know.examples.data_prep</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/data_prep_02.html">know.examples.data_prep_02</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/http_response.html">HTTP Response streaming reader with no external dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/http_sensor.html">know.examples.http_sensor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/keyboard_and_audio.html">know.examples.keyboard_and_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/keyboard_and_audio_front.html">know.examples.keyboard_and_audio_front</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/http_sensor_sim.html">know.http_sensor_sim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/malls.html">know.malls</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/scrap/architectures.html">know.scrap.architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/scrap/collection_of_objects_streamlit_app.html">know.scrap.collection_of_objects_streamlit_app</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/scrap/config_ops.html">know.scrap.config_ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/scrap/data_prep_box.html">know.scrap.data_prep_box</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/scrap/mesh_composer.html">know.scrap.mesh_composer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/scrap/pieces.html">know.scrap.pieces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/tests/test_slabsIter.html">know.tests.test_slabsIter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/util.html">know.util</a></li>
@@ -66,9 +80,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>know.base</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">know.base</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -118,7 +132,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">NewType</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">NewType</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">MutableMapping</span>
 <span class="kn">from</span> <span class="nn">i2</span> <span class="kn">import</span> <span class="n">Sig</span><span class="p">,</span> <span class="n">ContextFanout</span>
 
 
@@ -147,8 +161,9 @@
 <span class="n">DoNotBreak</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;DoNotBreak&#39;</span><span class="p">,</span> <span class="p">(),</span> <span class="p">{})</span>
 <span class="n">do_not_break</span> <span class="o">=</span> <span class="n">DoNotBreak</span><span class="p">()</span>
 <span class="n">do_not_break</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s1">&#39;A sentinel that exception handlers can use to indicate that iteration should &#39;</span>
-    <span class="s1">&#39;continue -- the default for exception handling is to break out of the iteration.&#39;</span>
+    <span class="s1">&#39;Sentinel that should be used to signal SlabsIter iteration not to break. &#39;</span>
+    <span class="s1">&#39;This sentinel should be returned by exception handlers if they want to tell &#39;</span>
+    <span class="s1">&#39;the iteration not to stop (in all other cases, the iteration will stop)&#39;</span>
 <span class="p">)</span>
 
 <span class="n">IgnoredOutput</span> <span class="o">=</span> <span class="n">Any</span>
@@ -220,7 +235,7 @@
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_call_from_dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">sig</span><span class="p">:</span> <span class="n">Sig</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_call_from_dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">MutableMapping</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">sig</span><span class="p">:</span> <span class="n">Sig</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A i2.call_forgivingly optimized for our purpose</span>
 
 <span class="sd">    The sig argument needs to be the Sig(func) to work correctly.</span>
@@ -385,6 +400,8 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">_output_of_context_enter</span> <span class="o">=</span> <span class="kc">None</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle_exceptions</span><span class="o">=</span><span class="n">DFLT_INTERRUPT_EXCEPTIONS</span><span class="p">,</span> <span class="o">**</span><span class="n">components</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">components</span> <span class="o">=</span> <span class="n">components</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">handle_exceptions</span> <span class="o">=</span> <span class="n">_get_handle_exceptions</span><span class="p">(</span><span class="n">handle_exceptions</span><span class="p">)</span>
@@ -393,8 +410,9 @@
             <span class="n">name</span><span class="p">:</span> <span class="n">Sig</span><span class="o">.</span><span class="n">sig_or_default</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">ContextFanout</span><span class="p">(</span><span class="o">**</span><span class="n">components</span><span class="p">)</span>
+        <span class="c1"># assert all(map(callable, self.components)), &quot;components need to all be callable&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_call_on_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_call_on_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="n">MutableMapping</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calls the components 1 by 1, sourcing inputs and writing outputs in scope&quot;&quot;&quot;</span>
         <span class="c1"># for each component</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">component</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -425,19 +443,20 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">exit_value</span> <span class="o">=</span> <span class="n">handler_output</span>  <span class="c1"># remember, in case useful</span>
                         <span class="k">break</span>
 
-    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_output_of_context_enter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exc_val</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exc_tb</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exc_val</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exc_tb</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_of_context_enter</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="k">pass</span>
 
-    <span class="nb">open</span> <span class="o">=</span> <span class="fm">__enter__</span>  <span class="c1"># convenience alias</span>
-    <span class="n">close</span> <span class="o">=</span> <span class="fm">__exit__</span>  <span class="c1"># convenience alias</span>
+    <span class="fm">__enter__</span> <span class="o">=</span> <span class="nb">open</span>
+    <span class="fm">__exit__</span> <span class="o">=</span> <span class="n">close</span>
+    <span class="fm">__call__</span> <span class="o">=</span> <span class="n">run</span>
 
     <span class="k">def</span> <span class="nf">dot_digraph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">i2</span> <span class="kn">import</span> <span class="n">Sig</span>

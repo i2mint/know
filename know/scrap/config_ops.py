@@ -120,7 +120,6 @@ from streamlitfront.spec_maker import (
     App,
     View,
     TextSection,
-    get_stored_value,
     IntInput,
     FloatInput,
     TextInput,
@@ -137,7 +136,6 @@ _DFLT_CONVENTION_DICT = {
             'description': {ELEMENT_KEY: TextSection,},
             'execution': {
                 ELEMENT_KEY: ExecSection,
-                'stored_value_getter': get_stored_value,
                 'inputs': {
                     int: {ELEMENT_KEY: IntInput,},
                     float: {ELEMENT_KEY: FloatInput,},
@@ -156,7 +154,6 @@ render_1 = partial(
     description=partial(TextSection),
     execution=partial(
         ExecSection,
-        stored_value_getter=get_stored_value,
         inputs={
             int: partial(IntInput),
             float: partial(IntInput),
@@ -173,7 +170,6 @@ from i2.deco import FuncFactory
 render_2 = FuncFactory(View)(
     description=FuncFactory(TextSection),
     execution=FuncFactory(ExecSection)(
-        stored_value_getter=get_stored_value,
         inputs={
             int: partial(IntInput),
             float: partial(IntInput),
@@ -209,7 +205,6 @@ def _ensure_factory_if_callable(
 render_3 = FuncFactory(View)(
     description=TextSection,  # factory will be made from callable
     execution=FuncFactory(ExecSection)(
-        stored_value_getter=Literal(get_stored_value),
         # Literal: we actually want a function, not a factory here
         inputs={
             int: IntInput,  # factory will be made from callable
@@ -225,11 +220,11 @@ from functools import reduce
 from typing import Iterable
 
 disjunction = partial(reduce, or_)
-disjunction = """disjunction([a, b, ...]) is equivalent to (a or b or ...)
+disjunction = '''disjunction([a, b, ...]) is equivalent to (a or b or ...)
 
 >>> assert disjunction([False, True, False]) == True
 >>> assert disjunction([False, False, False]) == False
-"""
+'''
 
 
 def get_mapping(obj):
@@ -241,11 +236,7 @@ def get_mapping(obj):
 
 
 # TODO: Wait a minute! What about i2.flatten_dict!?
-def key_path_and_val_pairs(
-        obj,
-        get_mapping=get_mapping,
-        path=()
-):
+def key_path_and_val_pairs(obj, get_mapping=get_mapping, path=()):
     mapping = get_mapping(obj)
     if mapping is not None:
         for k, v in mapping.items():
@@ -283,6 +274,9 @@ def test_ensure_factory_on_render_3():
     print(*key_path_and_val_pairs(render_3), sep='\n')
 
     from creek.tools import apply_func_to_index
-    ensure_factory = partial(apply_func_to_index, apply_to_idx=1, func=_ensure_factory_if_callable)
+
+    ensure_factory = partial(
+        apply_func_to_index, apply_to_idx=1, func=_ensure_factory_if_callable
+    )
     d = gather_in_nested_dict(map(ensure_factory, key_path_and_val_pairs(render_3)))
     return d

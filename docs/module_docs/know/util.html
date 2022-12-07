@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>know.util &mdash; know 0.1.12 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <title>know.util &mdash; know 0.1.13 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
@@ -45,11 +45,25 @@
 <li class="toctree-l1"><a class="reference internal" href="../know.html">know</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_to_store.html">know.audio_to_store</a></li>
 <li class="toctree-l1"><a class="reference internal" href="base.html">know.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="boxes.html">know.boxes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="boxes/audio_ml.html">know.boxes.audio_ml</a></li>
+<li class="toctree-l1"><a class="reference internal" href="boxes/dols.html">know.boxes.dols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="boxes/general.html">know.boxes.general</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/audio_slab_iter_front.html">know.examples.audio_slab_iter_front</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/audio_slicing.html">know.examples.audio_slicing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/data_prep.html">know.examples.data_prep</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/data_prep_02.html">know.examples.data_prep_02</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/http_response.html">HTTP Response streaming reader with no external dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/http_sensor.html">know.examples.http_sensor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/keyboard_and_audio.html">know.examples.keyboard_and_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/keyboard_and_audio_front.html">know.examples.keyboard_and_audio_front</a></li>
 <li class="toctree-l1"><a class="reference internal" href="http_sensor_sim.html">know.http_sensor_sim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="malls.html">know.malls</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scrap/architectures.html">know.scrap.architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scrap/collection_of_objects_streamlit_app.html">know.scrap.collection_of_objects_streamlit_app</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scrap/config_ops.html">know.scrap.config_ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scrap/data_prep_box.html">know.scrap.data_prep_box</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scrap/mesh_composer.html">know.scrap.mesh_composer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scrap/pieces.html">know.scrap.pieces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tests/test_slabsIter.html">know.tests.test_slabsIter</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">know.util</a></li>
@@ -68,8 +82,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>know.util</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">know.util</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/module_docs/know/util.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -83,67 +97,47 @@
 <span id="know-util"></span><h1>know.util<a class="headerlink" href="#module-know.util" title="Permalink to this headline">¶</a></h1>
 <p>Util objects</p>
 <dl class="py class">
-<dt id="know.util.FixedStepHunker">
-<em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">FixedStepHunker</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src</span></em>, <em class="sig-param"><span class="n">chk_size</span></em>, <em class="sig-param"><span class="n">chk_step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">start_idx</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">end_idx</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#FixedStepHunker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.FixedStepHunker" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py class">
-<dt id="know.util.LiveProcess">
-<em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">LiveProcess</code><span class="sig-paren">(</span><em class="sig-param">streams: Dict[str, Iterable], slab_callback: Callable[[Slab], Any] = &lt;built-in function print&gt;, walk: Callable = &lt;class 'know.util.DictZip'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#LiveProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.LiveProcess" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py method">
-<dt id="know.util.LiveProcess.slab_callback">
-<code class="sig-name descname">slab_callback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#know.util.LiveProcess.slab_callback" title="Permalink to this definition">¶</a></dt>
-<dd><p>print(value, …, sep=’ ‘, end=’n’, file=sys.stdout, flush=False)</p>
-<p>Prints the values to a stream, or to sys.stdout by default.
-Optional keyword arguments:
-file:  a file-like object (stream); defaults to the current sys.stdout.
-sep:   string inserted between values, default a space.
-end:   string appended after the last value, default a newline.
-flush: whether to forcibly flush the stream.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="know.util.MultiIterable">
-<em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">MultiIterable</code><span class="sig-paren">(</span><em class="sig-param">*unnamed, stop_condition: Callable[[Any], bool] = &lt;function always_false&gt;, **named</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#MultiIterable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.MultiIterable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Join several iterables together.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">know.util</span> <span class="kn">import</span> <span class="n">any_value_is_none</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<dt id="know.util.ContextualFunc">
+<em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">ContextualFunc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span></em>, <em class="sig-param"><span class="n">contexts</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span>AbstractContextManager<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">()</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#ContextualFunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.ContextualFunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap a function so that it’s also a multi-context context manager.</p>
+<p>This class makes callable instances that are also context managers.</p>
+<p>This is useful when a function needs specific resources run, which are managed by
+some context managers. What <code class="docutils literal notranslate"><span class="pre">ContextualFunc</span></code> does is bring both in one place
+so that the callable is its own context manager instance which you can enter,
+call, and exit.</p>
+<p>Note: This doesn’t mean that a <code class="docutils literal notranslate"><span class="pre">ContextualFunc</span></code> will enter the context
+automatically when you try to execute it. If this is needed, one can easily
+make such a function with <code class="docutils literal notranslate"><span class="pre">ContextualFunc</span></code> though.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
 <span class="go">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">any_value_is_none</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="nb">any</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">d</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">mk_multi_iterable</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">MultiIterable</span><span class="p">,</span> <span class="n">stop_condition</span><span class="o">=</span><span class="n">any_value_is_none</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">mi</span> <span class="o">=</span> <span class="n">mk_multi_iterable</span><span class="p">(</span><span class="n">lets</span><span class="o">=</span><span class="s1">&#39;abc&#39;</span><span class="p">,</span> <span class="n">nums</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">mi</span><span class="p">)</span>
-<span class="go">[{&#39;lets&#39;: &#39;a&#39;, &#39;nums&#39;: 1}, {&#39;lets&#39;: &#39;b&#39;, &#39;nums&#39;: 2}, {&#39;lets&#39;: &#39;c&#39;, &#39;nums&#39;: 3}]</span>
-</pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mi</span> <span class="o">=</span> <span class="n">MultiIterable</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="n">stop_condition</span><span class="o">=</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">mk_test_context</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">enter_obj</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_instance</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nd">@contextmanager</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">test_context</span><span class="p">():</span>
+<span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;entering </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> context&#39;</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="k">yield</span> <span class="n">enter_obj</span>
+<span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;exiting </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> context&#39;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">test_context</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">foo_context</span> <span class="o">=</span> <span class="n">mk_test_context</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bar_context</span> <span class="o">=</span> <span class="n">mk_test_context</span><span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">contextual_func</span> <span class="o">=</span> <span class="n">ContextualFunc</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">contexts</span><span class="o">=</span><span class="p">[</span><span class="n">foo_context</span><span class="p">,</span> <span class="n">bar_context</span><span class="p">]</span>
 <span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">mi</span><span class="p">)</span>
-<span class="go">[{&#39;x&#39;: 5, &#39;y&#39;: 1}, {&#39;x&#39;: 4, &#39;y&#39;: 2}]</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">contextual_func</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">contextual_func</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">contextual_func</span><span class="p">(</span><span class="mi">1414</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">entering foo context</span>
+<span class="go">entering bar context</span>
+<span class="go">contextual_func(2)=3</span>
+<span class="go">contextual_func(1414)=1415</span>
+<span class="go">exiting foo context</span>
+<span class="go">exiting bar context</span>
 </pre></div>
 </div>
-<dl class="py method">
-<dt id="know.util.MultiIterable.takewhile">
-<code class="sig-name descname">takewhile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">predicate</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#MultiIterable.takewhile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.MultiIterable.takewhile" title="Permalink to this definition">¶</a></dt>
-<dd><p>itertools.takewhile applied to self, with a bit of syntactic sugar
-There’s nothing to stop the iteration</p>
+<p>See <a class="reference external" href="https://github.com/otosense/know/issues/4">https://github.com/otosense/know/issues/4</a> for more info.</p>
 </dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="know.util.SlabsPush">
-<em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">SlabsPush</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">slabs</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span>Slab<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">services</span><span class="p">:</span> <span class="n">Mapping<span class="p">[</span>str<span class="p">, </span>Consumer<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#SlabsPush"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.SlabsPush" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py class">
-<dt id="know.util.SlabsPushTuple">
-<em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">SlabsPushTuple</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">slabs</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span>Slab<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">services</span><span class="p">:</span> <span class="n">Mapping<span class="p">[</span>str<span class="p">, </span>Consumer<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#SlabsPushTuple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.SlabsPushTuple" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="py function">
 <dt id="know.util.always_false">
@@ -161,6 +155,63 @@ There’s nothing to stop the iteration</p>
 <dt id="know.util.any_value_is_none">
 <code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">any_value_is_none</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span><span class="p">:</span> <span class="n">Mapping</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#any_value_is_none"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.any_value_is_none" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if any value of the mapping is None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="know.util.fixed_step_chunk_intervals">
+<code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">fixed_step_chunk_intervals</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chk_size</span></em>, <em class="sig-param"><span class="n">chk_step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">start</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#fixed_step_chunk_intervals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.fixed_step_chunk_intervals" title="Permalink to this definition">¶</a></dt>
+<dd><p>A infinite generator of (bt, tt) intervals of fixed size and step.
+Fixed size means all bt - tt are equal and consecutive bts are equidistant.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">chk_intervals</span> <span class="o">=</span> <span class="n">fixed_step_chunk_intervals</span><span class="p">(</span><span class="n">chk_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">chk_step</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="nb">next</span><span class="p">(</span><span class="n">chk_intervals</span><span class="p">),</span> <span class="nb">next</span><span class="p">(</span><span class="n">chk_intervals</span><span class="p">),</span> <span class="nb">next</span><span class="p">(</span><span class="n">chk_intervals</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">]</span> <span class="o">==</span> <span class="p">[(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">),</span> <span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">)]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="know.util.pairwise">
+<code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">pairwise</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">iterable</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#pairwise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.pairwise" title="Permalink to this definition">¶</a></dt>
+<dd><p>s -&gt; (s0,s1), (s1,s2), (s2, s3), …</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="know.util.slices_gen">
+<code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">slices_gen</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sliceable</span><span class="p">:</span> <span class="n">atypes.protocols.Sliceable</span></em>, <em class="sig-param"><span class="n">intervals</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#slices_gen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.slices_gen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate slabs by slicing sliceable with given intervals.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">slices_gen</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">)),</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]))</span>
+<span class="go">[[3, 5], [5, 7, 9, 11, 13]]</span>
+</pre></div>
+</div>
+<p>Note that no matter how much data sliceable has, the generator will end once the
+intervals run out, but if we provide an infinite generator of intervals, we could
+get an infinite generator of slices. For example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">alphabet</span> <span class="o">=</span> <span class="s1">&#39;abcdefghijklmnopqrstuvwxyz&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alphabet</span><span class="p">[</span><span class="mi">100</span><span class="p">:</span><span class="mi">110</span><span class="p">]</span>
+<span class="go">&#39;&#39;</span>
+</pre></div>
+</div>
+<p>So</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">it</span> <span class="o">=</span> <span class="n">slices_gen</span><span class="p">(</span><span class="n">alphabet</span><span class="p">,</span> <span class="n">fixed_step_chunk_intervals</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">),</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">),</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">),</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">),</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+<span class="go">(&#39;uvw&#39;, &#39;wxy&#39;, &#39;yz&#39;, &#39;&#39;, &#39;&#39;)</span>
+</pre></div>
+</div>
+<p>If this needs to be avoided, one can use sentinels:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">it</span> <span class="o">=</span> <span class="n">slices_gen</span><span class="p">(</span><span class="n">alphabet</span><span class="p">,</span> <span class="n">fixed_step_chunk_intervals</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">it_with_sentinel</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="fm">__next__</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">it_with_sentinel</span><span class="o">.</span><span class="fm">__next__</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+<span class="go">[&#39;uvw&#39;, &#39;wxy&#39;, &#39;yz&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="know.util.source_slices">
+<code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">source_slices</code><span class="sig-paren">(</span><em class="sig-param">src_factory: NewType.&lt;locals&gt;.new_type</em>, <em class="sig-param">intervals</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#source_slices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.source_slices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a source by calling src_factory(), then slices it with intervals,
+creating an iterator of slabs</p>
 </dd></dl>
 
 </section>

@@ -111,7 +111,7 @@ def get_root_dir(rootdir=None, verbose=True):
 
         os.makedirs(rootdir, exist_ok=True)
         if verbose:
-            print(f"{rootdir=}")
+            print(f'{rootdir=}')
         return rootdir
 
 
