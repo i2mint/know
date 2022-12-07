@@ -74,7 +74,7 @@ def keyboard_and_audio(
         return app
     else:
         app()
-        print(f"\nYour session is now over.\n")
+        print(f'\nYour session is now over.\n')
 
 
 # ---------------------------------------------------------------------------------------
@@ -83,38 +83,26 @@ def keyboard_and_audio(
 
 def lite_audio_callback(audio):
     if audio is not None:
-        (
-            audio_timestamp,
-            waveform,
-            frame_count,
-            time_info,
-            status_flags,
-        ) = audio
+        (audio_timestamp, waveform, frame_count, time_info, status_flags,) = audio
         print(
-            f"   [Audio] {audio_timestamp}: {len(waveform)=} {type(waveform).__name__}",
-            end="\n\r",
+            f'   [Audio] {audio_timestamp}: {len(waveform)=} {type(waveform).__name__}',
+            end='\n\r',
         )
 
 
 def full_audio_print(audio):
     if audio is not None:
-        (
-            audio_timestamp,
-            waveform,
-            frame_count,
-            time_info,
-            status_flags,
-        ) = audio
+        (audio_timestamp, waveform, frame_count, time_info, status_flags,) = audio
         # print(f"{type(audio_data)=}")
         print(
-            f"   [Audio] {audio_timestamp=}: {len(waveform)=} {type(waveform).__name__}"
-            f" {frame_count=}, {time_info=}, {status_flags=}",
-            end="\n\r",
+            f'   [Audio] {audio_timestamp=}: {len(waveform)=} {type(waveform).__name__}'
+            f' {frame_count=}, {time_info=}, {status_flags=}',
+            end='\n\r',
         )
 
 
 def keyboard_data_signals_an_interrupt(
-    keyboard_data, stop_signal_chars=frozenset(["\x03", "\x04", "\x1b"])
+    keyboard_data, stop_signal_chars=frozenset(['\x03', '\x04', '\x1b'])
 ):
     """The function returns a positive stop signal (1) if the character is in the
     `stop_signal_chars` set.
@@ -136,7 +124,7 @@ def keyboard_data_signals_an_interrupt(
         # print(f'[Keyboard] {keyboard_timestamp}: {char=} ({ord(char)=})', end='\n\r')
 
         if char in stop_signal_chars:
-            return f"ascii code: {ord(char)} (See https://theasciicode.com.ar/)"
+            return f'ascii code: {ord(char)} (See https://theasciicode.com.ar/)'
         else:
             return False
 
@@ -152,17 +140,17 @@ def audio_print(audio):
 
 def keyboard_stop(keyboard):
     if keyboard_data_signals_an_interrupt(keyboard):
-        print("\nI feel a disturbance in the keyboard...")
-        raise KeyboardInterrupt("You keyed an exit combination. You want to stop.")
+        print('\nI feel a disturbance in the keyboard...')
+        raise KeyboardInterrupt('You keyed an exit combination. You want to stop.')
 
 
 def keyboard_print(keyboard):
     if keyboard is not None:
-        print(f"{keyboard=}\n", end="\n\r")
+        print(f'{keyboard=}\n', end='\n\r')
 
 
 class LastCharPressed:
-    key = "*"
+    key = '*'
 
     def __call__(self, keyboard):
         if keyboard is not None:
@@ -173,16 +161,16 @@ class LastCharPressed:
 
 from recode import mk_codec
 
-codec = mk_codec("h")
+codec = mk_codec('h')
 
 
-def wf_to_print(wf, bar_char=";)"):
+def wf_to_print(wf, bar_char=';)'):
     from statistics import stdev
 
     if wf is not None:
         vol = stdev(wf) / 200
         n_bars = 1 + int(vol)
-        print(bar_char * n_bars, end="\n\r")
+        print(bar_char * n_bars, end='\n\r')
 
 
 def audio_to_wf(audio):
@@ -244,7 +232,7 @@ def only_if(locals_condition, sentinel=None):
 
 def print_samples(wf, max_samples=11):
     if wf is not None:
-        print(wf[:max_samples], end="\n\r")
+        print(wf[:max_samples], end='\n\r')
 
 
 # ---------------------------------------------------------------------------------------
@@ -271,7 +259,7 @@ dflt_slab_iter_commands = dict(
 )
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # TODO: When wrappers.py ready for it, use argh, preprocessing the function so that:
     #   specific (int expected) transformed to int (argname, annotation, or default)
     #   functional args removed, or {str: func} map provided, or inject otherwise?

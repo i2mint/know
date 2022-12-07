@@ -12,12 +12,12 @@ Stream = Iterable
 StreamId = str
 
 SlabService = MyType(
-    "Consumer", Callable[[Slab], Any], doc="A function that will call slabs iteratively"
+    'Consumer', Callable[[Slab], Any], doc='A function that will call slabs iteratively'
 )
 Name = str
 # BoolFunc = Callable[[...], bool]
 
-SliceableFactory = NewType("SliceableFactory", Callable[..., Sliceable])
+SliceableFactory = NewType('SliceableFactory', Callable[..., Sliceable])
 
 
 # def mk_audio_stream():
@@ -114,7 +114,7 @@ apply = Pipe(map, tuple)
 
 
 def pairwise(iterable):
-    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    's -> (s0,s1), (s1,s2), (s2, s3), ...'
     a, b = tee(iterable)
     next(b, None)
     return zip(a, b)

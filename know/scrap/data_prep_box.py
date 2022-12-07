@@ -20,20 +20,15 @@ factories = dict(
         key_filter=filt_iter,
         extract_extension=FuncFactory(extract_extension),
     ),
-    object_transformation=dict(
-        make_codec=make_decoder,
-    ),
-    boolean_functions=dict(regular_expression_filter=regular_expression_filter, ),
+    object_transformation=dict(make_codec=make_decoder,),
+    boolean_functions=dict(regular_expression_filter=regular_expression_filter,),
 )
 # mall = dict(object_transformation=DillFiles())
 
 from know.malls import mk_mall
 
 
-mall = mk_mall(
-    dflt_store_contents=dflt_store_contents,
-    factories_for_store=factories
-)
+mall = mk_mall(dflt_store_contents=dflt_store_contents, factories_for_store=factories)
 
 # dflt_store_contents = dict(
 #     files_of_folder=FuncFactory(Files),

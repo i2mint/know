@@ -61,7 +61,7 @@ def audio_slabs(
         return app
     else:
         app()
-        print(f"\nYour session is now over.\n")
+        print(f'\nYour session is now over.\n')
 
 
 def get_audio_reader(
@@ -88,11 +88,11 @@ def get_audio_reader(
     return audio_reader
 
 
-print_nr = partial(print, end="\n\r")
+print_nr = partial(print, end='\n\r')
 
 # TODO: Generalize to a curriable alias handling function? It's a if_cond_val pattern.
 def none_if_none_string(x):
-    if isinstance(x, str) and x == "None":
+    if isinstance(x, str) and x == 'None':
         return None
     return x
 
@@ -115,7 +115,7 @@ from know.examples.keyboard_and_audio import (
     IteratorExit,
     audio_to_wf,
     print_samples,
-    only_if
+    only_if,
 )
 
 pipeline_commands = dict(
@@ -134,7 +134,7 @@ pipeline_commands = dict(
 )
 
 # config
-if __name__ == "__main__":
+if __name__ == '__main__':
     from streamlitfront import mk_app
 
     audio_slabs(pipeline_commands=pipeline_commands)

@@ -305,6 +305,7 @@ class SlabsIter:
      'notify': None}
 
     """
+
     _output_of_context_enter = None
 
     def __init__(self, handle_exceptions=DFLT_INTERRUPT_EXCEPTIONS, **components):

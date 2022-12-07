@@ -21,7 +21,8 @@ _ = filt_iter, FilesOfZip, Files
 def filter_keys(filt: Union[Callable, Iterable]):
     return filt_iter(filt=filt)
 
-def make_decoder(chk_format="d"):
+
+def make_decoder(chk_format='d'):
     encoder, decoder = recode.mk_codec(chk_format)
     return decoder
 
@@ -39,7 +40,7 @@ def val_transformer(obj_of_data=None):
     return wrap_kvs(obj_of_data=obj_of_data)
 
 
-def regular_expression_filter(regular_expression: str = ".*"):
+def regular_expression_filter(regular_expression: str = '.*'):
     return re.compile(regular_expression).search
 
 

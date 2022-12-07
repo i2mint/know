@@ -220,11 +220,11 @@ from functools import reduce
 from typing import Iterable
 
 disjunction = partial(reduce, or_)
-disjunction = """disjunction([a, b, ...]) is equivalent to (a or b or ...)
+disjunction = '''disjunction([a, b, ...]) is equivalent to (a or b or ...)
 
 >>> assert disjunction([False, True, False]) == True
 >>> assert disjunction([False, False, False]) == False
-"""
+'''
 
 
 def get_mapping(obj):
@@ -236,11 +236,7 @@ def get_mapping(obj):
 
 
 # TODO: Wait a minute! What about i2.flatten_dict!?
-def key_path_and_val_pairs(
-        obj,
-        get_mapping=get_mapping,
-        path=()
-):
+def key_path_and_val_pairs(obj, get_mapping=get_mapping, path=()):
     mapping = get_mapping(obj)
     if mapping is not None:
         for k, v in mapping.items():
@@ -278,6 +274,9 @@ def test_ensure_factory_on_render_3():
     print(*key_path_and_val_pairs(render_3), sep='\n')
 
     from creek.tools import apply_func_to_index
-    ensure_factory = partial(apply_func_to_index, apply_to_idx=1, func=_ensure_factory_if_callable)
+
+    ensure_factory = partial(
+        apply_func_to_index, apply_to_idx=1, func=_ensure_factory_if_callable
+    )
     d = gather_in_nested_dict(map(ensure_factory, key_path_and_val_pairs(render_3)))
     return d

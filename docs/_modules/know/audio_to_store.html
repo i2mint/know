@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>know.audio_to_store &mdash; know 0.1.12 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <title>know.audio_to_store &mdash; know 0.1.13 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
@@ -43,11 +43,25 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know.html">know</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/audio_to_store.html">know.audio_to_store</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/base.html">know.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/boxes.html">know.boxes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/boxes/audio_ml.html">know.boxes.audio_ml</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/boxes/dols.html">know.boxes.dols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/boxes/general.html">know.boxes.general</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/audio_slab_iter_front.html">know.examples.audio_slab_iter_front</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/audio_slicing.html">know.examples.audio_slicing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/data_prep.html">know.examples.data_prep</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/data_prep_02.html">know.examples.data_prep_02</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/http_response.html">HTTP Response streaming reader with no external dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/http_sensor.html">know.examples.http_sensor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/keyboard_and_audio.html">know.examples.keyboard_and_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/examples/keyboard_and_audio_front.html">know.examples.keyboard_and_audio_front</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/http_sensor_sim.html">know.http_sensor_sim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/malls.html">know.malls</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/scrap/architectures.html">know.scrap.architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/scrap/collection_of_objects_streamlit_app.html">know.scrap.collection_of_objects_streamlit_app</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/scrap/config_ops.html">know.scrap.config_ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/scrap/data_prep_box.html">know.scrap.data_prep_box</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/scrap/mesh_composer.html">know.scrap.mesh_composer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/scrap/pieces.html">know.scrap.pieces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/tests/test_slabsIter.html">know.tests.test_slabsIter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/know/util.html">know.util</a></li>
@@ -66,9 +80,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>know.audio_to_store</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">know.audio_to_store</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -117,8 +131,7 @@
 <span class="kn">from</span> <span class="nn">recode</span> <span class="kn">import</span> <span class="n">mk_codec</span>
 
 <span class="kn">from</span> <span class="nn">dol</span> <span class="kn">import</span> <span class="n">StrTupleDict</span><span class="p">,</span> <span class="n">wrap_kvs</span>
-<span class="kn">from</span> <span class="nn">dol.filesys</span> <span class="kn">import</span> <span class="n">RelPathFileBytesPersister</span>
-<span class="kn">from</span> <span class="nn">dol.paths</span> <span class="kn">import</span> <span class="n">mk_dirs_if_missing</span>
+<span class="kn">from</span> <span class="nn">dol.filesys</span> <span class="kn">import</span> <span class="n">RelPathFileBytesPersister</span><span class="p">,</span> <span class="n">mk_dirs_if_missing</span>
 <span class="kn">from</span> <span class="nn">lined</span> <span class="kn">import</span> <span class="n">Pipe</span>
 
 <span class="kn">from</span> <span class="nn">taped</span> <span class="kn">import</span> <span class="n">LiveWf</span><span class="p">,</span> <span class="n">chunk_indices</span>
@@ -179,7 +192,7 @@
             <span class="n">wfs</span><span class="p">[</span><span class="n">session_id</span><span class="p">,</span> <span class="n">bt</span><span class="p">]</span> <span class="o">=</span> <span class="n">live_wf</span><span class="p">[</span><span class="n">bt</span><span class="p">:</span><span class="n">tt</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="get_root_dir"><a class="viewcode-back" href="../../module_docs/know/audio_to_store.html#know.audio_to_store.get_root_dir">[docs]</a><span class="k">def</span> <span class="nf">get_root_dir</span><span class="p">(</span><span class="n">rootdir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="get_root_dir"><a class="viewcode-back" href="../../module_docs/know/audio_to_store.html#know.audio_to_store.get_root_dir">[docs]</a><span class="k">def</span> <span class="nf">get_root_dir</span><span class="p">(</span><span class="n">rootdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;get a rootdir (a default one, or validate the one given etc.)&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">rootdir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">rootdir</span>
@@ -191,6 +204,8 @@
             <span class="n">rootdir</span> <span class="o">+=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span>
 
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">rootdir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">rootdir</span><span class="si">=}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">rootdir</span></div>
 
 
