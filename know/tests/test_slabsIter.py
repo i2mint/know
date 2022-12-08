@@ -71,18 +71,26 @@ def data_for_url(
     return annotations, wf_store
 
 
+# TODO: CA left, and deleted the file behind this dropbox link, so need to replace it.
+#  Perhaps better use a small file in a project-local data folder, or corporate
+#  dropbox account.
 test_1 = dict(
     url="https://www.dropbox.com/s/qsht8p0frl49njy/data_zipped.zip?dl=0",
     project_sref_name="filename",
 )
 
 
+<<<<<<< HEAD
 @pytest.mark.parametrize(
     "test_params",
     [
         test_1,
     ],
 )
+=======
+@pytest.mark.xfail
+@pytest.mark.parametrize('test_params', [test_1,])
+>>>>>>> 7deaec547926258666c68f7af9e25cde2a0c6387
 def test_slabsiter(test_params):
     # get the data from a dropbox url
     annotations, wf_store = data_for_url(

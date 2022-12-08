@@ -37,7 +37,6 @@ Note to developers looking into the code: The overview of the `SlabsIter` class:
 
 """
 
-
 from typing import Callable, Mapping, Iterable, Union, NewType, Any, MutableMapping
 from i2 import Sig, ContextFanout
 
@@ -62,7 +61,6 @@ class IteratorExit(BaseException):
 
 
 DFLT_INTERRUPT_EXCEPTIONS = (StopIteration, IteratorExit, KeyboardInterrupt)
-
 
 DoNotBreak = type('DoNotBreak', (), {})
 do_not_break = DoNotBreak()
@@ -169,6 +167,31 @@ def _call_from_dict(kwargs: MutableMapping, func: Callable, sig: Sig):
         apply_defaults=True,
     )
     return func(*args, **kwargs)
+
+
+def _conditional_pluralization(n_items, singular_msg, plural_msg):
+    """To route to the right message (or template) according to ``n_items``"""
+    if n_items == 1:
+        return singular_msg
+    else:
+        return plural_msg
+
+
+def _validate_components(components):
+    if not all(map(callable, components.values())):
+        not_callable = [k for k, v in components.items() if not callable(v)]
+        not_callable_keys = ', '.join(not_callable)
+        # TODO: Analyze values of components further and enhance error message with
+        #  further suggestions. For example, if there's an iterator component c,
+        #  suggest that perhaps ``c.__next__`` was intended?
+        #  These component-based suggestions should be placed as a default of an
+        #  argument of _validate_components so that it can be parametrized.
+        msg = _conditional_pluralization(
+            len(not_callable),
+            f'This component is not callable: {not_callable_keys}',
+            f'These components are not callable: {not_callable_keys}',
+        )
+        raise TypeError(msg)
 
 
 # TODO: Postelize (or add tooling for) the components specification and add validation.
@@ -305,9 +328,11 @@ class SlabsIter:
      'notify': None}
 
     """
+
     _output_of_context_enter = None
 
     def __init__(self, handle_exceptions=DFLT_INTERRUPT_EXCEPTIONS, **components):
+        _validate_components(components)
         self.components = components
         self.handle_exceptions = _get_handle_exceptions(handle_exceptions)
         self._handled_exception_types = tuple(self.handle_exceptions)
@@ -315,7 +340,6 @@ class SlabsIter:
             name: Sig.sig_or_default(func) for name, func in self.components.items()
         }
         self.context = ContextFanout(**components)
-        # assert all(map(callable, self.components)), "components need to all be callable"
 
     def _call_on_scope(self, scope: MutableMapping):
         """Calls the components 1 by 1, sourcing inputs and writing outputs in scope"""

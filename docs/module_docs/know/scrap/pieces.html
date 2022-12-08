@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>know.scrap.pieces &mdash; know 0.1.12 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>know.scrap.pieces &mdash; know 0.1.15 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
@@ -23,7 +23,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="know.tests.test_slabsIter" href="../tests/test_slabsIter.html" />
-    <link rel="prev" title="know.scrap.architectures" href="architectures.html" /> 
+    <link rel="prev" title="know.scrap.mesh_composer" href="mesh_composer.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,11 +46,25 @@
 <li class="toctree-l1"><a class="reference internal" href="../../know.html">know</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../audio_to_store.html">know.audio_to_store</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../base.html">know.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../boxes.html">know.boxes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../boxes/audio_ml.html">know.boxes.audio_ml</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../boxes/dols.html">know.boxes.dols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../boxes/general.html">know.boxes.general</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/audio_slab_iter_front.html">know.examples.audio_slab_iter_front</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/audio_slicing.html">know.examples.audio_slicing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/data_prep.html">know.examples.data_prep</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/data_prep_02.html">know.examples.data_prep_02</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/http_response.html">HTTP Response streaming reader with no external dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/http_sensor.html">know.examples.http_sensor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/keyboard_and_audio.html">know.examples.keyboard_and_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/keyboard_and_audio_front.html">know.examples.keyboard_and_audio_front</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../http_sensor_sim.html">know.http_sensor_sim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../malls.html">know.malls</a></li>
 <li class="toctree-l1"><a class="reference internal" href="architectures.html">know.scrap.architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="collection_of_objects_streamlit_app.html">know.scrap.collection_of_objects_streamlit_app</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_ops.html">know.scrap.config_ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_prep_box.html">know.scrap.data_prep_box</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mesh_composer.html">know.scrap.mesh_composer</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">know.scrap.pieces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tests/test_slabsIter.html">know.tests.test_slabsIter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../util.html">know.util</a></li>
@@ -69,8 +83,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>know.scrap.pieces</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">know.scrap.pieces</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../_sources/module_docs/know/scrap/pieces.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -84,8 +98,71 @@
 <span id="know-scrap-pieces"></span><h1>know.scrap.pieces<a class="headerlink" href="#module-know.scrap.pieces" title="Permalink to this headline">¶</a></h1>
 <p>pieces of thing for inspiration</p>
 <dl class="py class">
+<dt id="know.scrap.pieces.FixedStepHunker">
+<em class="property">class </em><code class="sig-prename descclassname">know.scrap.pieces.</code><code class="sig-name descname">FixedStepHunker</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">src</span></em>, <em class="sig-param"><span class="n">chk_size</span></em>, <em class="sig-param"><span class="n">chk_step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">start_idx</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">end_idx</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/know/scrap/pieces.html#FixedStepHunker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.scrap.pieces.FixedStepHunker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="know.scrap.pieces.LiveProcess">
+<em class="property">class </em><code class="sig-prename descclassname">know.scrap.pieces.</code><code class="sig-name descname">LiveProcess</code><span class="sig-paren">(</span><em class="sig-param">streams: Dict[str, Iterable], slab_callback: Callable[[Slab], Any] = &lt;built-in function print&gt;, walk: Callable = &lt;class 'know.scrap.pieces.DictZip'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/know/scrap/pieces.html#LiveProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.scrap.pieces.LiveProcess" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="know.scrap.pieces.LiveProcess.slab_callback">
+<code class="sig-name descname">slab_callback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#know.scrap.pieces.LiveProcess.slab_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>print(value, …, sep=’ ‘, end=’n’, file=sys.stdout, flush=False)</p>
+<p>Prints the values to a stream, or to sys.stdout by default.
+Optional keyword arguments:
+file:  a file-like object (stream); defaults to the current sys.stdout.
+sep:   string inserted between values, default a space.
+end:   string appended after the last value, default a newline.
+flush: whether to forcibly flush the stream.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="know.scrap.pieces.MultiIterable">
+<em class="property">class </em><code class="sig-prename descclassname">know.scrap.pieces.</code><code class="sig-name descname">MultiIterable</code><span class="sig-paren">(</span><em class="sig-param">*unnamed, stop_condition: Callable[[Any], bool] = &lt;function always_false&gt;, **named</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/know/scrap/pieces.html#MultiIterable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.scrap.pieces.MultiIterable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Join several iterables together.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">know.util</span> <span class="kn">import</span> <span class="n">any_value_is_none</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">any_value_is_none</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="nb">any</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">d</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mk_multi_iterable</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">MultiIterable</span><span class="p">,</span> <span class="n">stop_condition</span><span class="o">=</span><span class="n">any_value_is_none</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mi</span> <span class="o">=</span> <span class="n">mk_multi_iterable</span><span class="p">(</span><span class="n">lets</span><span class="o">=</span><span class="s1">&#39;abc&#39;</span><span class="p">,</span> <span class="n">nums</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">mi</span><span class="p">)</span>
+<span class="go">[{&#39;lets&#39;: &#39;a&#39;, &#39;nums&#39;: 1}, {&#39;lets&#39;: &#39;b&#39;, &#39;nums&#39;: 2}, {&#39;lets&#39;: &#39;c&#39;, &#39;nums&#39;: 3}]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mi</span> <span class="o">=</span> <span class="n">MultiIterable</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">stop_condition</span><span class="o">=</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">mi</span><span class="p">)</span>
+<span class="go">[{&#39;x&#39;: 5, &#39;y&#39;: 1}, {&#39;x&#39;: 4, &#39;y&#39;: 2}]</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="know.scrap.pieces.MultiIterable.takewhile">
+<code class="sig-name descname">takewhile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">predicate</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/know/scrap/pieces.html#MultiIterable.takewhile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.scrap.pieces.MultiIterable.takewhile" title="Permalink to this definition">¶</a></dt>
+<dd><p>itertools.takewhile applied to self, with a bit of syntactic sugar
+There’s nothing to stop the iteration</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt id="know.scrap.pieces.MultiIterator">
 <em class="property">class </em><code class="sig-prename descclassname">know.scrap.pieces.</code><code class="sig-name descname">MultiIterator</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">unnamed</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">named</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/know/scrap/pieces.html#MultiIterator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.scrap.pieces.MultiIterator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="know.scrap.pieces.SlabsPush">
+<em class="property">class </em><code class="sig-prename descclassname">know.scrap.pieces.</code><code class="sig-name descname">SlabsPush</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">slabs</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span>Slab<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">services</span><span class="p">:</span> <span class="n">Mapping<span class="p">[</span>str<span class="p">, </span>Consumer<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/know/scrap/pieces.html#SlabsPush"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.scrap.pieces.SlabsPush" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="know.scrap.pieces.SlabsPushTuple">
+<em class="property">class </em><code class="sig-prename descclassname">know.scrap.pieces.</code><code class="sig-name descname">SlabsPushTuple</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">slabs</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span>Slab<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">services</span><span class="p">:</span> <span class="n">Mapping<span class="p">[</span>str<span class="p">, </span>Consumer<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/know/scrap/pieces.html#SlabsPushTuple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.scrap.pieces.SlabsPushTuple" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -94,7 +171,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="architectures.html" class="btn btn-neutral float-left" title="know.scrap.architectures" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mesh_composer.html" class="btn btn-neutral float-left" title="know.scrap.mesh_composer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../tests/test_slabsIter.html" class="btn btn-neutral float-right" title="know.tests.test_slabsIter" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

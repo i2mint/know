@@ -23,7 +23,7 @@ from front.elements import OutputBase, ExecContainerBase, InputBase
 
 if not b.mall():
     # TODO: Maybe it's here that we need to use know.malls.mk_mall?
-    b.mall = {"keyboard_event": dict()}
+    b.mall = {'keyboard_event': dict()}
 mall = b.mall()
 
 
@@ -34,7 +34,7 @@ def view_mall(x: int):
 
 # TODO: Generalize to a curriable alias handling function? It's a if_cond_val pattern.
 def none_if_none_string(x):
-    if isinstance(x, str) and x == "None":
+    if isinstance(x, str) and x == 'None':
         return None
     return x
 
@@ -54,14 +54,14 @@ def none_if_none_string_for_all_none_defaulted(func, exception_argnames=()):
 
 def print_samples(wf, max_samples=11):
     if wf is not None:
-        print(wf[:max_samples], end="\n\r")
+        print(wf[:max_samples], end='\n\r')
 
 
 def keyboard_print(keyboard):  # use logger=print
     if keyboard is not None:
-        print(f"my {keyboard=}\n", end="\n\r")
-        mall["keyboard_event"] = {"last": f"{keyboard=}"}
-        st.warning(f"{keyboard=}")
+        print(f'my {keyboard=}\n', end='\n\r')
+        mall['keyboard_event'] = {'last': f'{keyboard=}'}
+        st.warning(f'{keyboard=}')
 
 
 dflt_slab_iter_commands = dict(
@@ -152,22 +152,22 @@ def keyboard_and_audio(
         return app
     else:
         app()
-        print(f"\nYour session is now over.\n")
+        print(f'\nYour session is now over.\n')
 
 
 @dataclass
 class OutRenderer(OutputBase):
     def render(self):
         print(self.output)
-        st.write(f"{self.output=}")
+        st.write(f'{self.output=}')
 
 
 config = {
-    APP_KEY: {"title": "Funcs"},
+    APP_KEY: {'title': 'Funcs'},
     RENDERING_KEY: {
-        "_keyboard_and_audio": {
+        '_keyboard_and_audio': {
             # NAME_KEY: "Identity Rendering",
-            "execution": {
+            'execution': {
                 # "inputs": {
                 #     "func": {
                 #         ELEMENT_KEY: SelectBox,
@@ -175,13 +175,13 @@ config = {
                 #         "value": b.selected_func,
                 #     },
                 # },
-                "output": {ELEMENT_KEY: OutRenderer},
+                'output': {ELEMENT_KEY: OutRenderer},
             },
         }
     },
 }
 # config
-if __name__ == "__main__":
+if __name__ == '__main__':
     from functools import partial
     from streamlitfront import mk_app
 

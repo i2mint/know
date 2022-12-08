@@ -6,6 +6,7 @@ from typing import Callable
 from i2 import Pipe
 from i2.deco import FuncFactory
 from collections import Counter, ChainMap
+
 # from i2.wrapper import include_exclude
 
 # The following is just so linting does complain about the imports of the these objects,
@@ -18,8 +19,8 @@ def identity(x):
 
 
 def mk_pipe(
-    name: str = "",
-    doc: str = "",
+    name: str = '',
+    doc: str = '',
     f1: Callable = identity,
     f2: Callable = identity,
     f3: Callable = identity,

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; know 0.1.12 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>Index &mdash; know 0.1.15 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
       <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
@@ -43,11 +43,25 @@
 <li class="toctree-l1"><a class="reference internal" href="module_docs/know.html">know</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/know/audio_to_store.html">know.audio_to_store</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/know/base.html">know.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/know/boxes.html">know.boxes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/know/boxes/audio_ml.html">know.boxes.audio_ml</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/know/boxes/dols.html">know.boxes.dols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/know/boxes/general.html">know.boxes.general</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/know/examples/audio_slab_iter_front.html">know.examples.audio_slab_iter_front</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/know/examples/audio_slicing.html">know.examples.audio_slicing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/know/examples/data_prep.html">know.examples.data_prep</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/know/examples/data_prep_02.html">know.examples.data_prep_02</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/know/examples/http_response.html">HTTP Response streaming reader with no external dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/know/examples/http_sensor.html">know.examples.http_sensor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/know/examples/keyboard_and_audio.html">know.examples.keyboard_and_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/know/examples/keyboard_and_audio_front.html">know.examples.keyboard_and_audio_front</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/know/http_sensor_sim.html">know.http_sensor_sim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/know/malls.html">know.malls</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/know/scrap/architectures.html">know.scrap.architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/know/scrap/collection_of_objects_streamlit_app.html">know.scrap.collection_of_objects_streamlit_app</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/know/scrap/config_ops.html">know.scrap.config_ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/know/scrap/data_prep_box.html">know.scrap.data_prep_box</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/know/scrap/mesh_composer.html">know.scrap.mesh_composer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/know/scrap/pieces.html">know.scrap.pieces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/know/tests/test_slabsIter.html">know.tests.test_slabsIter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/know/util.html">know.util</a></li>
@@ -66,8 +80,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Index</li>
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Index</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -81,6 +95,9 @@
 
 <div class="genindex-jumpbox">
  <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
@@ -88,8 +105,11 @@
  | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
+ | <a href="#V"><strong>V</strong></a>
  | <a href="#W"><strong>W</strong></a>
  
 </div>
@@ -98,11 +118,49 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/know/util.html#know.util.always_false">always_false() (in module know.util)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/know/util.html#know.util.always_true">always_true() (in module know.util)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/know/util.html#know.util.any_value_is_none">any_value_is_none() (in module know.util)</a>
+</li>
+      <li><a href="module_docs/know/examples/audio_slab_iter_front.html#know.examples.audio_slab_iter_front.audio_slabs">audio_slabs() (in module know.examples.audio_slab_iter_front)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/know/scrap/config_ops.html#know.scrap.config_ops.Box">Box (class in know.scrap.config_ops)</a>
+
+      <ul>
+        <li><a href="module_docs/know/scrap/mesh_composer.html#know.scrap.mesh_composer.Box">(class in know.scrap.mesh_composer)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/know/scrap/mesh_composer.html#know.scrap.mesh_composer.box_items">box_items() (in module know.scrap.mesh_composer)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/know/util.html#know.util.ContextualFunc">ContextualFunc (class in know.util)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/know/scrap/data_prep_box.html#know.scrap.data_prep_box.DataPrepBox">DataPrepBox (class in know.scrap.data_prep_box)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/know/malls.html#know.malls.DillFiles">DillFiles (class in know.malls)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -118,7 +176,13 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/know/util.html#know.util.FixedStepHunker">FixedStepHunker (class in know.util)</a>
+      <li><a href="module_docs/know/scrap/config_ops.html#know.scrap.config_ops.FactoryDictSpec">FactoryDictSpec (class in know.scrap.config_ops)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/know/util.html#know.util.fixed_step_chunk_intervals">fixed_step_chunk_intervals() (in module know.util)</a>
+</li>
+      <li><a href="module_docs/know/scrap/pieces.html#know.scrap.pieces.FixedStepHunker">FixedStepHunker (class in know.scrap.pieces)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -143,7 +207,11 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/know/examples/keyboard_and_audio.html#know.examples.keyboard_and_audio.keyboard_and_audio">keyboard_and_audio() (in module know.examples.keyboard_and_audio)</a>
+
+      <ul>
+        <li><a href="module_docs/know/examples/keyboard_and_audio_front.html#know.examples.keyboard_and_audio_front.keyboard_and_audio">(in module know.examples.keyboard_and_audio_front)</a>
 </li>
+      </ul></li>
       <li><a href="module_docs/know/examples/keyboard_and_audio.html#know.examples.keyboard_and_audio.keyboard_data_signals_an_interrupt">keyboard_data_signals_an_interrupt() (in module know.examples.keyboard_and_audio)</a>
 </li>
       <li>
@@ -168,12 +236,70 @@
 </li>
       </ul></li>
       <li>
+    know.boxes
+
+      <ul>
+        <li><a href="module_docs/know/boxes.html#module-know.boxes">module</a>
+</li>
+      </ul></li>
+      <li>
+    know.boxes.audio_ml
+
+      <ul>
+        <li><a href="module_docs/know/boxes/audio_ml.html#module-know.boxes.audio_ml">module</a>
+</li>
+      </ul></li>
+      <li>
+    know.boxes.dols
+
+      <ul>
+        <li><a href="module_docs/know/boxes/dols.html#module-know.boxes.dols">module</a>
+</li>
+      </ul></li>
+      <li>
+    know.boxes.general
+
+      <ul>
+        <li><a href="module_docs/know/boxes/general.html#module-know.boxes.general">module</a>
+</li>
+      </ul></li>
+      <li>
+    know.examples.audio_slab_iter_front
+
+      <ul>
+        <li><a href="module_docs/know/examples/audio_slab_iter_front.html#module-know.examples.audio_slab_iter_front">module</a>
+</li>
+      </ul></li>
+      <li>
+    know.examples.audio_slicing
+
+      <ul>
+        <li><a href="module_docs/know/examples/audio_slicing.html#module-know.examples.audio_slicing">module</a>
+</li>
+      </ul></li>
+      <li>
+    know.examples.data_prep
+
+      <ul>
+        <li><a href="module_docs/know/examples/data_prep.html#module-know.examples.data_prep">module</a>
+</li>
+      </ul></li>
+      <li>
+    know.examples.data_prep_02
+
+      <ul>
+        <li><a href="module_docs/know/examples/data_prep_02.html#module-know.examples.data_prep_02">module</a>
+</li>
+      </ul></li>
+      <li>
     know.examples.http_response
 
       <ul>
         <li><a href="module_docs/know/examples/http_response.html#module-know.examples.http_response">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     know.examples.http_sensor
 
@@ -181,13 +307,18 @@
         <li><a href="module_docs/know/examples/http_sensor.html#module-know.examples.http_sensor">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     know.examples.keyboard_and_audio
 
       <ul>
         <li><a href="module_docs/know/examples/keyboard_and_audio.html#module-know.examples.keyboard_and_audio">module</a>
+</li>
+      </ul></li>
+      <li>
+    know.examples.keyboard_and_audio_front
+
+      <ul>
+        <li><a href="module_docs/know/examples/keyboard_and_audio_front.html#module-know.examples.keyboard_and_audio_front">module</a>
 </li>
       </ul></li>
       <li>
@@ -198,10 +329,45 @@
 </li>
       </ul></li>
       <li>
+    know.malls
+
+      <ul>
+        <li><a href="module_docs/know/malls.html#module-know.malls">module</a>
+</li>
+      </ul></li>
+      <li>
     know.scrap.architectures
 
       <ul>
         <li><a href="module_docs/know/scrap/architectures.html#module-know.scrap.architectures">module</a>
+</li>
+      </ul></li>
+      <li>
+    know.scrap.collection_of_objects_streamlit_app
+
+      <ul>
+        <li><a href="module_docs/know/scrap/collection_of_objects_streamlit_app.html#module-know.scrap.collection_of_objects_streamlit_app">module</a>
+</li>
+      </ul></li>
+      <li>
+    know.scrap.config_ops
+
+      <ul>
+        <li><a href="module_docs/know/scrap/config_ops.html#module-know.scrap.config_ops">module</a>
+</li>
+      </ul></li>
+      <li>
+    know.scrap.data_prep_box
+
+      <ul>
+        <li><a href="module_docs/know/scrap/data_prep_box.html#module-know.scrap.data_prep_box">module</a>
+</li>
+      </ul></li>
+      <li>
+    know.scrap.mesh_composer
+
+      <ul>
+        <li><a href="module_docs/know/scrap/mesh_composer.html#module-know.scrap.mesh_composer">module</a>
 </li>
       </ul></li>
       <li>
@@ -235,7 +401,7 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/know/util.html#know.util.LiveProcess">LiveProcess (class in know.util)</a>
+      <li><a href="module_docs/know/scrap/pieces.html#know.scrap.pieces.LiveProcess">LiveProcess (class in know.scrap.pieces)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -243,7 +409,11 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/know/malls.html#know.malls.mk_mall">mk_mall() (in module know.malls)</a>
+</li>
       <li><a href="module_docs/know/audio_to_store.html#know.audio_to_store.mk_mongo_single_data">mk_mongo_single_data() (in module know.audio_to_store)</a>
+</li>
+      <li><a href="module_docs/know/boxes/general.html#know.boxes.general.mk_pipe">mk_pipe() (in module know.boxes.general)</a>
 </li>
       <li>
     module
@@ -255,15 +425,43 @@
 </li>
         <li><a href="module_docs/know/base.html#module-know.base">know.base</a>
 </li>
+        <li><a href="module_docs/know/boxes.html#module-know.boxes">know.boxes</a>
+</li>
+        <li><a href="module_docs/know/boxes/audio_ml.html#module-know.boxes.audio_ml">know.boxes.audio_ml</a>
+</li>
+        <li><a href="module_docs/know/boxes/dols.html#module-know.boxes.dols">know.boxes.dols</a>
+</li>
+        <li><a href="module_docs/know/boxes/general.html#module-know.boxes.general">know.boxes.general</a>
+</li>
+        <li><a href="module_docs/know/examples/audio_slab_iter_front.html#module-know.examples.audio_slab_iter_front">know.examples.audio_slab_iter_front</a>
+</li>
+        <li><a href="module_docs/know/examples/audio_slicing.html#module-know.examples.audio_slicing">know.examples.audio_slicing</a>
+</li>
+        <li><a href="module_docs/know/examples/data_prep.html#module-know.examples.data_prep">know.examples.data_prep</a>
+</li>
+        <li><a href="module_docs/know/examples/data_prep_02.html#module-know.examples.data_prep_02">know.examples.data_prep_02</a>
+</li>
         <li><a href="module_docs/know/examples/http_response.html#module-know.examples.http_response">know.examples.http_response</a>
 </li>
         <li><a href="module_docs/know/examples/http_sensor.html#module-know.examples.http_sensor">know.examples.http_sensor</a>
 </li>
         <li><a href="module_docs/know/examples/keyboard_and_audio.html#module-know.examples.keyboard_and_audio">know.examples.keyboard_and_audio</a>
 </li>
+        <li><a href="module_docs/know/examples/keyboard_and_audio_front.html#module-know.examples.keyboard_and_audio_front">know.examples.keyboard_and_audio_front</a>
+</li>
         <li><a href="module_docs/know/http_sensor_sim.html#module-know.http_sensor_sim">know.http_sensor_sim</a>
 </li>
+        <li><a href="module_docs/know/malls.html#module-know.malls">know.malls</a>
+</li>
         <li><a href="module_docs/know/scrap/architectures.html#module-know.scrap.architectures">know.scrap.architectures</a>
+</li>
+        <li><a href="module_docs/know/scrap/collection_of_objects_streamlit_app.html#module-know.scrap.collection_of_objects_streamlit_app">know.scrap.collection_of_objects_streamlit_app</a>
+</li>
+        <li><a href="module_docs/know/scrap/config_ops.html#module-know.scrap.config_ops">know.scrap.config_ops</a>
+</li>
+        <li><a href="module_docs/know/scrap/data_prep_box.html#module-know.scrap.data_prep_box">know.scrap.data_prep_box</a>
+</li>
+        <li><a href="module_docs/know/scrap/mesh_composer.html#module-know.scrap.mesh_composer">know.scrap.mesh_composer</a>
 </li>
         <li><a href="module_docs/know/scrap/pieces.html#module-know.scrap.pieces">know.scrap.pieces</a>
 </li>
@@ -274,7 +472,7 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/know/util.html#know.util.MultiIterable">MultiIterable (class in know.util)</a>
+      <li><a href="module_docs/know/scrap/pieces.html#know.scrap.pieces.MultiIterable">MultiIterable (class in know.scrap.pieces)</a>
 </li>
       <li><a href="module_docs/know/scrap/architectures.html#know.scrap.architectures.MultiIterator">MultiIterator (class in know.scrap.architectures)</a>
 
@@ -282,6 +480,32 @@
         <li><a href="module_docs/know/scrap/pieces.html#know.scrap.pieces.MultiIterator">(class in know.scrap.pieces)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/know/scrap/mesh_composer.html#know.scrap.mesh_composer.MyBox">MyBox (class in know.scrap.mesh_composer)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/know/examples/keyboard_and_audio.html#know.examples.keyboard_and_audio.only_if">only_if() (in module know.examples.keyboard_and_audio)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/know/examples/keyboard_and_audio_front.html#know.examples.keyboard_and_audio_front.OutRenderer">OutRenderer (class in know.examples.keyboard_and_audio_front)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/know/util.html#know.util.pairwise">pairwise() (in module know.util)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/know/scrap/config_ops.html#know.scrap.config_ops.path_set">path_set() (in module know.scrap.config_ops)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -296,15 +520,19 @@
 </li>
       <li><a href="module_docs/know/http_sensor_sim.html#know.http_sensor_sim.simulate_http_sensor">simulate_http_sensor() (in module know.http_sensor_sim)</a>
 </li>
+      <li><a href="module_docs/know/scrap/pieces.html#know.scrap.pieces.LiveProcess.slab_callback">slab_callback() (know.scrap.pieces.LiveProcess method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/know/util.html#know.util.LiveProcess.slab_callback">slab_callback() (know.util.LiveProcess method)</a>
-</li>
       <li><a href="module_docs/know/base.html#know.base.SlabsIter">SlabsIter (class in know.base)</a>
 </li>
-      <li><a href="module_docs/know/util.html#know.util.SlabsPush">SlabsPush (class in know.util)</a>
+      <li><a href="module_docs/know/scrap/pieces.html#know.scrap.pieces.SlabsPush">SlabsPush (class in know.scrap.pieces)</a>
 </li>
-      <li><a href="module_docs/know/util.html#know.util.SlabsPushTuple">SlabsPushTuple (class in know.util)</a>
+      <li><a href="module_docs/know/scrap/pieces.html#know.scrap.pieces.SlabsPushTuple">SlabsPushTuple (class in know.scrap.pieces)</a>
+</li>
+      <li><a href="module_docs/know/util.html#know.util.slices_gen">slices_gen() (in module know.util)</a>
+</li>
+      <li><a href="module_docs/know/util.html#know.util.source_slices">source_slices() (in module know.util)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -312,7 +540,15 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/know/util.html#know.util.MultiIterable.takewhile">takewhile() (know.util.MultiIterable method)</a>
+      <li><a href="module_docs/know/scrap/pieces.html#know.scrap.pieces.MultiIterable.takewhile">takewhile() (know.scrap.pieces.MultiIterable method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/know/scrap/mesh_composer.html#know.scrap.mesh_composer.ValidationError">ValidationError</a>
 </li>
   </ul></td>
 </tr></table>

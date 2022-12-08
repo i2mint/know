@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>know.scrap.pieces &mdash; know 0.1.12 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>know.scrap.pieces &mdash; know 0.1.15 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
@@ -43,11 +43,25 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know.html">know</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/audio_to_store.html">know.audio_to_store</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/base.html">know.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/boxes.html">know.boxes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/boxes/audio_ml.html">know.boxes.audio_ml</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/boxes/dols.html">know.boxes.dols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/boxes/general.html">know.boxes.general</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/examples/audio_slab_iter_front.html">know.examples.audio_slab_iter_front</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/examples/audio_slicing.html">know.examples.audio_slicing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/examples/data_prep.html">know.examples.data_prep</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/examples/data_prep_02.html">know.examples.data_prep_02</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/examples/http_response.html">HTTP Response streaming reader with no external dependencies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/examples/http_sensor.html">know.examples.http_sensor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/examples/keyboard_and_audio.html">know.examples.keyboard_and_audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/examples/keyboard_and_audio_front.html">know.examples.keyboard_and_audio_front</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/http_sensor_sim.html">know.http_sensor_sim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/malls.html">know.malls</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/scrap/architectures.html">know.scrap.architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/scrap/collection_of_objects_streamlit_app.html">know.scrap.collection_of_objects_streamlit_app</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/scrap/config_ops.html">know.scrap.config_ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/scrap/data_prep_box.html">know.scrap.data_prep_box</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/scrap/mesh_composer.html">know.scrap.mesh_composer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/scrap/pieces.html">know.scrap.pieces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/tests/test_slabsIter.html">know.tests.test_slabsIter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/know/util.html">know.util</a></li>
@@ -66,9 +80,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>know.scrap.pieces</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">know.scrap.pieces</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -81,10 +95,33 @@
 <span></span><span class="sd">&quot;&quot;&quot;pieces of thing for inspiration</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">takewhile</span> <span class="k">as</span> <span class="n">itertools_takewhile</span>
-<span class="kn">from</span> <span class="nn">i2</span> <span class="kn">import</span> <span class="n">MultiObj</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span>
+
+<span class="kn">from</span> <span class="nn">atypes</span> <span class="kn">import</span> <span class="n">Slab</span>
+<span class="kn">from</span> <span class="nn">creek</span> <span class="kn">import</span> <span class="n">Creek</span>
+<span class="kn">from</span> <span class="nn">creek.util</span> <span class="kn">import</span> <span class="n">to_iterator</span>
+<span class="kn">from</span> <span class="nn">i2</span> <span class="kn">import</span> <span class="n">MultiObj</span><span class="p">,</span> <span class="n">FuncFanout</span><span class="p">,</span> <span class="n">ContextFanout</span><span class="p">,</span> <span class="n">Pipe</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Dict</span>
 <span class="kn">from</span> <span class="nn">i2</span> <span class="kn">import</span> <span class="n">Pipe</span>
+<span class="kn">from</span> <span class="nn">know.util</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Name</span><span class="p">,</span>
+    <span class="n">SlabService</span><span class="p">,</span>
+    <span class="n">iterate</span><span class="p">,</span>
+    <span class="n">FiltFunc</span><span class="p">,</span>
+    <span class="n">iterate_dict_values</span><span class="p">,</span>
+    <span class="n">always_false</span><span class="p">,</span>
+    <span class="n">always_true</span><span class="p">,</span>
+    <span class="n">StreamId</span><span class="p">,</span>
+    <span class="n">Stream</span><span class="p">,</span>
+    <span class="n">SlabCallback</span><span class="p">,</span>
+    <span class="n">HunkerType</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">taped</span> <span class="kn">import</span> <span class="n">chunk_indices</span>
+
+<span class="n">always</span><span class="p">:</span> <span class="n">FiltFunc</span>
+<span class="n">Hunker</span><span class="p">:</span> <span class="n">HunkerType</span>
 
 
 <div class="viewcode-block" id="MultiIterator"><a class="viewcode-back" href="../../../module_docs/know/scrap/pieces.html#know.scrap.pieces.MultiIterator">[docs]</a><span class="k">class</span> <span class="nc">MultiIterator</span><span class="p">(</span><span class="n">MultiObj</span><span class="p">):</span>
@@ -96,38 +133,40 @@
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gen_next</span><span class="p">())</span></div>
 
 
+<span class="c1"># TODO: Make smart default for stop_condition. If finite iterable, use any_value_is_none?</span>
+
 <span class="n">no_more_data</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;no_more_data&#39;</span><span class="p">,</span> <span class="p">(),</span> <span class="p">{})</span>
 
 
-<span class="k">class</span> <span class="nc">DictZip</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">unnamed</span><span class="p">,</span> <span class="n">takewhile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">named</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">multi_iterator</span> <span class="o">=</span> <span class="n">MultiIterator</span><span class="p">(</span><span class="o">*</span><span class="n">unnamed</span><span class="p">,</span> <span class="o">**</span><span class="n">named</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">objects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multi_iterator</span><span class="o">.</span><span class="n">objects</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">takewhile</span> <span class="o">=</span> <span class="n">takewhile</span>
+<span class="c1"># class DictZip:</span>
+<span class="c1">#     def __init__(self, *unnamed, takewhile=None, **named):</span>
+<span class="c1">#         self.multi_iterator = MultiIterator(*unnamed, **named)</span>
+<span class="c1">#         self.objects = self.multi_iterator.objects</span>
+<span class="c1">#         self.takewhile = takewhile</span>
+<span class="c1">#</span>
+<span class="c1">#     def __iter__(self):</span>
+<span class="c1">#         while True:</span>
+<span class="c1">#             x = next(self.multi_iterator)</span>
+<span class="c1">#             if not self.takewhile(x):</span>
+<span class="c1">#                 break</span>
+<span class="c1">#             yield x</span>
 
-    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">multi_iterator</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">takewhile</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-                <span class="k">break</span>
-            <span class="k">yield</span> <span class="n">x</span>
-
-
-<span class="k">class</span> <span class="nc">MultiIterable</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">unnamed</span><span class="p">,</span> <span class="o">**</span><span class="n">named</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">multi_iterator</span> <span class="o">=</span> <span class="n">MultiIterator</span><span class="p">(</span><span class="o">*</span><span class="n">unnamed</span><span class="p">,</span> <span class="o">**</span><span class="n">named</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">objects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multi_iterator</span><span class="o">.</span><span class="n">objects</span>
-
-    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">multi_iterator</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">takewhile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predicate</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;itertools.takewhile applied to self, with a bit of syntactic sugar</span>
-<span class="sd">        There&#39;s nothing to stop the iteration&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">predicate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">predicate</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="kc">True</span>  <span class="c1"># always true</span>
-        <span class="k">return</span> <span class="n">itertools_takewhile</span><span class="p">(</span><span class="n">predicate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+<span class="c1">#</span>
+<span class="c1"># class MultiIterable:</span>
+<span class="c1">#     def __init__(self, *unnamed, **named):</span>
+<span class="c1">#         self.multi_iterator = MultiIterator(*unnamed, **named)</span>
+<span class="c1">#         self.objects = self.multi_iterator.objects</span>
+<span class="c1">#</span>
+<span class="c1">#     def __iter__(self):</span>
+<span class="c1">#         while True:</span>
+<span class="c1">#             yield next(self.multi_iterator)</span>
+<span class="c1">#</span>
+<span class="c1">#     def takewhile(self, predicate=None):</span>
+<span class="c1">#         &quot;&quot;&quot;itertools.takewhile applied to self, with a bit of syntactic sugar</span>
+<span class="c1">#         There&#39;s nothing to stop the iteration&quot;&quot;&quot;</span>
+<span class="c1">#         if predicate is None:</span>
+<span class="c1">#             predicate = lambda x: True  # always true</span>
+<span class="c1">#         return itertools_takewhile(predicate, self)</span>
 
 
 <span class="k">def</span> <span class="nf">test_multi_iterator</span><span class="p">():</span>
@@ -192,136 +231,188 @@
         <span class="p">{</span><span class="s1">&#39;audio&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;keyboard&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">},</span>
     <span class="p">]</span>
 
-    <span class="c1">#</span>
-    <span class="c1"># get_multi_iterable = lambda: DictZip(</span>
-    <span class="c1">#     audio=iter([1, 2, 3]),</span>
-    <span class="c1">#     keyboard=iter([4, 5, 6]),</span>
-    <span class="c1">#     takewhile=lambda x: x is not None</span>
-    <span class="c1"># )</span>
-    <span class="c1">#</span>
-    <span class="c1"># m = get_multi_iterable()</span>
-    <span class="c1"># assert list(m.objects) == [&#39;audio&#39;, &#39;keyboard&#39;]</span>
-    <span class="c1">#</span>
-    <span class="c1"># from functools import partial</span>
-    <span class="c1">#</span>
-    <span class="c1"># def if_then_else(x, then_func, else_func, if_func):</span>
-    <span class="c1">#     if if_func(x):</span>
-    <span class="c1">#         return then_func(x)</span>
-    <span class="c1">#     else:</span>
-    <span class="c1">#         return else_func(x)</span>
-    <span class="c1">#</span>
-    <span class="c1"># call_if_not_none = partial(</span>
-    <span class="c1">#     if_then_else, if_func=lambda x: x is not None, else_func=lambda x: None</span>
-    <span class="c1"># )</span>
-    <span class="c1">#</span>
-    <span class="c1"># predicate = partial(call_if_not_none, then_func=lambda x: sum(x.values()) &lt; 7)</span>
-    <span class="c1">#</span>
-    <span class="c1"># def predicate(x):</span>
-    <span class="c1">#     if x is not None:</span>
-    <span class="c1">#         return any(v is not None for v in x.values())</span>
-    <span class="c1">#     else:</span>
-    <span class="c1">#         return False</span>
-    <span class="c1">#</span>
-    <span class="c1"># m = get_multi_iterable()</span>
-    <span class="c1"># assert list(m) == [</span>
-    <span class="c1">#     {&#39;audio&#39;: 1, &#39;keyboard&#39;: 4},</span>
-    <span class="c1">#     {&#39;audio&#39;: 2, &#39;keyboard&#39;: 5},</span>
-    <span class="c1">#     {&#39;audio&#39;: 3, &#39;keyboard&#39;: 6},</span>
-    <span class="c1"># ]</span>
-    <span class="c1">#</span>
-    <span class="c1"># # iter(callable, sentinel) use pattern</span>
-    <span class="c1"># # It would have been desirable to provide the tools to be able to use</span>
-    <span class="c1"># # more known iter(callable, sentinel) pattern, but I had difficulty squeezing</span>
-    <span class="c1"># # my use case into it. The best I could do was below.</span>
-    <span class="c1"># # Required:</span>
-    <span class="c1"># # - a multi_iter_zip (zip, for lists of dicts)</span>
-    <span class="c1"># # - a wrapper to produce a given sentinel when a given condition is met</span>
-    <span class="c1"># # - an object that makes a callable (yielding next item) from an iterable</span>
-    <span class="c1">#</span>
-    <span class="c1"># get_multi_iterator = lambda: MultiIterator(</span>
-    <span class="c1">#     audio=iter([1, 2, 3]), keyboard=iter([4, 5, 6])</span>
-    <span class="c1"># )</span>
-    <span class="c1">#</span>
-    <span class="c1"># m = get_multi_iterator()</span>
-    <span class="c1"># assert list(zip(*m)) == [(1, 4), (2, 5), (3, 6)]</span>
-    <span class="c1">#</span>
-    <span class="c1"># from i2 import Pipe</span>
-    <span class="c1">#</span>
-    <span class="c1"># m = get_multi_iterator()</span>
-    <span class="c1"># dict_zip = Pipe(partial(zip, m.objects), dict)</span>
-    <span class="c1"># multi_iter_zip = lambda m: map(dict_zip, zip(*m))</span>
-    <span class="c1"># assert list(multi_iter_zip(m)) == [</span>
-    <span class="c1">#     {&#39;audio&#39;: 1, &#39;keyboard&#39;: 4},</span>
-    <span class="c1">#     {&#39;audio&#39;: 2, &#39;keyboard&#39;: 5},</span>
-    <span class="c1">#     {&#39;audio&#39;: 3, &#39;keyboard&#39;: 6},</span>
-    <span class="c1"># ]</span>
-    <span class="c1">#</span>
-    <span class="c1"># def sentinel_on_condition(x, bool_func, sentinel=None):</span>
-    <span class="c1">#     if bool_func(x):</span>
-    <span class="c1">#         return sentinel</span>
-    <span class="c1">#     return x</span>
-    <span class="c1">#</span>
-    <span class="c1"># class Iter:</span>
-    <span class="c1">#     def __init__(self, iterator):</span>
-    <span class="c1">#         self.iterator = iterator</span>
-    <span class="c1">#</span>
-    <span class="c1">#     def __call__(self):</span>
-    <span class="c1">#         return next(self.iterator)</span>
-    <span class="c1">#</span>
-    <span class="c1"># none_on_cond = partial(sentinel_on_condition, bool_func=cond)</span>
-    <span class="c1">#</span>
-    <span class="c1"># m = get_multi_iterator()</span>
-    <span class="c1"># assert list(iter(Iter(map(none_on_cond, multi_iter_zip(m))), None)) == [</span>
-    <span class="c1">#     {&#39;audio&#39;: 1, &#39;keyboard&#39;: 4},</span>
-    <span class="c1">#     {&#39;audio&#39;: 2, &#39;keyboard&#39;: 5},</span>
-    <span class="c1">#     # {&#39;audio&#39;: 3, &#39;keyboard&#39;: 6}</span>
-    <span class="c1"># ]</span>
+
+<span class="k">class</span> <span class="nc">_MultiIterator</span><span class="p">(</span><span class="n">MultiObj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper class for DictZip&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">unnamed</span><span class="p">,</span> <span class="o">**</span><span class="n">named</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">unnamed</span><span class="p">,</span> <span class="o">**</span><span class="n">named</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">objects</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">to_iterator</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="k">def</span> <span class="nf">_gen_next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">iterator</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="n">name</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">iterator</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gen_next</span><span class="p">())</span>
 
 
-<span class="c1"># test_multi_iterator()</span>
+<span class="n">StopCondition</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span>
 
-<span class="c1"># def _ensure_predicate_is_callable(stop_cond):</span>
-<span class="c1">#     if not isinstance(stop_cond, Callable):</span>
-<span class="c1">#         stop_val = stop_cond</span>
-<span class="c1">#         stop_cond = lambda item: item == stop_val</span>
-<span class="c1">#     assert isinstance(stop_cond, Callable), f&#39;stop_cond not callable: {stop_cond}&#39;</span>
-<span class="c1">#</span>
-<span class="c1">#</span>
-<span class="c1"># def iter_until_condition(iterator, stop_cond=None, include_last=False):</span>
-<span class="c1">#     stop_cond = _ensure_predicate_is_callable(stop_cond)  # Pattern: Postel</span>
-<span class="c1">#     while True:</span>
-<span class="c1">#         item = next(iterator)</span>
-<span class="c1">#         if stop_cond(item):</span>
-<span class="c1">#             if include_last:</span>
-<span class="c1">#                 yield item</span>
-<span class="c1">#             break</span>
-<span class="c1">#         yield item</span>
-<span class="c1">#</span>
-<span class="c1">#</span>
-<span class="c1"># def iter_while_condition(iterator, stop_cond):</span>
-<span class="c1">#     stop_cond = _ensure_predicate_is_callable(stop_cond)  # Pattern: Postel</span>
-<span class="c1">#     while True:</span>
-<span class="c1">#         item = next(iterator)</span>
-<span class="c1">#         if stop_cond(item):</span>
-<span class="c1">#             yield item</span>
-<span class="c1">#         else:</span>
-<span class="c1">#             break</span>
 
-<span class="c1"># def iterate(</span>
-<span class="c1">#         iterators: Iterable[Iterator],</span>
-<span class="c1">#         stop_condition: Callable[[Iterable], bool] = lambda x: False,</span>
-<span class="c1"># ):</span>
-<span class="c1">#     # TODO: Meant to ensure iterator, but not working. Repair:</span>
-<span class="c1">#     # iterators = apply(iter, iterators)</span>
-<span class="c1">#     while True:</span>
-<span class="c1">#         items = apply(next, iterators)</span>
-<span class="c1">#         yield items</span>
-<span class="c1">#         if stop_condition(items):</span>
-<span class="c1">#             break</span>
-<span class="c1">#</span>
-<span class="c1"># apply = Pipe(map, tuple)</span>
-<span class="c1">#</span>
-<span class="c1">#</span>
+<span class="c1"># TODO: Make smart default for stop_condition. If finite iterable, use any_value_is_none?</span>
+<span class="c1"># TODO: Default consumer(s) (e.g. data-safe prints?)</span>
+<span class="c1"># TODO: Default slabs? (iterate through</span>
+
+
+<div class="viewcode-block" id="SlabsPushTuple"><a class="viewcode-back" href="../../../module_docs/know/scrap/pieces.html#know.scrap.pieces.SlabsPushTuple">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">SlabsPushTuple</span><span class="p">:</span>
+    <span class="n">slabs</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Slab</span><span class="p">]</span>
+    <span class="n">services</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Name</span><span class="p">,</span> <span class="n">SlabService</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">,</span> <span class="n">FuncFanout</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">multi_service</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">services</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># TODO: Add capability (in FuncFanout) to get a mix of (un)named consumers</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">multi_service</span> <span class="o">=</span> <span class="n">FuncFanout</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slabs_and_services_context</span> <span class="o">=</span> <span class="n">ContextFanout</span><span class="p">(</span>
+            <span class="n">slabs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">slabs</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">multi_service</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">slabs_and_services_context</span><span class="p">:</span>  <span class="c1"># enter all contained contexts</span>
+            <span class="c1"># get an iterable slabs object</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slabs</span><span class="p">,</span> <span class="n">ContextFanout</span><span class="p">):</span>
+                <span class="n">its</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slabs</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">slabs</span><span class="p">)</span>
+                <span class="n">slabs</span> <span class="o">=</span> <span class="n">iterate</span><span class="p">(</span><span class="n">its</span><span class="p">)</span>
+                <span class="c1"># slabs = iterate_dict_values(self.slabs)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">slabs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">slabs</span>
+            <span class="c1"># Now iterate...</span>
+            <span class="k">for</span> <span class="n">slab</span> <span class="ow">in</span> <span class="n">slabs</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">multi_service</span><span class="p">(</span><span class="n">slab</span><span class="p">)</span>  <span class="c1"># ... calling the services on each slab</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sentinel_func</span><span class="p">:</span> <span class="n">FiltFunc</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">for</span> <span class="n">multi_service_output</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">callback</span><span class="p">:</span>
+                <span class="n">callback_output</span> <span class="o">=</span> <span class="n">callback</span><span class="p">(</span><span class="n">multi_service_output</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">sentinel_func</span> <span class="ow">and</span> <span class="n">sentinel_func</span><span class="p">(</span><span class="n">callback_output</span><span class="p">):</span>
+                    <span class="k">break</span></div>
+
+
+<div class="viewcode-block" id="SlabsPush"><a class="viewcode-back" href="../../../module_docs/know/scrap/pieces.html#know.scrap.pieces.SlabsPush">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">SlabsPush</span><span class="p">:</span>
+    <span class="n">slabs</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Slab</span><span class="p">]</span>
+    <span class="n">services</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Name</span><span class="p">,</span> <span class="n">SlabService</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">,</span> <span class="n">FuncFanout</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">multi_service</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">services</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># TODO: Add capability (in FuncFanout) to get a mix of (un)named consumers</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">multi_service</span> <span class="o">=</span> <span class="n">FuncFanout</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">)</span>
+        <span class="c1"># Put slabs and multi_services in a ContextFanout so that</span>
+        <span class="c1"># anything that needs to be contextualized, will.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slabs_and_services_context</span> <span class="o">=</span> <span class="n">ContextFanout</span><span class="p">(</span>
+            <span class="n">slabs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">slabs</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">multi_service</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">slabs_and_services_context</span><span class="p">:</span>  <span class="c1"># enter all contained contexts</span>
+            <span class="c1"># get an iterable slabs object</span>
+            <span class="c1"># TODO: not sure this ContextFanout is the right check</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slabs</span><span class="p">,</span> <span class="n">ContextFanout</span><span class="p">):</span>
+                <span class="n">slabs</span> <span class="o">=</span> <span class="n">iterate_dict_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slabs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">slabs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">slabs</span>
+            <span class="c1"># Now iterate...</span>
+            <span class="k">for</span> <span class="n">slab</span> <span class="ow">in</span> <span class="n">slabs</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">multi_service</span><span class="p">(</span><span class="n">slab</span><span class="p">)</span>  <span class="c1"># ... calling the services on each slab</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sentinel_func</span><span class="p">:</span> <span class="n">FiltFunc</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">for</span> <span class="n">multi_service_output</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">callback</span><span class="p">:</span>
+                <span class="n">callback_output</span> <span class="o">=</span> <span class="n">callback</span><span class="p">(</span><span class="n">multi_service_output</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">sentinel_func</span> <span class="ow">and</span> <span class="n">sentinel_func</span><span class="p">(</span><span class="n">callback_output</span><span class="p">):</span>
+                    <span class="k">break</span></div>
+
+
+<span class="n">apply</span> <span class="o">=</span> <span class="n">Pipe</span><span class="p">(</span><span class="nb">map</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="MultiIterable"><a class="viewcode-back" href="../../../module_docs/know/scrap/pieces.html#know.scrap.pieces.MultiIterable">[docs]</a><span class="k">class</span> <span class="nc">MultiIterable</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Join several iterables together.</span>
+
+<span class="sd">    &gt;&gt;&gt; from know.util import any_value_is_none</span>
+<span class="sd">    &gt;&gt;&gt; from functools import partial</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; any_value_is_none = lambda d: any(d[k] is None for k in d)</span>
+<span class="sd">    &gt;&gt;&gt; mk_multi_iterable = partial(MultiIterable, stop_condition=any_value_is_none)</span>
+<span class="sd">    &gt;&gt;&gt; mi = mk_multi_iterable(lets=&#39;abc&#39;, nums=[1, 2, 3, 4])</span>
+<span class="sd">    &gt;&gt;&gt; list(mi)</span>
+<span class="sd">    [{&#39;lets&#39;: &#39;a&#39;, &#39;nums&#39;: 1}, {&#39;lets&#39;: &#39;b&#39;, &#39;nums&#39;: 2}, {&#39;lets&#39;: &#39;c&#39;, &#39;nums&#39;: 3}]</span>
+
+<span class="sd">    &gt;&gt;&gt; mi = MultiIterable(</span>
+<span class="sd">    ...     x=[5, 4, 3, 2, 1], y=[1, 2, 3, 4, 5],</span>
+<span class="sd">    ...     stop_condition=lambda d: d[&#39;x&#39;] == d[&#39;y&#39;]</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; list(mi)</span>
+<span class="sd">    [{&#39;x&#39;: 5, &#39;y&#39;: 1}, {&#39;x&#39;: 4, &#39;y&#39;: 2}]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">unnamed</span><span class="p">,</span> <span class="n">stop_condition</span><span class="p">:</span> <span class="n">StopCondition</span> <span class="o">=</span> <span class="n">always_false</span><span class="p">,</span> <span class="o">**</span><span class="n">named</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multi_iterator</span> <span class="o">=</span> <span class="n">_MultiIterator</span><span class="p">(</span><span class="o">*</span><span class="n">unnamed</span><span class="p">,</span> <span class="o">**</span><span class="n">named</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iterators</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multi_iterator</span><span class="o">.</span><span class="n">objects</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_condition</span> <span class="o">=</span> <span class="n">stop_condition</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_condition</span><span class="p">(</span><span class="n">items</span> <span class="o">:=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">multi_iterator</span><span class="p">)):</span>
+            <span class="k">yield</span> <span class="n">items</span>
+
+<div class="viewcode-block" id="MultiIterable.takewhile"><a class="viewcode-back" href="../../../module_docs/know/scrap/pieces.html#know.scrap.pieces.MultiIterable.takewhile">[docs]</a>    <span class="k">def</span> <span class="nf">takewhile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predicate</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;itertools.takewhile applied to self, with a bit of syntactic sugar</span>
+<span class="sd">        There&#39;s nothing to stop the iteration&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">predicate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">predicate</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="kc">True</span>  <span class="c1"># always true</span>
+        <span class="k">return</span> <span class="n">itertools</span><span class="o">.</span><span class="n">takewhile</span><span class="p">(</span><span class="n">predicate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div></div>
+
+
+<span class="k">class</span> <span class="nc">DictZip</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">unnamed</span><span class="p">,</span> <span class="n">takewhile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">named</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multi_iterator</span> <span class="o">=</span> <span class="n">_MultiIterator</span><span class="p">(</span><span class="o">*</span><span class="n">unnamed</span><span class="p">,</span> <span class="o">**</span><span class="n">named</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">objects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multi_iterator</span><span class="o">.</span><span class="n">objects</span>
+        <span class="k">if</span> <span class="n">takewhile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">takewhile</span> <span class="o">=</span> <span class="n">always_true</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">takewhile</span> <span class="o">=</span> <span class="n">takewhile</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">takewhile</span><span class="p">(</span><span class="n">d</span> <span class="o">:=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">multi_iterator</span><span class="p">)):</span>
+            <span class="k">yield</span> <span class="n">d</span>
+
+
+<div class="viewcode-block" id="LiveProcess"><a class="viewcode-back" href="../../../module_docs/know/scrap/pieces.html#know.scrap.pieces.LiveProcess">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">LiveProcess</span><span class="p">:</span>
+    <span class="n">streams</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">StreamId</span><span class="p">,</span> <span class="n">Stream</span><span class="p">]</span>
+    <span class="n">slab_callback</span><span class="p">:</span> <span class="n">SlabCallback</span> <span class="o">=</span> <span class="nb">print</span>
+    <span class="n">walk</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">DictZip</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">ContextFanout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slab_callback</span><span class="p">):</span>
+            <span class="n">slabs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">slab</span> <span class="ow">in</span> <span class="n">slabs</span><span class="p">:</span>
+                <span class="n">callback_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">slab_callback</span><span class="p">(</span><span class="n">slab</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">callback_output</span></div>
+
+
+<span class="c1"># TODO: Weird subclassing. Not the Creek init. Consider factory or delegation</span>
+
+
+<div class="viewcode-block" id="FixedStepHunker"><a class="viewcode-back" href="../../../module_docs/know/scrap/pieces.html#know.scrap.pieces.FixedStepHunker">[docs]</a><span class="k">class</span> <span class="nc">FixedStepHunker</span><span class="p">(</span><span class="n">Creek</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">chk_size</span><span class="p">,</span> <span class="n">chk_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">intervals</span> <span class="o">=</span> <span class="n">chunk_indices</span><span class="p">(</span>
+            <span class="n">chk_size</span><span class="o">=</span><span class="n">chk_size</span><span class="p">,</span> <span class="n">chk_step</span><span class="o">=</span><span class="n">chk_step</span><span class="p">,</span> <span class="n">start_idx</span><span class="o">=</span><span class="n">start_idx</span><span class="p">,</span> <span class="n">end_idx</span><span class="o">=</span><span class="n">end_idx</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="n">intervals</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src</span> <span class="o">=</span> <span class="n">src</span>
+
+    <span class="k">def</span> <span class="nf">data_to_obj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">src</span><span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="o">*</span><span class="n">data</span><span class="p">)]</span></div>
 </pre></div>
 
            </div>
