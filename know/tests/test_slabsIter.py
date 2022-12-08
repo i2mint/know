@@ -80,17 +80,12 @@ test_1 = dict(
 )
 
 
-<<<<<<< HEAD
 @pytest.mark.parametrize(
     "test_params",
     [
         test_1,
     ],
 )
-=======
-@pytest.mark.xfail
-@pytest.mark.parametrize('test_params', [test_1,])
->>>>>>> 7deaec547926258666c68f7af9e25cde2a0c6387
 def test_slabsiter(test_params):
     # get the data from a dropbox url
     annotations, wf_store = data_for_url(
