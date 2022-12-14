@@ -32,14 +32,12 @@ SliceableFactory = NewType('SliceableFactory', Callable[..., Sliceable])
 
 ########################################################################################
 
-from dataclasses import dataclass
 from typing import Callable, ContextManager, Iterable
 from i2 import Sig
 
 # Note: Could re-use ContextFanout, but didn't because I'm not sure the extra
 #  functionality is worth the extra complexity/dependence.
 #  Notes on how it can be done here: https://github.com/otosense/know/issues/4
-@dataclass
 class ContextualFunc:
     """Wrap a function so that it's also a multi-context context manager.
 
@@ -55,6 +53,7 @@ class ContextualFunc:
     make such a function with ``ContextualFunc`` though.
 
     >>> from contextlib import contextmanager
+    >>> from i2 import ContextFanout
     >>>
     >>> def mk_test_context(name, enter_obj=None, return_instance=True):
     ...     @contextmanager
@@ -64,44 +63,56 @@ class ContextualFunc:
     ...         print(f'exiting {name} context')
     ...     return test_context()
     >>> foo_context = mk_test_context('foo')
-    >>> bar_context = mk_test_context('bar')
     >>>
     >>> contextual_func = ContextualFunc(
     ...     lambda x: x + 1,
-    ...     contexts=[foo_context, bar_context]
+    ...     foo_context
     ... )
     >>>
     >>> with contextual_func:
     ...     print(f"{contextual_func(2)=}")
     ...     print(f"{contextual_func(1414)=}")
     entering foo context
-    entering bar context
     contextual_func(2)=3
     contextual_func(1414)=1415
     exiting foo context
+    >>>
+    >>> bar_context = mk_test_context('bar')
+    >>> baz_context = mk_test_context('baz')
+    >>>
+    >>> contextual_func = ContextualFunc(
+    ...     lambda x: x + 1,
+    ...     bar_context,
+    ...     baz_context,
+    ... )
+    >>> with contextual_func:
+    ...     print(f"{contextual_func(2)=}")
+    ...     print(f"{contextual_func(1414)=}")
+    entering bar context
+    entering baz context
+    contextual_func(2)=3
+    contextual_func(1414)=1415
     exiting bar context
+    exiting baz context
 
     See https://github.com/otosense/know/issues/4 for more info.
 
     """
 
-    func: Callable
-    contexts: Iterable[ContextManager] = ()
-
-    def __post_init__(self):
+    def __init__(self, func: Callable, *contexts: ContextManager, **named_contexts: ContextManager):
+        self.func = func
         self.__signature__ = Sig(self.func)
+        self.context = ContextFanout(*contexts, **named_contexts)
 
     def __call__(self, *args, **kwargs):
         return self.func(*args, **kwargs)
 
     def __enter__(self):
-        for context in self.contexts:
-            context.__enter__()
+        self.context.__enter__()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
-        for context in self.contexts:
-            context.__exit__(exc_type, exc_val, exc_tb)
+        self.context.__exit__(exc_type, exc_val, exc_tb)
 
 
 ########################################################################################
