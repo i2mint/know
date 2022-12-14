@@ -99,7 +99,12 @@ class ContextualFunc:
 
     """
 
-    def __init__(self, func: Callable, *contexts: ContextManager, **named_contexts: ContextManager):
+    def __init__(
+        self,
+        func: Callable,
+        *contexts: ContextManager,
+        **named_contexts: ContextManager,
+    ):
         self.func = func
         self.__signature__ = Sig(self.func)
         self.context = ContextFanout(*contexts, **named_contexts)

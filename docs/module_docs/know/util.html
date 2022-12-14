@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>know.util &mdash; know 0.1.17 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <title>know.util &mdash; know 0.1.18 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
@@ -98,7 +98,7 @@
 <p>Util objects</p>
 <dl class="py class">
 <dt id="know.util.ContextualFunc">
-<em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">ContextualFunc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span></em>, <em class="sig-param"><span class="n">contexts</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span>AbstractContextManager<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">()</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#ContextualFunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.ContextualFunc" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">know.util.</code><code class="sig-name descname">ContextualFunc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">contexts</span><span class="p">:</span> <span class="n">AbstractContextManager</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">named_contexts</span><span class="p">:</span> <span class="n">AbstractContextManager</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/util.html#ContextualFunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.util.ContextualFunc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wrap a function so that it’s also a multi-context context manager.</p>
 <p>This class makes callable instances that are also context managers.</p>
 <p>This is useful when a function needs specific resources run, which are managed by
@@ -109,6 +109,7 @@ call, and exit.</p>
 automatically when you try to execute it. If this is needed, one can easily
 make such a function with <code class="docutils literal notranslate"><span class="pre">ContextualFunc</span></code> though.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">i2</span> <span class="kn">import</span> <span class="n">ContextFanout</span>
 <span class="go">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">mk_test_context</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">enter_obj</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_instance</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="nd">@contextmanager</span>
@@ -118,22 +119,37 @@ make such a function with <code class="docutils literal notranslate"><span class
 <span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;exiting </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> context&#39;</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="n">test_context</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">foo_context</span> <span class="o">=</span> <span class="n">mk_test_context</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bar_context</span> <span class="o">=</span> <span class="n">mk_test_context</span><span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">)</span>
 <span class="go">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">contextual_func</span> <span class="o">=</span> <span class="n">ContextualFunc</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">contexts</span><span class="o">=</span><span class="p">[</span><span class="n">foo_context</span><span class="p">,</span> <span class="n">bar_context</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">foo_context</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="go">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">contextual_func</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">contextual_func</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">contextual_func</span><span class="p">(</span><span class="mi">1414</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="go">entering foo context</span>
-<span class="go">entering bar context</span>
 <span class="go">contextual_func(2)=3</span>
 <span class="go">contextual_func(1414)=1415</span>
 <span class="go">exiting foo context</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bar_context</span> <span class="o">=</span> <span class="n">mk_test_context</span><span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">baz_context</span> <span class="o">=</span> <span class="n">mk_test_context</span><span class="p">(</span><span class="s1">&#39;baz&#39;</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">contextual_func</span> <span class="o">=</span> <span class="n">ContextualFunc</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">bar_context</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">baz_context</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">contextual_func</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">contextual_func</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">contextual_func</span><span class="p">(</span><span class="mi">1414</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">entering bar context</span>
+<span class="go">entering baz context</span>
+<span class="go">contextual_func(2)=3</span>
+<span class="go">contextual_func(1414)=1415</span>
 <span class="go">exiting bar context</span>
+<span class="go">exiting baz context</span>
 </pre></div>
 </div>
 <p>See <a class="reference external" href="https://github.com/otosense/know/issues/4">https://github.com/otosense/know/issues/4</a> for more info.</p>

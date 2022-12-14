@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>know.util &mdash; know 0.1.17 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <title>know.util &mdash; know 0.1.18 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
@@ -126,15 +126,13 @@
 
 <span class="c1">########################################################################################</span>
 
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">ContextManager</span><span class="p">,</span> <span class="n">Iterable</span>
 <span class="kn">from</span> <span class="nn">i2</span> <span class="kn">import</span> <span class="n">Sig</span>
 
 <span class="c1"># Note: Could re-use ContextFanout, but didn&#39;t because I&#39;m not sure the extra</span>
 <span class="c1">#  functionality is worth the extra complexity/dependence.</span>
 <span class="c1">#  Notes on how it can be done here: https://github.com/otosense/know/issues/4</span>
-<div class="viewcode-block" id="ContextualFunc"><a class="viewcode-back" href="../../module_docs/know/util.html#know.util.ContextualFunc">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ContextualFunc</span><span class="p">:</span>
+<div class="viewcode-block" id="ContextualFunc"><a class="viewcode-back" href="../../module_docs/know/util.html#know.util.ContextualFunc">[docs]</a><span class="k">class</span> <span class="nc">ContextualFunc</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Wrap a function so that it&#39;s also a multi-context context manager.</span>
 
 <span class="sd">    This class makes callable instances that are also context managers.</span>
@@ -149,6 +147,7 @@
 <span class="sd">    make such a function with ``ContextualFunc`` though.</span>
 
 <span class="sd">    &gt;&gt;&gt; from contextlib import contextmanager</span>
+<span class="sd">    &gt;&gt;&gt; from i2 import ContextFanout</span>
 <span class="sd">    &gt;&gt;&gt;</span>
 <span class="sd">    &gt;&gt;&gt; def mk_test_context(name, enter_obj=None, return_instance=True):</span>
 <span class="sd">    ...     @contextmanager</span>
@@ -158,44 +157,61 @@
 <span class="sd">    ...         print(f&#39;exiting {name} context&#39;)</span>
 <span class="sd">    ...     return test_context()</span>
 <span class="sd">    &gt;&gt;&gt; foo_context = mk_test_context(&#39;foo&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; bar_context = mk_test_context(&#39;bar&#39;)</span>
 <span class="sd">    &gt;&gt;&gt;</span>
 <span class="sd">    &gt;&gt;&gt; contextual_func = ContextualFunc(</span>
 <span class="sd">    ...     lambda x: x + 1,</span>
-<span class="sd">    ...     contexts=[foo_context, bar_context]</span>
+<span class="sd">    ...     foo_context</span>
 <span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt;</span>
 <span class="sd">    &gt;&gt;&gt; with contextual_func:</span>
 <span class="sd">    ...     print(f&quot;{contextual_func(2)=}&quot;)</span>
 <span class="sd">    ...     print(f&quot;{contextual_func(1414)=}&quot;)</span>
 <span class="sd">    entering foo context</span>
-<span class="sd">    entering bar context</span>
 <span class="sd">    contextual_func(2)=3</span>
 <span class="sd">    contextual_func(1414)=1415</span>
 <span class="sd">    exiting foo context</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; bar_context = mk_test_context(&#39;bar&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; baz_context = mk_test_context(&#39;baz&#39;)</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; contextual_func = ContextualFunc(</span>
+<span class="sd">    ...     lambda x: x + 1,</span>
+<span class="sd">    ...     bar_context,</span>
+<span class="sd">    ...     baz_context,</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; with contextual_func:</span>
+<span class="sd">    ...     print(f&quot;{contextual_func(2)=}&quot;)</span>
+<span class="sd">    ...     print(f&quot;{contextual_func(1414)=}&quot;)</span>
+<span class="sd">    entering bar context</span>
+<span class="sd">    entering baz context</span>
+<span class="sd">    contextual_func(2)=3</span>
+<span class="sd">    contextual_func(1414)=1415</span>
 <span class="sd">    exiting bar context</span>
+<span class="sd">    exiting baz context</span>
 
 <span class="sd">    See https://github.com/otosense/know/issues/4 for more info.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span>
-    <span class="n">contexts</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ContextManager</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">contexts</span><span class="p">:</span> <span class="n">ContextManager</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">named_contexts</span><span class="p">:</span> <span class="n">ContextManager</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__signature__</span> <span class="o">=</span> <span class="n">Sig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">ContextFanout</span><span class="p">(</span><span class="o">*</span><span class="n">contexts</span><span class="p">,</span> <span class="o">**</span><span class="n">named_contexts</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">context</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">contexts</span><span class="p">:</span>
-            <span class="n">context</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">context</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">contexts</span><span class="p">:</span>
-            <span class="n">context</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">)</span></div>
 
 
 <span class="c1">########################################################################################</span>
