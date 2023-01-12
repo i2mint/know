@@ -109,7 +109,7 @@ def test_streamlitfront_convention_ops():
 # Alternatives to mappings for front configs.
 
 from i2.deco import FuncFactory
-from i2 import Literal
+from i2 import LiteralVal
 from typing import Any
 
 from streamlitfront.elements import ExecSection
@@ -194,7 +194,7 @@ def _is_instance(obj, class_or_tuple):
 def _ensure_factory_if_callable(
     obj, is_factory=partial(_is_instance, class_or_tuple=partial)
 ):
-    if isinstance(obj, Literal):
+    if isinstance(obj, LiteralVal):
         return obj.get_val()  # we want the literal value, get it
     elif callable(obj) and not is_factory(obj):
         return FuncFactory(obj)  # make the callable into a factory if it's not
