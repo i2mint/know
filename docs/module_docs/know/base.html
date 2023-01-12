@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>know.base &mdash; know 0.1.18 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <title>know.base &mdash; know 0.1.19 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
@@ -108,17 +108,17 @@ slabs that can contain the original data, or other datas computed from it, or bo
 <p>Note to developers looking into the code: The overview of the <cite>SlabsIter</cite> class:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">SlabsIter</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="k">def</span> <span class="nf">_call_on_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
-<span class="gp">... </span>        <span class="sd">&#39;&#39;&#39;Calls the components 1 by 1, sourcing inputs and writing outputs in scope&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="w">        </span><span class="sd">&#39;&#39;&#39;Calls the components 1 by 1, sourcing inputs and writing outputs in scope&#39;&#39;&#39;</span>
 <span class="gp">...</span>
 <span class="gp">... </span>    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="gp">... </span>        <span class="sd">&#39;&#39;&#39;Get the next slab by calling _call_on_scope on an new empty scope.</span>
+<span class="gp">... </span><span class="w">        </span><span class="sd">&#39;&#39;&#39;Get the next slab by calling _call_on_scope on an new empty scope.</span>
 <span class="gp">... </span><span class="sd">        At least one of the components will have to be argument-less and provide</span>
 <span class="gp">... </span><span class="sd">        some data for other components to get their inputs from, if any are needed.</span>
 <span class="gp">... </span><span class="sd">        &#39;&#39;&#39;</span>
 <span class="gp">... </span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_on_scope</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="p">{})</span>
 <span class="gp">...</span>
 <span class="gp">... </span>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="gp">... </span>        <span class="sd">&#39;&#39;&#39;Iterates over slabs until a handle exception is raised.&#39;&#39;&#39;</span>
+<span class="gp">... </span><span class="w">        </span><span class="sd">&#39;&#39;&#39;Iterates over slabs until a handle exception is raised.&#39;&#39;&#39;</span>
 <span class="gp">... </span>        <span class="c1"># Simplified code:</span>
 <span class="gp">... </span>        <span class="k">with</span> <span class="bp">self</span><span class="p">:</span>  <span class="c1"># enter all the contexts that need to be entered</span>
 <span class="gp">... </span>            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>  <span class="c1"># loop until you encounter a handled exception</span>
@@ -251,7 +251,7 @@ from our smart home device.</p>
 sources since they reached the end of their iterators).</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">next</span><span class="p">(</span><span class="n">si</span><span class="p">)</span>  
 <span class="gt">Traceback (most recent call last):</span>
-  <span class="c">...</span>
+<span class="w">  </span><span class="c">...</span>
 <span class="gr">StopIteration</span>
 </pre></div>
 </div>

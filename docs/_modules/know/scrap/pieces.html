@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>know.scrap.pieces &mdash; know 0.1.18 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>know.scrap.pieces &mdash; know 0.1.19 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
@@ -183,7 +183,7 @@
     <span class="c1"># Note: Equivalent to any_non_none_value = Pipe(methodcaller(&#39;values&#39;), iterize(</span>
     <span class="c1"># is_not_none), any)</span>
     <span class="k">def</span> <span class="nf">any_non_none_value</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;True if and only if d has any non-None values</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;True if and only if d has any non-None values</span>
 
 <span class="sd">        &gt;&gt;&gt; assert not any_non_none_value({&#39;a&#39;: None, &#39;b&#39;: None})</span>
 <span class="sd">        &gt;&gt;&gt; assert any_non_none_value({&#39;a&#39;: None, &#39;b&#39;: 3})</span>
@@ -233,7 +233,7 @@
 
 
 <span class="k">class</span> <span class="nc">_MultiIterator</span><span class="p">(</span><span class="n">MultiObj</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Helper class for DictZip&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper class for DictZip&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">unnamed</span><span class="p">,</span> <span class="o">**</span><span class="n">named</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">unnamed</span><span class="p">,</span> <span class="o">**</span><span class="n">named</span><span class="p">)</span>
@@ -336,7 +336,7 @@
 
 
 <div class="viewcode-block" id="MultiIterable"><a class="viewcode-back" href="../../../module_docs/know/scrap/pieces.html#know.scrap.pieces.MultiIterable">[docs]</a><span class="k">class</span> <span class="nc">MultiIterable</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Join several iterables together.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Join several iterables together.</span>
 
 <span class="sd">    &gt;&gt;&gt; from know.util import any_value_is_none</span>
 <span class="sd">    &gt;&gt;&gt; from functools import partial</span>
@@ -365,7 +365,7 @@
             <span class="k">yield</span> <span class="n">items</span>
 
 <div class="viewcode-block" id="MultiIterable.takewhile"><a class="viewcode-back" href="../../../module_docs/know/scrap/pieces.html#know.scrap.pieces.MultiIterable.takewhile">[docs]</a>    <span class="k">def</span> <span class="nf">takewhile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predicate</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;itertools.takewhile applied to self, with a bit of syntactic sugar</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;itertools.takewhile applied to self, with a bit of syntactic sugar</span>
 <span class="sd">        There&#39;s nothing to stop the iteration&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">predicate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">predicate</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="kc">True</span>  <span class="c1"># always true</span>

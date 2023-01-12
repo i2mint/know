@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>know.util &mdash; know 0.1.18 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <title>know.util &mdash; know 0.1.19 documentation</title><link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
@@ -133,7 +133,7 @@
 <span class="c1">#  functionality is worth the extra complexity/dependence.</span>
 <span class="c1">#  Notes on how it can be done here: https://github.com/otosense/know/issues/4</span>
 <div class="viewcode-block" id="ContextualFunc"><a class="viewcode-back" href="../../module_docs/know/util.html#know.util.ContextualFunc">[docs]</a><span class="k">class</span> <span class="nc">ContextualFunc</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Wrap a function so that it&#39;s also a multi-context context manager.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrap a function so that it&#39;s also a multi-context context manager.</span>
 
 <span class="sd">    This class makes callable instances that are also context managers.</span>
 
@@ -231,7 +231,7 @@
 
 
 <div class="viewcode-block" id="fixed_step_chunk_intervals"><a class="viewcode-back" href="../../module_docs/know/util.html#know.util.fixed_step_chunk_intervals">[docs]</a><span class="k">def</span> <span class="nf">fixed_step_chunk_intervals</span><span class="p">(</span><span class="n">chk_size</span><span class="p">,</span> <span class="n">chk_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A infinite generator of (bt, tt) intervals of fixed size and step.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A infinite generator of (bt, tt) intervals of fixed size and step.</span>
 <span class="sd">    Fixed size means all bt - tt are equal and consecutive bts are equidistant.</span>
 
 <span class="sd">    &gt;&gt;&gt; chk_intervals = fixed_step_chunk_intervals(chk_size=2, chk_step=0.5, start=3)</span>
@@ -244,7 +244,7 @@
 
 
 <div class="viewcode-block" id="slices_gen"><a class="viewcode-back" href="../../module_docs/know/util.html#know.util.slices_gen">[docs]</a><span class="k">def</span> <span class="nf">slices_gen</span><span class="p">(</span><span class="n">sliceable</span><span class="p">:</span> <span class="n">Sliceable</span><span class="p">,</span> <span class="n">intervals</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Generate slabs by slicing sliceable with given intervals.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate slabs by slicing sliceable with given intervals.</span>
 
 <span class="sd">    &gt;&gt;&gt; list(slices_gen(list(range(1, 100, 2)), [(1, 3), (2, 7)]))</span>
 <span class="sd">    [[3, 5], [5, 7, 9, 11, 13]]</span>
@@ -277,7 +277,7 @@
 
 
 <div class="viewcode-block" id="source_slices"><a class="viewcode-back" href="../../module_docs/know/util.html#know.util.source_slices">[docs]</a><span class="k">def</span> <span class="nf">source_slices</span><span class="p">(</span><span class="n">src_factory</span><span class="p">:</span> <span class="n">SliceableFactory</span><span class="p">,</span> <span class="n">intervals</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Makes a source by calling src_factory(), then slices it with intervals,</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Makes a source by calling src_factory(), then slices it with intervals,</span>
 <span class="sd">    creating an iterator of slabs&quot;&quot;&quot;</span>
     <span class="n">src</span><span class="p">:</span> <span class="n">Sliceable</span> <span class="o">=</span> <span class="n">src_factory</span><span class="p">()</span>
     <span class="k">with</span> <span class="n">ContextFanout</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">intervals</span><span class="p">):</span>
@@ -289,17 +289,17 @@
 
 
 <div class="viewcode-block" id="always_true"><a class="viewcode-back" href="../../module_docs/know/util.html#know.util.always_true">[docs]</a><span class="k">def</span> <span class="nf">always_true</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">True</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Returns True, regardless of input. Meant for filter functions.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns True, regardless of input. Meant for filter functions.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="kc">True</span></div>
 
 
 <div class="viewcode-block" id="always_false"><a class="viewcode-back" href="../../module_docs/know/util.html#know.util.always_false">[docs]</a><span class="k">def</span> <span class="nf">always_false</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">False</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Returns False, regardless of input. Meant for stopping (filter) functions&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns False, regardless of input. Meant for stopping (filter) functions&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="kc">False</span></div>
 
 
 <div class="viewcode-block" id="any_value_is_none"><a class="viewcode-back" href="../../module_docs/know/util.html#know.util.any_value_is_none">[docs]</a><span class="k">def</span> <span class="nf">any_value_is_none</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns True if any value of the mapping is None&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns True if any value of the mapping is None&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">d</span><span class="p">)</span></div>
 
 
