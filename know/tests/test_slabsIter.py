@@ -1,5 +1,5 @@
 from know.base import SlabsIter
-from py2store import wrap_kvs, filt_iter, FilesOfZip
+from dol import wrap_kvs, filt_iter, FilesOfZip
 import soundfile as sf
 import io
 from graze import Graze
