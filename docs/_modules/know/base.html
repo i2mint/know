@@ -94,7 +94,7 @@
   <h1>Source code for know.base</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Base objects for know</span>
 
-<span class="sd">The main object of this module is `SlabsIter`, and object to source and manipulate</span>
+<span class="sd">The main object of this module is `Slabs`, and object to source and manipulate</span>
 <span class="sd">multiple streams.</span>
 
 <span class="sd">A slab is a collection of items of a same interval of time.</span>
@@ -102,12 +102,12 @@
 <span class="sd">Typically, a slab will be the aggregation of multiple information streams that</span>
 <span class="sd">happened around the same time.</span>
 
-<span class="sd">`SlabsIter` is a tool that allows you to source multiple streams into a stream of</span>
+<span class="sd">`Slabs` is a tool that allows you to source multiple streams into a stream of</span>
 <span class="sd">slabs that can contain the original data, or other datas computed from it, or both.</span>
 
-<span class="sd">Note to developers looking into the code: The overview of the `SlabsIter` class:</span>
+<span class="sd">Note to developers looking into the code: The overview of the `Slabs` class:</span>
 
-<span class="sd">&gt;&gt;&gt; class SlabsIter:</span>
+<span class="sd">&gt;&gt;&gt; class Slabs:</span>
 <span class="sd">...     def _call_on_scope(self, scope):</span>
 <span class="sd">...         &#39;&#39;&#39;Calls the components 1 by 1, sourcing inputs and writing outputs in scope&#39;&#39;&#39;</span>
 <span class="sd">...</span>
@@ -159,7 +159,7 @@
 <span class="n">DoNotBreak</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;DoNotBreak&#39;</span><span class="p">,</span> <span class="p">(),</span> <span class="p">{})</span>
 <span class="n">do_not_break</span> <span class="o">=</span> <span class="n">DoNotBreak</span><span class="p">()</span>
 <span class="n">do_not_break</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s1">&#39;Sentinel that should be used to signal SlabsIter iteration not to break. &#39;</span>
+    <span class="s1">&#39;Sentinel that should be used to signal Slabs iteration not to break. &#39;</span>
     <span class="s1">&#39;This sentinel should be returned by exception handlers if they want to tell &#39;</span>
     <span class="s1">&#39;the iteration not to stop (in all other cases, the iteration will stop)&#39;</span>
 <span class="p">)</span>
@@ -240,7 +240,7 @@
 
 <span class="sd">    Two uses cases here:</span>
 
-<span class="sd">    - using a scope dict as both the source of `SlabsIter` components, and as a place</span>
+<span class="sd">    - using a scope dict as both the source of `Slabs` components, and as a place</span>
 <span class="sd">    to temporarily store the outputs of these components.</span>
 
 <span class="sd">    - exception handlers: We&#39;d like the exception handlers to be easy to express.</span>
@@ -289,7 +289,7 @@
 
 
 <span class="c1"># TODO: Postelize (or add tooling for) the components specification and add validation.</span>
-<div class="viewcode-block" id="SlabsIter"><a class="viewcode-back" href="../../module_docs/know/base.html#know.base.SlabsIter">[docs]</a><span class="k">class</span> <span class="nc">SlabsIter</span><span class="p">:</span>
+<div class="viewcode-block" id="SlabsIter"><a class="viewcode-back" href="../../module_docs/know/base.html#know.base.SlabsIter">[docs]</a><span class="k">class</span> <span class="nc">Slabs</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Object to source and manipulate multiple streams.</span>
 <span class="sd">    </span>
 <span class="sd">    A slab is a collection of items of a same interval of time.</span>
@@ -333,11 +333,11 @@
 <span class="sd">    of information, and we do so iteratively over over slab that is streaming to us</span>
 <span class="sd">    from our smart home device.</span>
 
-<span class="sd">    `SlabsIter` is there to help you create such slabs, from source to enhanced.</span>
+<span class="sd">    `Slabs` is there to help you create such slabs, from source to enhanced.</span>
 
 <span class="sd">    The situation above would look something along like this:</span>
 
-<span class="sd">    &gt;&gt;&gt; from know.base import SlabsIter</span>
+<span class="sd">    &gt;&gt;&gt; from know.base import Slabs</span>
 <span class="sd">    &gt;&gt;&gt; from statistics import stdev</span>
 <span class="sd">    &gt;&gt;&gt;</span>
 <span class="sd">    &gt;&gt;&gt; vol = stdev</span>
@@ -350,7 +350,7 @@
 <span class="sd">    ...     light_sensor_read = iter([126, 501, 523]).__next__</span>
 <span class="sd">    ...     movement_sensor_read = iter([None, None, True]).__next__</span>
 <span class="sd">    ...</span>
-<span class="sd">    ...     return SlabsIter(</span>
+<span class="sd">    ...     return Slabs(</span>
 <span class="sd">    ...         # The first three components get data from the sensors.</span>
 <span class="sd">    ...         # The *_read objects are all callable, returning the next</span>
 <span class="sd">    ...         # chunk of data for that sensor, if any.</span>
@@ -400,7 +400,7 @@
 <span class="sd">      ...</span>
 <span class="sd">    StopIteration</span>
 
-<span class="sd">    That said, if you iterate through a `SlabsIter` that handles the `StopIteration`</span>
+<span class="sd">    That said, if you iterate through a `Slabs` that handles the `StopIteration`</span>
 <span class="sd">    exception (it does by default), you&#39;ll reach the end of you iteration gracefully.</span>
 
 <span class="sd">    &gt;&gt;&gt; si = make_a_slabs_iter()</span>

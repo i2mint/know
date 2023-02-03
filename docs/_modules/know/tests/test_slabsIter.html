@@ -92,7 +92,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for know.tests.test_slabsIter</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">know.base</span> <span class="kn">import</span> <span class="n">SlabsIter</span>
+<span></span><span class="kn">from</span> <span class="nn">know.base</span> <span class="kn">import</span> <span class="n">Slabs</span>
 <span class="kn">from</span> <span class="nn">py2store</span> <span class="kn">import</span> <span class="n">wrap_kvs</span><span class="p">,</span> <span class="n">filt_iter</span><span class="p">,</span> <span class="n">FilesOfZip</span>
 <span class="kn">import</span> <span class="nn">soundfile</span> <span class="k">as</span> <span class="nn">sf</span>
 <span class="kn">import</span> <span class="nn">io</span>
@@ -202,7 +202,7 @@
         <span class="n">session_read</span> <span class="o">=</span> <span class="n">session_iter</span><span class="o">.</span><span class="fm">__next__</span>
         <span class="n">phase_read</span> <span class="o">=</span> <span class="n">phase_iter</span><span class="o">.</span><span class="fm">__next__</span>
 
-        <span class="k">return</span> <span class="n">SlabsIter</span><span class="p">(</span>
+        <span class="k">return</span> <span class="n">Slabs</span><span class="p">(</span>
             <span class="n">audio</span><span class="o">=</span><span class="n">audio_sensor_read</span><span class="p">,</span>
             <span class="n">channel</span><span class="o">=</span><span class="n">channel_read</span><span class="p">,</span>
             <span class="n">phase</span><span class="o">=</span><span class="n">phase_read</span><span class="p">,</span>

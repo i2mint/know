@@ -97,16 +97,16 @@
   <section id="module-know.base">
 <span id="know-base"></span><h1>know.base<a class="headerlink" href="#module-know.base" title="Permalink to this headline">¶</a></h1>
 <p>Base objects for know</p>
-<p>The main object of this module is <cite>SlabsIter</cite>, and object to source and manipulate
+<p>The main object of this module is <cite>Slabs</cite>, and object to source and manipulate
 multiple streams.</p>
 <p>A slab is a collection of items of a same interval of time.
 We represent a slab using a <cite>dict</cite> or mapping.
 Typically, a slab will be the aggregation of multiple information streams that
 happened around the same time.</p>
-<p><cite>SlabsIter</cite> is a tool that allows you to source multiple streams into a stream of
+<p><cite>Slabs</cite> is a tool that allows you to source multiple streams into a stream of
 slabs that can contain the original data, or other datas computed from it, or both.</p>
-<p>Note to developers looking into the code: The overview of the <cite>SlabsIter</cite> class:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">SlabsIter</span><span class="p">:</span>
+<p>Note to developers looking into the code: The overview of the <cite>Slabs</cite> class:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Slabs</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="k">def</span> <span class="nf">_call_on_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
 <span class="gp">... </span><span class="w">        </span><span class="sd">&#39;&#39;&#39;Calls the components 1 by 1, sourcing inputs and writing outputs in scope&#39;&#39;&#39;</span>
 <span class="gp">...</span>
@@ -150,7 +150,7 @@ an error.</p>
 
 <dl class="py class">
 <dt id="know.base.SlabsIter">
-<em class="property">class </em><code class="sig-prename descclassname">know.base.</code><code class="sig-name descname">SlabsIter</code><span class="sig-paren">(</span><em class="sig-param">handle_exceptions=(&lt;class 'StopIteration'&gt;</em>, <em class="sig-param">&lt;class 'know.base.IteratorExit'&gt;</em>, <em class="sig-param">&lt;class 'KeyboardInterrupt'&gt;)</em>, <em class="sig-param">**components</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/base.html#SlabsIter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.base.SlabsIter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">know.base.</code><code class="sig-name descname">Slabs</code><span class="sig-paren">(</span><em class="sig-param">handle_exceptions=(&lt;class 'StopIteration'&gt;</em>, <em class="sig-param">&lt;class 'know.base.IteratorExit'&gt;</em>, <em class="sig-param">&lt;class 'KeyboardInterrupt'&gt;)</em>, <em class="sig-param">**components</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/know/base.html#SlabsIter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#know.base.SlabsIter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Object to source and manipulate multiple streams.</p>
 <p>A slab is a collection of items of a same interval of time.
 We represent a slab using a <cite>dict</cite> or mapping.
@@ -189,9 +189,9 @@ signal is computed, and a notification sent if that metric is above a given thes
 <p>The point here is that we incrementally compute various fields, enhancing our slab
 of information, and we do so iteratively over over slab that is streaming to us
 from our smart home device.</p>
-<p><cite>SlabsIter</cite> is there to help you create such slabs, from source to enhanced.</p>
+<p><cite>Slabs</cite> is there to help you create such slabs, from source to enhanced.</p>
 <p>The situation above would look something along like this:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">know.base</span> <span class="kn">import</span> <span class="n">SlabsIter</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">know.base</span> <span class="kn">import</span> <span class="n">Slabs</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">statistics</span> <span class="kn">import</span> <span class="n">stdev</span>
 <span class="go">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">vol</span> <span class="o">=</span> <span class="n">stdev</span>
@@ -204,7 +204,7 @@ from our smart home device.</p>
 <span class="gp">... </span>    <span class="n">light_sensor_read</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">([</span><span class="mi">126</span><span class="p">,</span> <span class="mi">501</span><span class="p">,</span> <span class="mi">523</span><span class="p">])</span><span class="o">.</span><span class="fm">__next__</span>
 <span class="gp">... </span>    <span class="n">movement_sensor_read</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">])</span><span class="o">.</span><span class="fm">__next__</span>
 <span class="gp">...</span>
-<span class="gp">... </span>    <span class="k">return</span> <span class="n">SlabsIter</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">Slabs</span><span class="p">(</span>
 <span class="gp">... </span>        <span class="c1"># The first three components get data from the sensors.</span>
 <span class="gp">... </span>        <span class="c1"># The *_read objects are all callable, returning the next</span>
 <span class="gp">... </span>        <span class="c1"># chunk of data for that sensor, if any.</span>
@@ -255,7 +255,7 @@ sources since they reached the end of their iterators).</p>
 <span class="gr">StopIteration</span>
 </pre></div>
 </div>
-<p>That said, if you iterate through a <cite>SlabsIter</cite> that handles the <cite>StopIteration</cite>
+<p>That said, if you iterate through a <cite>Slabs</cite> that handles the <cite>StopIteration</cite>
 exception (it does by default), you’ll reach the end of you iteration gracefully.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">si</span> <span class="o">=</span> <span class="n">make_a_slabs_iter</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">slab</span> <span class="ow">in</span> <span class="n">si</span><span class="p">:</span>
