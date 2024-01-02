@@ -219,7 +219,7 @@ def only_if(locals_condition, sentinel=None):
 
         @wraps(func)
         def locals_conditioned_func(*args, **kwargs):
-            _kwargs = sig.kwargs_from_args_and_kwargs(args, kwargs)
+            _kwargs = sig.map_arguments(args, kwargs)
             if call_forgivingly(locals_condition, **_kwargs):
                 return func(*args, **kwargs)
             else:
