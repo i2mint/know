@@ -1,4 +1,5 @@
 """A module to jot down ideas around configuration operations"""
+
 import pprint
 from typing import Mapping, Callable
 from dol.sources import AttrContainer, AttrDict
@@ -65,9 +66,11 @@ class FactoryDictSpec:
         self._sig(self)
 
     def __call__(
-        self, *args, **kwargs,
+        self,
+        *args,
+        **kwargs,
     ):
-        _kwargs = self._sig.kwargs_from_args_and_kwargs(
+        _kwargs = self._sig.map_arguments(
             args, kwargs, allow_partial=self.allow_partial
         )
         return dict({self.func_field: self.func}, **_kwargs)
@@ -133,15 +136,25 @@ _DFLT_CONVENTION_DICT = {
         ELEMENT_KEY: App,
         Callable: {
             ELEMENT_KEY: View,
-            'description': {ELEMENT_KEY: TextSection,},
+            'description': {
+                ELEMENT_KEY: TextSection,
+            },
             'execution': {
                 ELEMENT_KEY: ExecSection,
                 'inputs': {
-                    int: {ELEMENT_KEY: IntInput,},
-                    float: {ELEMENT_KEY: FloatInput,},
-                    Any: {ELEMENT_KEY: TextInput,},
+                    int: {
+                        ELEMENT_KEY: IntInput,
+                    },
+                    float: {
+                        ELEMENT_KEY: FloatInput,
+                    },
+                    Any: {
+                        ELEMENT_KEY: TextInput,
+                    },
                 },
-                'output': {ELEMENT_KEY: TextOutput,},
+                'output': {
+                    ELEMENT_KEY: TextOutput,
+                },
             },
         },
     },
