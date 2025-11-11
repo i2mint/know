@@ -4,36 +4,63 @@ Build live stream tools
 
 To install:	```pip install know```
 
-The tools are made to be able to create live streams of data 
-(e.g. from sensors) and funnel them into proceses with a consistent interfaces. 
-One important process being the process that will store all or part of 
-the data, through a simple storage-system-agnositic facade. 
+The tools are made to be able to create live streams of data
+(e.g. from sensors) and funnel them into proceses with a consistent interfaces.
+One important process being the process that will store all or part of
+the data, through a simple storage-system-agnositic facade.
+
+> **Note on Package Evolution**: Core streaming functionality (including `SlabsIter`) has been moved to the [`meshed`](https://github.com/i2mint/meshed) package (formerly in [`creek`](https://github.com/i2mint/creek)). The `know` package now focuses on providing utility tools for context management and data processing. For slab iteration and stream processing, please use `meshed.slabs`.
+
+## Main Exports
+
+The `know` package currently exports the following main utilities:
+
+### `ContextualFunc`
+
+Wrap a function so that it's also a multi-context context manager. This is useful when a function needs specific resources managed by context managers.
 
 ```python
-proc = LiveProc(
-   source=Sources(  # make a multi-source object (which will manage buffering and timing)
-       audio=AudioSource(...),
-       plc=PlcSource(...),
-       video=VideoSource(...),
-   ),
-   services=Services(  # make a multi-data service (and/or writer/transformer) object
-       storage=Store(...),
-       notifications=Notif(...),
-       live_viz=LiveViz(...),
-   ),
-   ...  # other settings for the process (logging, etc.)
-)
+from know import ContextualFunc
+from contextlib import contextmanager
 
-proc()  # run the process
+@contextmanager
+def my_resource():
+    print('Setting up resource')
+    yield
+    print('Cleaning up resource')
+
+# Wrap your function with the context
+def process_data(x):
+    return x * 2
+
+contextual_process = ContextualFunc(process_data, my_resource())
+
+# Use it as a context manager
+with contextual_process:
+    result = contextual_process(21)  # prints: Setting up resource
+    print(result)  # 42
+# prints: Cleaning up resource
 ```
 
-With a variety of sources, target storage systems, etc.
+### `any_value_is_none`
+
+Simple utility to check if any value in a mapping is None:
+
+```python
+from know import any_value_is_none
+
+any_value_is_none({'a': 1, 'b': 2})        # False
+any_value_is_none({'a': 1, 'b': None})     # True
+```
+
+### `ContextFanout`
+
+Multi-context manager (imported from `i2` package) for managing multiple contexts at once.
 
 
-![image](https://user-images.githubusercontent.com/1906276/143310662-a39d146a-7655-4b65-8e7a-d981d366becb.png)
+# Historical Examples
 
-
-# Examples
+> **Note**: The following examples demonstrate audio recording and storage capabilities that were part of earlier versions of `know`. These examples still work but represent functionality that may be better suited for specialized packages. The examples are kept here for reference and backward compatibility.
 
 ## Recording Audio
 
