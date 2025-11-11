@@ -205,7 +205,15 @@ def always_false(x: Any) -> False:
 
 
 def any_value_is_none(d: Mapping):
-    """Returns True if any value of the mapping is None"""
+    """Returns True if any value of the mapping is None
+
+    >>> any_value_is_none({'a': 1, 'b': 2, 'c': 3})
+    False
+    >>> any_value_is_none({'a': 1, 'b': None, 'c': 3})
+    True
+    >>> any_value_is_none({})
+    False
+    """
     return any(d[k] is None for k in d)
 
 
