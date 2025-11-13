@@ -2,7 +2,7 @@
 
 # --------------------------------------------------------------------------------------
 # General
-from typing import Callable
+from collections.abc import Callable
 from i2 import Pipe
 from i2.deco import FuncFactory
 from collections import Counter, ChainMap

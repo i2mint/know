@@ -1,7 +1,7 @@
 """A module to jot down ideas around configuration operations"""
 
 import pprint
-from typing import Mapping, Callable
+from collections.abc import Mapping, Callable
 from dol.sources import AttrContainer, AttrDict
 from i2 import Sig
 
@@ -230,7 +230,7 @@ render_3 = FuncFactory(View)(
 
 from operator import attrgetter, methodcaller, or_
 from functools import reduce
-from typing import Iterable
+from collections.abc import Iterable
 
 disjunction = partial(reduce, or_)
 disjunction = '''disjunction([a, b, ...]) is equivalent to (a or b or ...)

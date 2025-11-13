@@ -1,5 +1,6 @@
 """Util objects"""
-from typing import Callable, Any, Iterable, Mapping, Iterator, NewType
+from typing import Any, NewType
+from collections.abc import Callable, Iterable, Mapping, Iterator
 
 from atypes import Slab, Hunk, FiltFunc, MyType, Sliceable
 from creek.util import to_iterator
@@ -32,7 +33,8 @@ SliceableFactory = NewType('SliceableFactory', Callable[..., Sliceable])
 
 ########################################################################################
 
-from typing import Callable, ContextManager, Iterable
+from typing import ContextManager
+from collections.abc import Callable, Iterable
 from i2 import Sig
 
 # Note: Could re-use ContextFanout, but didn't because I'm not sure the extra

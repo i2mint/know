@@ -1,10 +1,10 @@
 """
 An app to take care of the initial 'sourcing' part of the data prep of audio ML
 """
-from typing import Mapping
+from collections.abc import Mapping
 from know.boxes import *
 from functools import partial
-from typing import Callable, Iterable
+from collections.abc import Callable, Iterable
 from front import APP_KEY, RENDERING_KEY, ELEMENT_KEY, NAME_KEY
 from i2 import Pipe, Sig
 from front.crude import Crudifier, prepare_for_crude_dispatch

@@ -1,7 +1,8 @@
 """To explore different architectures"""
 
 from dataclasses import dataclass
-from typing import Callable, Iterable, Any, Mapping, Iterator
+from typing import Any
+from collections.abc import Callable, Iterable, Mapping, Iterator
 from atypes import Slab, MyType
 from i2 import Pipe
 from i2.multi_object import FuncFanout, ContextFanout, MultiObj

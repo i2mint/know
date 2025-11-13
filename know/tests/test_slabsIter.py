@@ -3,7 +3,8 @@ from dol import wrap_kvs, filt_iter, FilesOfZip
 import soundfile as sf
 import io
 from graze import Graze
-from typing import Mapping, Callable, Any, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
+from collections.abc import Mapping, Callable
 import pytest
 import logging
 import pandas as pd

@@ -9,7 +9,8 @@ from atypes import Slab
 from creek import Creek
 from creek.util import to_iterator
 from i2 import MultiObj, FuncFanout, ContextFanout, Pipe
-from typing import Callable, Iterable, Iterator, Any, Mapping, Dict
+from typing import Any, Dict
+from collections.abc import Callable, Iterable, Iterator, Mapping
 from i2 import Pipe
 from know.util import (
     Name,
@@ -293,7 +294,7 @@ class DictZip:
 
 @dataclass
 class LiveProcess:
-    streams: Dict[StreamId, Stream]
+    streams: dict[StreamId, Stream]
     slab_callback: SlabCallback = print
     walk: Callable = DictZip
 

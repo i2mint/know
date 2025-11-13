@@ -10,7 +10,8 @@ experience of a drag and drop GUI.
 from dol.sources import AttrContainer
 from operator import itemgetter
 import numpy as np
-from typing import Any, Iterable, Tuple, Optional, Callable
+from typing import Any, Tuple, Optional
+from collections.abc import Iterable, Callable
 from inspect import signature
 
 from slang.chunkers import fixed_step_chunker, mk_chunker
@@ -41,8 +42,8 @@ from atypes import WfStore
 
 
 def _attr_name_and_obj_pairs(
-    o: Any, obj_filt: Optional[Callable] = None
-) -> Iterable[Tuple[str, Any]]:
+    o: Any, obj_filt: Callable | None = None
+) -> Iterable[tuple[str, Any]]:
     obj_filt = obj_filt or (lambda x: True)
     for attr_name in dir(o):
         attr_obj = getattr(o, attr_name)

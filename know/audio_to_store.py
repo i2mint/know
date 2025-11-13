@@ -30,7 +30,8 @@ print(f"{len(wfs)=}")
 """
 
 from time import time
-from typing import Protocol, Tuple, NewType, Any, Callable, Union
+from typing import Protocol, Tuple, NewType, Any, Union
+from collections.abc import Callable
 from operator import itemgetter
 
 from atypes import WaveformBytes, Waveform, IntervalSlice, Segment
@@ -51,7 +52,7 @@ def print_signature(func):
 
 SessionId = NewType('SessionId', int)
 BlockId = NewType('BlockId', int)
-SessionBlockTuple = NewType('SessionBlockTuple', Tuple[SessionId, BlockId])
+SessionBlockTuple = NewType('SessionBlockTuple', tuple[SessionId, BlockId])
 
 
 class LiveDataSingleSourceType(Protocol):
@@ -362,9 +363,9 @@ def persistence_demo(rootdir=None):
 
 def demo_live_data_acquisition(
     live_source=LiveWf,
-    store: Union[
-        SessionBlockStoreType, Callable[[], SessionBlockStoreType]
-    ] = mk_session_block_wf_store,
+    store: (
+        SessionBlockStoreType | Callable[[], SessionBlockStoreType]
+    ) = mk_session_block_wf_store,
     chk_size=100_000,
     end_idx=300_000,
     logger=None,
@@ -393,9 +394,9 @@ def iterate_chunks(src, chk_size, chk_step=None, start_idx=0, end_idx=None):
 
 def audio_only_live_process(
     live_source=LiveWf,
-    store: Union[
-        SessionBlockStoreType, Callable[[], SessionBlockStoreType]
-    ] = mk_session_block_wf_store,
+    store: (
+        SessionBlockStoreType | Callable[[], SessionBlockStoreType]
+    ) = mk_session_block_wf_store,
     chk_size=100_000,
     end_idx=300_000,
     logger=None,

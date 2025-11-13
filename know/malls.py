@@ -2,7 +2,8 @@
 
 import os
 from functools import partial
-from typing import Iterable, Mapping, Union, Callable
+from typing import Union
+from collections.abc import Iterable, Mapping, Callable
 from tempfile import gettempdir
 from dol import Files, wrap_kvs
 from dol.filesys import ensure_dir, mk_dirs_if_missing
@@ -29,7 +30,7 @@ def mk_mall(
     stores: Mapping = (),
     dflt_store_contents: Mapping = (),
     factories_for_store: Mapping = (),
-    name_to_store: Union[Callable, str] = _dflt_name_to_store,
+    name_to_store: Callable | str = _dflt_name_to_store,
 ):
     """
 

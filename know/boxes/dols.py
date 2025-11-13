@@ -4,7 +4,8 @@ Tools to make dols (data object layers).
 That is, to make objects that manage the reading and/or writing of persisted data.
 
 """
-from typing import Callable, Iterable, Union
+from typing import Union
+from collections.abc import Callable, Iterable
 from functools import partial
 from operator import itemgetter
 import re
@@ -18,7 +19,7 @@ from dol import wrap_kvs, filt_iter, FilesOfZip, Files, Pipe
 _ = filt_iter, FilesOfZip, Files
 
 
-def filter_keys(filt: Union[Callable, Iterable]):
+def filter_keys(filt: Callable | Iterable):
     return filt_iter(filt=filt)
 
 
