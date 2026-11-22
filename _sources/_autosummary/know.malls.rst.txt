@@ -1,0 +1,18 @@
+know.malls
+==========
+
+.. automodule:: know.malls
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      mk_mall
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      DillFiles
+   

@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="alternate" type="text/markdown" href="index.html.md">
+<link rel="describedby" href="llms.txt" type="text/markdown">
+<link rel="alternate" type="text/markdown" href="index.html.md">
+<link rel="describedby" href="llms.txt">
+    <title>know &#8212; know</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx_autodoc_typehints.css?v=057ac668" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/epythet.css?v=7fa43997" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
+
+    <script src="_static/documentation_options.js?v=3d116926"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API reference" href="api.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.1.19" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="#">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">know</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/i2mint/know" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page" aria-expanded="false" aria-controls="pst-secondary-sidebar-modal">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/i2mint/know" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none"></div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <!-- generated by epythet -->
+<section id="know">
+<h1>know<a class="headerlink" href="#know" title="Link to this heading">#</a></h1>
+<p>Build live stream tools</p>
+<p>To install:	<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">know</span></code></p>
+<p>The tools are made to be able to create live streams of data
+(e.g. from sensors) and funnel them into proceses with a consistent interfaces.
+One important process being the process that will store all or part of
+the data, through a simple storage-system-agnositic facade.</p>
+<blockquote>
+<div><p><strong>Note on Package Evolution</strong>: Core streaming functionality (including <code class="docutils literal notranslate"><span class="pre">SlabsIter</span></code>) has been moved to the <a class="reference external" href="https://github.com/i2mint/meshed"><code class="docutils literal notranslate"><span class="pre">meshed</span></code></a> package (formerly in <a class="reference external" href="https://github.com/i2mint/creek"><code class="docutils literal notranslate"><span class="pre">creek</span></code></a>). The <code class="docutils literal notranslate"><span class="pre">know</span></code> package now focuses on providing utility tools for context management and data processing. For slab iteration and stream processing, please use <code class="docutils literal notranslate"><span class="pre">meshed.slabs</span></code>.</p>
+</div></blockquote>
+<section id="main-exports">
+<h2>Main Exports<a class="headerlink" href="#main-exports" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">know</span></code> package currently exports the following main utilities:</p>
+<section id="contextualfunc">
+<h3><code class="docutils literal notranslate"><span class="pre">ContextualFunc</span></code><a class="headerlink" href="#contextualfunc" title="Link to this heading">#</a></h3>
+<p>Wrap a function so that it’s also a multi-context context manager. This is useful when a function needs specific resources managed by context managers.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">know</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContextualFunc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+
+<span class="nd">@contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_resource</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'Setting up resource'</span><span class="p">)</span>
+    <span class="k">yield</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'Cleaning up resource'</span><span class="p">)</span>
+
+<span class="c1"># Wrap your function with the context</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">process_data</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span>
+
+<span class="n">contextual_process</span> <span class="o">=</span> <span class="n">ContextualFunc</span><span class="p">(</span><span class="n">process_data</span><span class="p">,</span> <span class="n">my_resource</span><span class="p">())</span>
+
+<span class="c1"># Use it as a context manager</span>
+<span class="k">with</span> <span class="n">contextual_process</span><span class="p">:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">contextual_process</span><span class="p">(</span><span class="mi">21</span><span class="p">)</span>  <span class="c1"># prints: Setting up resource</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>  <span class="c1"># 42</span>
+<span class="c1"># prints: Cleaning up resource</span>
+</pre></div>
+</div>
+</section>
+<section id="any-value-is-none">
+<span id="any_value_is_none"></span><h3><code class="docutils literal notranslate"><span class="pre">any_value_is_none</span></code><a class="headerlink" href="#any-value-is-none" title="Link to this heading">#</a></h3>
+<p>Simple utility to check if any value in a mapping is None:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">know</span><span class="w"> </span><span class="kn">import</span> <span class="n">any_value_is_none</span>
+
+<span class="n">any_value_is_none</span><span class="p">({</span><span class="s1">'a'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>        <span class="c1"># False</span>
+<span class="n">any_value_is_none</span><span class="p">({</span><span class="s1">'a'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>     <span class="c1"># True</span>
+</pre></div>
+</div>
+</section>
+<section id="contextfanout">
+<h3><code class="docutils literal notranslate"><span class="pre">ContextFanout</span></code><a class="headerlink" href="#contextfanout" title="Link to this heading">#</a></h3>
+<p>Multi-context manager (imported from <code class="docutils literal notranslate"><span class="pre">i2</span></code> package) for managing multiple contexts at once.</p>
+</section>
+</section>
+</section>
+<section id="historical-examples">
+<h1>Historical Examples<a class="headerlink" href="#historical-examples" title="Link to this heading">#</a></h1>
+<blockquote>
+<div><p><strong>Note</strong>: The following examples demonstrate audio recording and storage capabilities that were part of earlier versions of <code class="docutils literal notranslate"><span class="pre">know</span></code>. These examples still work but represent functionality that may be better suited for specialized packages. The examples are kept here for reference and backward compatibility.</p>
+</div></blockquote>
+<section id="recording-audio">
+<h2>Recording Audio<a class="headerlink" href="#recording-audio" title="Link to this heading">#</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">know.audio_to_store</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">wfs</span> <span class="o">=</span> <span class="n">demo_live_data_acquisition</span><span class="p">(</span><span class="n">chk_size</span><span class="o">=</span><span class="mi">100_000</span><span class="p">,</span> <span class="n">end_idx</span><span class="o">=</span><span class="mi">300_000</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="nb">print</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">wfs</span><span class="p">)</span><span class="si">=}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">end_idx=300_000</span></code> is there to automatically stop the demo after 300 thousand bytes are acquired
+(at the default rates that’s about 1.5 seconds).</p>
+<p>If you specify <code class="docutils literal notranslate"><span class="pre">end_idx=None</span></code>, the process will run until you interrupt it.</p>
+</section>
+<section id="recording-audio-with-more-control">
+<h2>Recording Audio, with more control<a class="headerlink" href="#recording-audio-with-more-control" title="Link to this heading">#</a></h2>
+<p>Here’s what’s actually being fed to the demo when you don’t specify any explicit <code class="docutils literal notranslate"><span class="pre">live_source</span></code> or <code class="docutils literal notranslate"><span class="pre">store</span></code>.
+You can use this to try different combinations of specs out:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">know.audio_to_store</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">wfs</span> <span class="o">=</span> <span class="n">demo_live_data_acquisition</span><span class="p">(</span>
+    <span class="n">live_source</span><span class="o">=</span><span class="n">LiveWf</span><span class="p">(</span>
+        <span class="n">input_device_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># if None, will try to guess the device index</span>
+        <span class="n">sr</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span>
+        <span class="n">sample_width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">chk_size</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
+        <span class="n">stream_buffer_size_s</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">store</span><span class="o">=</span><span class="n">mk_session_block_wf_store</span><span class="p">(</span>
+        <span class="n">rootdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># will choose one for you</span>
+        <span class="c1"># template examples: '{session}_{block}.wav' '{session}/d/{block}.pcm', '{session}/{block}', 'demo/s_{session}/blocks/{block}.wav'</span>
+        <span class="n">template</span><span class="o">=</span><span class="s1">'</span><span class="si">{session}</span><span class="s1">/d/</span><span class="si">{block}</span><span class="s1">.pcm'</span><span class="p">,</span>  <span class="c1"># </span>
+        <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s1">'\d+'</span><span class="p">,</span>
+        <span class="n">value_trans</span><span class="o">=</span><span class="nb">int</span>
+    <span class="p">),</span>
+    <span class="n">chk_size</span><span class="o">=</span><span class="mi">100_000</span><span class="p">,</span>
+    <span class="n">end_idx</span><span class="o">=</span><span class="mi">300_000</span><span class="p">,</span>
+    <span class="n">logger</span><span class="o">=</span><span class="nb">print</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">wfs</span><span class="p">)</span><span class="si">=}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>What you want to see above, is how you can easily change the folder/file template you use to store data.</p>
+<p>Below, we’ll also show how you can change the data storage system backend completely,
+using a mongo database instead!</p>
+</section>
+<section id="id1">
+<h2><a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<p>Here, see how you can use MongoDB to store your data.
+For this, you’ll need to have a <a class="reference external" href="https://www.mongodb.com/">mongoDB</a> server running locally,
+and <a class="reference external" href="https://pypi.org/project/mongodol/">mongodol</a> installed (<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">mongodol</span></code>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">know.audio_to_store</span><span class="w"> </span><span class="kn">import</span> <span class="n">mk_mongo_single_data</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_cast_data_field_to_json_list</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+
+
+<span class="n">play_nice_with_json</span> <span class="o">=</span> <span class="n">wrap_kvs</span><span class="p">(</span><span class="n">data_of_obj</span><span class="o">=</span><span class="n">_cast_data_field_to_json_list</span><span class="p">)</span>
+
+<span class="n">mongo_store</span> <span class="o">=</span> <span class="n">play_nice_with_json</span><span class="p">(</span>
+    <span class="n">mk_mongo_single_data</span><span class="p">(</span>
+        <span class="n">mgc</span><span class="o">=</span><span class="s1">'mongodol/test'</span><span class="p">,</span>  <span class="c1"># enter here, the `db_name/collection_name` you want to use (uses local mongo client)</span>
+        <span class="n">key_fields</span><span class="o">=</span><span class="p">(</span><span class="s1">'session'</span><span class="p">,</span> <span class="s1">'block'</span><span class="p">),</span>
+        <span class="n">data_field</span><span class="o">=</span><span class="s1">'data'</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">wfs</span> <span class="o">=</span> <span class="n">demo_live_data_acquisition</span><span class="p">(</span>
+    <span class="n">live_source</span><span class="o">=</span><span class="n">LiveWf</span><span class="p">(</span>
+        <span class="n">input_device_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># if None, will try to guess the device index</span>
+        <span class="n">sr</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span>
+        <span class="n">sample_width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">chk_size</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span>
+        <span class="n">stream_buffer_size_s</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">store</span><span class="o">=</span><span class="n">mongo_store</span><span class="p">,</span>
+    <span class="n">chk_size</span><span class="o">=</span><span class="mi">100_000</span><span class="p">,</span>
+    <span class="n">end_idx</span><span class="o">=</span><span class="mi">300_000</span><span class="p">,</span>
+    <span class="n">logger</span><span class="o">=</span><span class="nb">print</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">wfs</span><span class="p">)</span><span class="si">=}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="epythet-aggregates">This documentation as a single file: <a href="know.md">know.md</a> (Markdown, for agents).</p>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+</section>
+
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-22 22:54 UTC from <a href="https://github.com/i2mint/know/commit/179055569fb18f701807dd3968ffe3ccb3a0d406">1790555</a> (master) · know 0.1.19 · <a href="about-this-build.html">about this build</a></p>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="right-next"
+       href="api.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">API reference</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal" tabindex="-1"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">know</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#main-exports">Main Exports</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#contextualfunc"><code class="docutils literal notranslate"><span class="pre">ContextualFunc</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#any-value-is-none"><code class="docutils literal notranslate"><span class="pre">any_value_is_none</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#contextfanout"><code class="docutils literal notranslate"><span class="pre">ContextFanout</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#historical-examples">Historical Examples</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#recording-audio">Recording Audio</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#recording-audio-with-more-control">Recording Audio, with more control</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"></a></li>
+</ul>
+</li>
+</ul>
+
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/index.md.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

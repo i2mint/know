@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "built_at": "2026-11-22T22:54:57Z",
+  "package": {
+    "name": "know",
+    "version": "0.1.19",
+    "display_name": "know",
+    "source": "pyproject.toml"
+  },
+  "git": {
+    "available": true,
+    "commit": "179055569fb18f701807dd3968ffe3ccb3a0d406",
+    "short_commit": "1790555",
+    "branch": "master",
+    "tags": [],
+    "dirty": false,
+    "remote_url": "https://github.com/i2mint/know",
+    "commit_url": "https://github.com/i2mint/know/commit/179055569fb18f701807dd3968ffe3ccb3a0d406",
+    "error": null
+  },
+  "ci": {
+    "provider": "github",
+    "repository": "i2mint/know",
+    "sha": "179055569fb18f701807dd3968ffe3ccb3a0d406",
+    "sha_in_history": true,
+    "ref": "refs/heads/master",
+    "ref_name": "master",
+    "run_id": "45080117386",
+    "run_url": "https://github.com/i2mint/know/actions/runs/45080117386",
+    "server_url": "https://github.com"
+  },
+  "tools": {
+    "epythet": "0.2.23",
+    "sphinx": "9.1.1",
+    "docutils": "0.22.4",
+    "python": "3.12.16"
+  },
+  "config": {
+    "theme": "auto",
+    "html_theme": "pydata_sphinx_theme",
+    "accent": "#464e9f",
+    "mode": "auto",
+    "api_generator": "autosummary",
+    "ignore": [
+      "tests/",
+      "scrap/",
+      "examples/"
+    ],
+    "agent_outputs": true,
+    "aggregates": [
+      "md"
+    ],
+    "ai_artifacts": true,
+    "provenance": true,
+    "docs_dir": "docsrc"
+  },
+  "site": {
+    "modules_documented": 10,
+    "objects_documented": 20
+  },
+  "pypi": {
+    "checked": true,
+    "latest": "0.1.19",
+    "relation": "same",
+    "error": null
+  },
+  "reproduce": "git clone https://github.com/i2mint/know && cd know\ngit checkout 179055569fb18f701807dd3968ffe3ccb3a0d406\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "warnings": [],
+  "alignment": {
+    "aligned": true,
+    "notes": []
+  }
+}

@@ -1,0 +1,13 @@
+know.boxes.general
+==================
+
+.. automodule:: know.boxes.general
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      identity
+      mk_pipe
+   

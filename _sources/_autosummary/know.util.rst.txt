@@ -1,0 +1,28 @@
+know.util
+=========
+
+.. automodule:: know.util
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      always_false
+      always_true
+      any_value_is_none
+      asis
+      fixed_step_chunk_intervals
+      iterate
+      iterate_dict_values
+      let_through
+      pairwise
+      slices_gen
+      source_slices
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ContextualFunc
+   
