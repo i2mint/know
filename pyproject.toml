@@ -187,3 +187,19 @@ ignore_paths = [
     "scrap/",
     "examples/",
 ]
+
+[tool.wads.ops.portaudio]
+description = "PortAudio - the audio I/O library that pyaudio (via audiostream2py) builds against"
+url = "http://www.portaudio.com/"
+
+[tool.wads.ops.portaudio.check]
+linux = "ldconfig -p | grep -q libportaudio"
+macos = "brew list portaudio"
+windows = "python -c \"import pyaudio\""
+
+[tool.wads.ops.portaudio.install]
+linux = [
+    "sudo apt-get -qq update",
+    "sudo apt-get install -y portaudio19-dev",
+]
+macos = "brew install portaudio"
