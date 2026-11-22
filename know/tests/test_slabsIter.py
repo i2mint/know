@@ -83,11 +83,16 @@ test_1 = dict(
 )
 def test_slabsiter(test_params):
     # get the data from a dropbox url
-    annotations, wf_store = data_for_url(
-        test_params['url'],
-        get_wf_store_factory=get_wf_store_cls,
-        key_to_annots_csv='plc_0.csv',
-    )
+    import zipfile
+
+    try:
+        annotations, wf_store = data_for_url(
+            test_params['url'],
+            get_wf_store_factory=get_wf_store_cls,
+            key_to_annots_csv='plc_0.csv',
+        )
+    except zipfile.BadZipFile:
+        pytest.skip('test data URL no longer serves the zip (the dropbox link now returns an HTML page)')
 
     # Make all the iterators needed. They are aligned in the sense that each "next" yields aligned data
     wf_iter = (wf_store[store_key] for store_key in pd.unique(annotations['filename']))
